@@ -10,7 +10,7 @@ export interface MusicStyle {
   name: string;
   description: string;
   icon: string;
-  tags: string[];
+  sunoDescription: string;
 }
 
 export interface EnhancementOptions {
@@ -69,42 +69,56 @@ export function getMusicStyles(): MusicStyle[] {
       name: "Trap",
       description: "Hard-hitting bass and 808s",
       icon: "bass",
-      tags: ["trap drums", "808 bass", "dark synths", "hi-hats"]
+      sunoDescription: "Heavy 808 bass, punchy drums, and dark synths create an atmospheric trap soundscape. Hi-hats roll with precision while sub-bass rumbles beneath. Minimal melody gives space for vocals while maintaining an aggressive edge."
     },
     {
       id: "rnb",
       name: "R&B",
       description: "Smooth, soulful production",
       icon: "music",
-      tags: ["melodic", "soul samples", "smooth drums", "vocal harmonies"]
+      sunoDescription: "Lush chord progressions and soulful instrumentation blend with mellow drums. Warm bass lines support smooth vocals, while subtle keys and atmospheric pads create depth. Organic percussion adds rhythm to this intimate sonic palette."
     },
     {
       id: "boom-bap",
       name: "Boom Bap",
       description: "Classic hip-hop drums",
       icon: "drum",
-      tags: ["vinyl samples", "heavy drums", "jazz loops", "boom bap drums"]
+      sunoDescription: "Gritty vinyl samples and jazz loops create nostalgic texture. Hard-hitting kicks and snappy snares define the classic boom-bap rhythm. Dusty breaks and horn sections punctuate the groove, while vintage bass lines anchor this golden-era sound."
     },
     {
       id: "drill",
       name: "Drill",
       description: "Dark, sliding 808s",
       icon: "trending-up",
-      tags: ["sliding 808s", "dark melodies", "punchy drums", "energetic"]
+      sunoDescription: "Sliding 808 bass notes create menacing tension beneath dark melodies. Rapid hi-hats and punchy drums drive the rhythm with relentless energy. Minimal synthetic elements create space for vocals while maintaining a cold, street edge."
     },
     {
       id: "pop-rap",
       name: "Pop Rap",
       description: "Radio-friendly production",
       icon: "radio",
-      tags: ["catchy hooks", "clean production", "bright synths", "melodic"]
+      sunoDescription: "Bright synthesizers and catchy hooks blend with clean, punchy production. Commercial polish gives way to radio-friendly structures and infectious melodies. Modern drum programming supports upbeat energy while maintaining hip-hop credibility."
     },
     {
       id: "lofi",
       name: "Lo-Fi",
       description: "Mellow, chill beats",
       icon: "coffee",
-      tags: ["vinyl crackle", "jazz samples", "chill drums", "relaxed tempo"]
+      sunoDescription: "Vinyl crackle and tape hiss add warmth to jazzy samples and dusty drums. Relaxed tempos create a laid-back atmosphere perfect for focus or relaxation. Filtered piano loops and subtle bass create a nostalgic, dreamy soundscape."
+    },
+    {
+      id: "rock",
+      name: "Rock",
+      description: "Electric guitars and live drums",
+      icon: "guitar",
+      sunoDescription: "Crunchy electric guitars, punchy bass, and commanding drums introduce a bold theme. Alternating melodic sections use snare-driven, syncopated rhythms. Clean tones and octave melodies build into a raucous, up-tempo reprise with layered instrumentation."
+    },
+    {
+      id: "future-funk",
+      name: "Future Funk",
+      description: "Retro-futuristic disco vibes",
+      icon: "disc",
+      sunoDescription: "Atmospheric city pop samples blend with funky bass lines and hypnotic DJ beats. Vintage synthesizers create nostalgic melodies while modern production techniques add punch. Disco influence merges with electronic elements for a retro-futuristic dance experience."
     }
   ];
 }

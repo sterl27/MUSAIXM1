@@ -54,13 +54,15 @@ export async function enhanceLyrics(
     let bpmRangeKey = personaId;
     let tags = [...defaultSunoTags];
     
-    // If a music style is selected, use its BPM range and tags
+    // If a music style is selected, use its BPM range and description
     if (options.musicStyle) {
       const musicStyle = getMusicStyleById(options.musicStyle);
       if (musicStyle) {
         bpmRangeKey = options.musicStyle;
-        // Add the music style's tags to our tag pool
-        tags = [...musicStyle.tags, ...tags];
+        // Use the music style's Suno description
+        enhancedLines.push(`[SUNO: ${musicStyle.sunoDescription}]`);
+        enhancedLines.push("");
+        return enhancedLines.join("\n");
       }
     }
     
@@ -96,19 +98,26 @@ export async function enhanceLyrics(
     // Add occasional Suno production direction
     if (options.includeSunoTags && (index === lines.length - 1 || Math.random() < 0.2)) {
       if (Math.random() < 0.5) {
-        // Determine which tags to use
-        let tags = [...defaultSunoTags];
-        
-        // If a music style is selected, prioritize its tags
+        // Add a Suno direction based on music style or default
         if (options.musicStyle) {
           const musicStyle = getMusicStyleById(options.musicStyle);
           if (musicStyle) {
-            tags = [...musicStyle.tags, ...tags];
+            // Extract a random segment from the Suno description
+            const segments = musicStyle.sunoDescription.split('.');
+            const randomSegment = segments[Math.floor(Math.random() * segments.length)].trim();
+            
+            enhancedLines.push("");
+            enhancedLines.push(`[SUNO: ${randomSegment}]`);
+          } else {
+            // Fallback to default tags
+            enhancedLines.push("");
+            enhancedLines.push(`[SUNO: add ${defaultSunoTags[Math.floor(Math.random() * defaultSunoTags.length)]} here]`);
           }
+        } else {
+          // Use default tags
+          enhancedLines.push("");
+          enhancedLines.push(`[SUNO: add ${defaultSunoTags[Math.floor(Math.random() * defaultSunoTags.length)]} here]`);
         }
-        
-        enhancedLines.push("");
-        enhancedLines.push(`[SUNO: add ${tags[Math.floor(Math.random() * tags.length)]} here]`);
       }
     }
   });

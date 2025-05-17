@@ -8,7 +8,8 @@ import {
   Coffee, 
   CheckCircle, 
   Disc,
-  Music 
+  Music,
+  Guitar
 } from "lucide-react";
 
 interface MusicStyleSelectorProps {
@@ -37,6 +38,10 @@ export default function MusicStyleSelector({
         return <Radio className="text-secondary" />;
       case "coffee":
         return <Coffee className="text-secondary" />;
+      case "guitar":
+        return <Guitar className="text-secondary" />;
+      case "disc":
+        return <Disc className="text-secondary" />;
       default:
         return <Music2 className="text-secondary" />;
     }
