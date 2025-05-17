@@ -1,10 +1,10 @@
-import { EnhancementOptions } from "@/lib/types";
+import { EnhancementOptions, getMusicStyleById } from "@/lib/types";
 
 // Effects available for FX cues
 const fxCues = ["ECHO", "REVERB", "DELAY", "DISTORT", "FILTER", "CHORUS"];
 
-// Suno production tags
-const sunoTags = [
+// Default Suno production tags
+const defaultSunoTags = [
   "dirty south beat", 
   "trap drums", 
   "808 bass", 
@@ -16,10 +16,19 @@ const sunoTags = [
 
 // BPM ranges for different styles
 const bpmRanges = {
+  // Persona-based BPM ranges
   "outkast": [85, 95],
   "goodiemob": [75, 90],
   "liljon": [95, 110],
-  "ti": [65, 85]
+  "ti": [65, 85],
+  
+  // Music style-based BPM ranges
+  "trap": [130, 150],
+  "rnb": [60, 80],
+  "boom-bap": [85, 95],
+  "drill": [140, 150],
+  "pop-rap": [90, 110],
+  "lofi": [70, 85]
 };
 
 /**
@@ -41,9 +50,23 @@ export async function enhanceLyrics(
   
   // Add a Suno tag at the beginning if enabled
   if (options.includeSunoTags) {
-    const bpmRange = bpmRanges[personaId as keyof typeof bpmRanges] || [85, 95];
+    // Determine which BPM range to use based on music style or persona
+    let bpmRangeKey = personaId;
+    let tags = [...defaultSunoTags];
+    
+    // If a music style is selected, use its BPM range and tags
+    if (options.musicStyle) {
+      const musicStyle = getMusicStyleById(options.musicStyle);
+      if (musicStyle) {
+        bpmRangeKey = options.musicStyle;
+        // Add the music style's tags to our tag pool
+        tags = [...musicStyle.tags, ...tags];
+      }
+    }
+    
+    const bpmRange = bpmRanges[bpmRangeKey as keyof typeof bpmRanges] || [85, 95];
     const bpm = Math.floor(Math.random() * (bpmRange[1] - bpmRange[0] + 1)) + bpmRange[0];
-    const randomTag = sunoTags[Math.floor(Math.random() * sunoTags.length)];
+    const randomTag = tags[Math.floor(Math.random() * tags.length)];
     enhancedLines.push(`[SUNO: ${randomTag}, ${bpm} BPM]`);
     enhancedLines.push("");
   }
@@ -57,6 +80,11 @@ export async function enhanceLyrics(
     
     let enhancedLine = enhanceLineByPersona(line, personaId, options.flowStrength);
     
+    // Apply music style-specific enhancements if selected
+    if (options.musicStyle) {
+      enhancedLine = enhanceLineByMusicStyle(enhancedLine, options.musicStyle, options.flowStrength);
+    }
+    
     // Add FX cue to approximately 1/4 of lines if enabled
     if (options.includeFxCues && Math.random() < 0.25) {
       const randomFx = fxCues[Math.floor(Math.random() * fxCues.length)];
@@ -68,8 +96,19 @@ export async function enhanceLyrics(
     // Add occasional Suno production direction
     if (options.includeSunoTags && (index === lines.length - 1 || Math.random() < 0.2)) {
       if (Math.random() < 0.5) {
+        // Determine which tags to use
+        let tags = [...defaultSunoTags];
+        
+        // If a music style is selected, prioritize its tags
+        if (options.musicStyle) {
+          const musicStyle = getMusicStyleById(options.musicStyle);
+          if (musicStyle) {
+            tags = [...musicStyle.tags, ...tags];
+          }
+        }
+        
         enhancedLines.push("");
-        enhancedLines.push(`[SUNO: add ${sunoTags[Math.floor(Math.random() * sunoTags.length)]} here]`);
+        enhancedLines.push(`[SUNO: add ${tags[Math.floor(Math.random() * tags.length)]} here]`);
       }
     }
   });
@@ -148,6 +187,142 @@ function enhanceLineByPersona(line: string, personaId: string, flowStrength: num
   }
   
   return enhancedLine;
+}
+
+/**
+ * Apply music style-specific enhancements to a line of lyrics
+ */
+function enhanceLineByMusicStyle(line: string, musicStyleId: string, flowStrength: number): string {
+  // Skip enhancement if the strength is minimal
+  if (flowStrength <= 1) return line;
+  
+  let enhancedLine = line;
+  
+  // Replace common words with music style-specific vocabulary
+  switch (musicStyleId) {
+    case "trap":
+      // Trap music style transformations
+      enhancedLine = enhancedLine
+        .replace(/money/gi, "bands")
+        .replace(/drugs/gi, "work")
+        .replace(/friends/gi, "squad")
+        .replace(/house/gi, "trap")
+        .replace(/car/gi, "whip")
+        .replace(/jewelry/gi, "ice");
+      break;
+    
+    case "rnb":
+      // R&B transformations
+      enhancedLine = enhancedLine
+        .replace(/love/gi, "lovin'")
+        .replace(/girl/gi, "shorty")
+        .replace(/relationship/gi, "vibe")
+        .replace(/dance/gi, "groove")
+        .replace(/feeling/gi, "feelin'");
+      break;
+      
+    case "boom-bap":
+      // Boom bap transformations
+      enhancedLine = enhancedLine
+        .replace(/city/gi, "concrete jungle")
+        .replace(/speak/gi, "spit")
+        .replace(/good/gi, "dope")
+        .replace(/music/gi, "beats")
+        .replace(/rhymes/gi, "bars");
+      break;
+      
+    case "drill":
+      // Drill transformations
+      enhancedLine = enhancedLine
+        .replace(/enemies/gi, "opps")
+        .replace(/area/gi, "block")
+        .replace(/gun/gi, "pole")
+        .replace(/friends/gi, "gang")
+        .replace(/talk/gi, "cap");
+      break;
+      
+    case "pop-rap":
+      // Pop rap transformations
+      enhancedLine = enhancedLine
+        .replace(/party/gi, "function")
+        .replace(/happy/gi, "lit")
+        .replace(/good/gi, "fire")
+        .replace(/excited/gi, "hyped")
+        .replace(/amazing/gi, "legendary");
+      break;
+      
+    case "lofi":
+      // Lo-Fi transformations
+      enhancedLine = enhancedLine
+        .replace(/relax/gi, "vibe")
+        .replace(/think/gi, "reflect")
+        .replace(/remember/gi, "reminisce")
+        .replace(/calm/gi, "chill")
+        .replace(/night/gi, "late night");
+      break;
+  }
+  
+  // Apply more thematic elements for higher flow strength
+  if (flowStrength >= 4) {
+    enhancedLine = addMusicStyleElements(enhancedLine, musicStyleId);
+  }
+  
+  return enhancedLine;
+}
+
+/**
+ * Add additional stylistic elements based on music style
+ */
+function addMusicStyleElements(line: string, musicStyleId: string): string {
+  let result = line;
+  
+  switch (musicStyleId) {
+    case "trap":
+      // Additional trap elements
+      if (Math.random() < 0.3 && result.length < 40) {
+        const adlibs = [", skrrt", ", yeah", ", aye", ", gang"];
+        result += adlibs[Math.floor(Math.random() * adlibs.length)];
+      }
+      break;
+      
+    case "rnb":
+      // Additional R&B elements
+      if (Math.random() < 0.3 && result.length < 40) {
+        result = result.replace(/[.!?]$/, "... baby");
+      }
+      break;
+      
+    case "boom-bap":
+      // Additional boom bap elements
+      if (Math.random() < 0.3) {
+        result = result.replace(/\b(my|the|your)\b/gi, "that");
+      }
+      break;
+      
+    case "drill":
+      // Additional drill elements
+      if (Math.random() < 0.3) {
+        const endings = [", no cap", ", on foe nem", ", on gang"];
+        result += endings[Math.floor(Math.random() * endings.length)];
+      }
+      break;
+      
+    case "pop-rap":
+      // Additional pop-rap elements
+      if (Math.random() < 0.3) {
+        result = result.replace(/[.!?]$/, "!");
+      }
+      break;
+      
+    case "lofi":
+      // Additional lo-fi elements
+      if (Math.random() < 0.3 && result.length < 40) {
+        result += "... *lo-fi beat plays*";
+      }
+      break;
+  }
+  
+  return result;
 }
 
 /**
