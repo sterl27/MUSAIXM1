@@ -25,6 +25,9 @@ export default function Home() {
     musicStyle: null
   });
   
+  // State for custom Suno descriptions
+  const [customMusicStyleDescription, setCustomMusicStyleDescription] = useState<string>("");
+  
   const { 
     enhancedLyrics, 
     isEnhancing, 
@@ -33,7 +36,18 @@ export default function Home() {
   } = useLyricsEnhancer();
 
   const handleEnhance = () => {
-    enhance({ lyrics, persona: selectedPersona, options });
+    // Create a modified copy of the options with the custom description
+    const enhanceOptions = { ...options };
+    
+    // Include custom music style description if available
+    const enhanceParams = { 
+      lyrics, 
+      persona: selectedPersona, 
+      options: enhanceOptions,
+      customDescription: customMusicStyleDescription 
+    };
+    
+    enhance(enhanceParams);
   };
 
   const handleClearLyrics = () => {
@@ -72,6 +86,7 @@ export default function Home() {
             <MusicStyleSelector
               selectedMusicStyle={options.musicStyle}
               onSelectMusicStyle={handleSelectMusicStyle}
+              onDescriptionChange={setCustomMusicStyleDescription}
             />
             <ToolPanel 
               options={options} 

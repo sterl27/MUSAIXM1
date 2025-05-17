@@ -18,10 +18,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const { lyrics, personaId, options } = validationResult.data;
+      const { lyrics, personaId, options, customDescription } = validationResult.data;
       
       // Process lyrics through AI enhancement
-      const enhancedLyrics = await enhanceLyrics(lyrics, personaId, options);
+      const enhancedLyrics = await enhanceLyrics(lyrics, personaId, options, customDescription);
       
       // Store the lyrics in the database (commented out for now)
       // If user is authenticated, you could save to the database

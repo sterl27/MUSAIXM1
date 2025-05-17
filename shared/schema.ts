@@ -43,7 +43,8 @@ export const enhanceLyricsRequestSchema = z.object({
     includeFxCues: z.boolean(),
     flowStrength: z.number().min(1).max(5),
     musicStyle: z.string().nullable()
-  })
+  }),
+  customDescription: z.string().optional()
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

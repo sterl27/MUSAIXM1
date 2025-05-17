@@ -7,6 +7,7 @@ interface EnhanceParams {
   lyrics: string;
   persona: Persona;
   options: EnhancementOptions;
+  customDescription?: string;
 }
 
 interface EnhanceResponse {
@@ -18,11 +19,12 @@ export function useLyricsEnhancer() {
   const [error, setError] = useState<string | null>(null);
 
   const enhanceMutation = useMutation({
-    mutationFn: async ({ lyrics, persona, options }: EnhanceParams) => {
+    mutationFn: async ({ lyrics, persona, options, customDescription }: EnhanceParams) => {
       const res = await apiRequest("POST", "/api/enhance", {
         lyrics,
         personaId: persona.id,
-        options
+        options,
+        customDescription
       });
       return res.json() as Promise<EnhanceResponse>;
     },
