@@ -2,11 +2,12 @@ import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PersonaSelector from "@/components/PersonaSelector";
+import MusicStyleSelector from "@/components/MusicStyleSelector";
 import ToolPanel from "@/components/ToolPanel";
 import LyricsInput from "@/components/LyricsInput";
 import OutputPanel from "@/components/OutputPanel";
 import { useLyricsEnhancer } from "@/hooks/useLyricsEnhancer";
-import { Persona, EnhancementOptions } from "@/lib/types";
+import { Persona, EnhancementOptions, getMusicStyleById } from "@/lib/types";
 
 export default function Home() {
   const [lyrics, setLyrics] = useState("");
@@ -20,7 +21,8 @@ export default function Home() {
   const [options, setOptions] = useState<EnhancementOptions>({
     includeSunoTags: true,
     includeFxCues: true,
-    flowStrength: 3
+    flowStrength: 3,
+    musicStyle: null
   });
   
   const { 
@@ -50,6 +52,10 @@ export default function Home() {
   const handleUpdateOptions = (newOptions: Partial<EnhancementOptions>) => {
     setOptions(prev => ({ ...prev, ...newOptions }));
   };
+  
+  const handleSelectMusicStyle = (styleId: string | null) => {
+    setOptions(prev => ({ ...prev, musicStyle: styleId }));
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,6 +68,10 @@ export default function Home() {
             <PersonaSelector 
               selectedPersona={selectedPersona} 
               onSelectPersona={setSelectedPersona} 
+            />
+            <MusicStyleSelector
+              selectedMusicStyle={options.musicStyle}
+              onSelectMusicStyle={handleSelectMusicStyle}
             />
             <ToolPanel 
               options={options} 
