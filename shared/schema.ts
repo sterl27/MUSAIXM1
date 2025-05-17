@@ -41,7 +41,8 @@ export const enhanceLyricsRequestSchema = z.object({
   options: z.object({
     includeSunoTags: z.boolean(),
     includeFxCues: z.boolean(),
-    flowStrength: z.number().min(1).max(5)
+    flowStrength: z.number().min(1).max(5),
+    musicStyle: z.string().nullable()
   })
 });
 
