@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 36% 12%;
+  --foreground: 200 10% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 13% 13%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 12% 19%;
+  --input: 240 10% 15%;
+  --primary: 267 90% 56%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 35 93% 51%;
+  --secondary-foreground: 210 20% 12%;
+  --accent: 160 84% 39%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 267 92% 58%;
+  --radius: 0.5rem;
+
+  --sidebar-background: 240 10% 3.9%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-primary: 267 90% 56%;
+  --sidebar-primary-foreground: 211 100% 99%;
+  --sidebar-accent: 35 93% 51%;
+  --sidebar-accent-foreground: 210 20% 10%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 240 4.9% 83.9%;
+  
+  --chart-1: 267 90% 56%;
+  --chart-2: 35 93% 51%;
+  --chart-3: 160 84% 39%;
+  --chart-4: 220 91% 54%;
+  --chart-5: 335 87% 51%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+@layer components {
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/50 rounded-md;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
+  }
+}
+
+/* Line numbers for textareas */
+.line-numbers {
+  @apply relative;
+  counter-reset: line;
+}
+
+.line-numbers::before {
+  @apply absolute left-10 top-0 bottom-0 w-px bg-border;
+  content: "";
+}
+
+.line-numbers textarea {
+  @apply leading-relaxed pl-2;
+}
+
+.suno-tag {
+  @apply px-3 py-1 bg-muted rounded-full text-sm text-accent-foreground border border-accent/20 flex items-center;
+}
+
+.fx-tag {
+  @apply px-3 py-1 bg-muted rounded-full text-sm text-primary-foreground border border-primary/20 flex items-center;
+}
+
+.annotation {
+  @apply font-mono text-sm;
+}
+
+.suno-annotation {
+  @apply text-secondary text-opacity-80;
+}
+
+.fx-annotation {
+  @apply text-primary text-opacity-80;
+}
