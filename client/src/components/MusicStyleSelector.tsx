@@ -1,5 +1,4 @@
-import { MusicStyle } from "@/lib/types";
-import { getMusicStyles } from "@/lib/types";
+import { MusicStyle, getMusicStyles, getMusicStyleById } from "@/lib/types";
 import { 
   Music2, 
   Drum, 
@@ -9,20 +8,45 @@ import {
   CheckCircle, 
   Disc,
   Music,
-  Guitar
+  Guitar,
+  FileText
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface MusicStyleSelectorProps {
   selectedMusicStyle: string | null;
   onSelectMusicStyle: (styleId: string | null) => void;
+  onDescriptionChange?: (description: string) => void;
 }
 
 export default function MusicStyleSelector({ 
   selectedMusicStyle, 
-  onSelectMusicStyle 
+  onSelectMusicStyle,
+  onDescriptionChange 
 }: MusicStyleSelectorProps) {
   const musicStyles = getMusicStyles();
+  const [styleDescription, setStyleDescription] = useState<string>("");
   
+  // Update the style description when the selected style changes
+  useEffect(() => {
+    if (selectedMusicStyle) {
+      const style = getMusicStyleById(selectedMusicStyle);
+      if (style) {
+        setStyleDescription(style.sunoDescription);
+        // Notify parent component of description change
+        if (onDescriptionChange) {
+          onDescriptionChange(style.sunoDescription);
+        }
+      }
+    } else {
+      setStyleDescription("");
+      // Clear description when no style is selected
+      if (onDescriptionChange) {
+        onDescriptionChange("");
+      }
+    }
+  }, [selectedMusicStyle, onDescriptionChange]);
+
   // Function to render the appropriate icon based on style.icon
   const renderIcon = (iconName: string) => {
     switch (iconName) {
@@ -57,7 +81,7 @@ export default function MusicStyleSelector({
         Select a music style to match your lyrics
       </p>
       
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 mb-4">
         {musicStyles.map((style) => (
           <div className="relative" key={style.id}>
             <input 
@@ -108,6 +132,26 @@ export default function MusicStyleSelector({
             <CheckCircle size={16} />
           </div>
         </div>
+      </div>
+
+      {/* Suno Description Text Box - Always visible */}
+      <div className="mt-4">
+        <div className="flex items-center mb-2">
+          <FileText className="text-secondary mr-2" size={16} />
+          <h3 className="font-medium text-sm">Suno Description</h3>
+        </div>
+        <textarea
+          value={styleDescription}
+          onChange={(e) => {
+            const newDescription = e.target.value;
+            setStyleDescription(newDescription);
+            if (onDescriptionChange) {
+              onDescriptionChange(newDescription);
+            }
+          }}
+          className="w-full min-h-[150px] p-3 bg-background border border-muted rounded-lg resize-none text-sm focus:outline-none focus:ring-1 focus:ring-accent"
+          placeholder={selectedMusicStyle ? "Edit the Suno description" : "Select a music style to see its description"}
+        />
       </div>
     </div>
   );

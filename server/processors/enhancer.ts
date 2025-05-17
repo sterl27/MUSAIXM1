@@ -59,8 +59,11 @@ export async function enhanceLyrics(
       const musicStyle = getMusicStyleById(options.musicStyle);
       if (musicStyle) {
         bpmRangeKey = options.musicStyle;
-        // Use the music style's Suno description
-        enhancedLines.push(`[SUNO: ${musicStyle.sunoDescription}]`);
+        const bpmRange = bpmRanges[bpmRangeKey as keyof typeof bpmRanges] || [85, 95];
+        const bpm = Math.floor(Math.random() * (bpmRange[1] - bpmRange[0] + 1)) + bpmRange[0];
+        
+        // Use the music style's Suno description with BPM
+        enhancedLines.push(`[SUNO: ${musicStyle.sunoDescription} ${bpm} BPM]`);
         enhancedLines.push("");
       }
     } else {
