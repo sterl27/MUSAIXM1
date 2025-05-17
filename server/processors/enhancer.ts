@@ -62,15 +62,14 @@ export async function enhanceLyrics(
         // Use the music style's Suno description
         enhancedLines.push(`[SUNO: ${musicStyle.sunoDescription}]`);
         enhancedLines.push("");
-        return enhancedLines.join("\n");
       }
+    } else {
+      const bpmRange = bpmRanges[bpmRangeKey as keyof typeof bpmRanges] || [85, 95];
+      const bpm = Math.floor(Math.random() * (bpmRange[1] - bpmRange[0] + 1)) + bpmRange[0];
+      const randomTag = tags[Math.floor(Math.random() * tags.length)];
+      enhancedLines.push(`[SUNO: ${randomTag}, ${bpm} BPM]`);
+      enhancedLines.push("");
     }
-    
-    const bpmRange = bpmRanges[bpmRangeKey as keyof typeof bpmRanges] || [85, 95];
-    const bpm = Math.floor(Math.random() * (bpmRange[1] - bpmRange[0] + 1)) + bpmRange[0];
-    const randomTag = tags[Math.floor(Math.random() * tags.length)];
-    enhancedLines.push(`[SUNO: ${randomTag}, ${bpm} BPM]`);
-    enhancedLines.push("");
   }
   
   // Apply persona-specific transformations to each line
@@ -105,9 +104,10 @@ export async function enhanceLyrics(
             // Extract a random segment from the Suno description
             const segments = musicStyle.sunoDescription.split('.');
             const randomSegment = segments[Math.floor(Math.random() * segments.length)].trim();
-            
-            enhancedLines.push("");
-            enhancedLines.push(`[SUNO: ${randomSegment}]`);
+            if (randomSegment) {
+              enhancedLines.push("");
+              enhancedLines.push(`[SUNO: ${randomSegment}]`);
+            }
           } else {
             // Fallback to default tags
             enhancedLines.push("");
