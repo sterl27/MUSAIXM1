@@ -24,6 +24,29 @@ export default function OutputPanel({
     }
   };
   
+  const saveLyricsToFile = () => {
+    if (enhancedLyrics) {
+      // Create a blob with the enhanced lyrics
+      const blob = new Blob([enhancedLyrics], { type: "text/plain" });
+      
+      // Create a URL for the blob
+      const url = URL.createObjectURL(blob);
+      
+      // Create a download link
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `enhanced_lyrics_${new Date().getTime()}.txt`;
+      
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
+  };
+  
   // Function to parse and format the enhanced lyrics with proper styling
   const formatLyrics = (lyrics: string) => {
     if (!lyrics) return null;
@@ -129,7 +152,7 @@ export default function OutputPanel({
           </div>
           <Button 
             className="px-4 py-2 bg-secondary hover:bg-secondary/90 transition-colors rounded-md font-medium text-secondary-foreground flex items-center space-x-2"
-            onClick={copyToClipboard}
+            onClick={saveLyricsToFile}
           >
             <Download className="mr-2 h-4 w-4" />
             <span>Save Lyrics</span>
