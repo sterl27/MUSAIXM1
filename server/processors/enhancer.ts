@@ -37,7 +37,8 @@ const bpmRanges = {
 export async function enhanceLyrics(
   lyrics: string, 
   personaId: string, 
-  options: EnhancementOptions
+  options: EnhancementOptions,
+  customDescription?: string
 ): Promise<string> {
   // This would typically call an AI service API
   // For now, we'll implement a rule-based enhancer
@@ -62,8 +63,11 @@ export async function enhanceLyrics(
         const bpmRange = bpmRanges[bpmRangeKey as keyof typeof bpmRanges] || [85, 95];
         const bpm = Math.floor(Math.random() * (bpmRange[1] - bpmRange[0] + 1)) + bpmRange[0];
         
+        // Use custom description if provided, otherwise use the default
+        const description = customDescription || musicStyle.sunoDescription;
+        
         // Use the music style's Suno description with BPM
-        enhancedLines.push(`[SUNO: ${musicStyle.sunoDescription} ${bpm} BPM]`);
+        enhancedLines.push(`[SUNO: ${description} ${bpm} BPM]`);
         enhancedLines.push("");
       }
     } else {
@@ -104,8 +108,11 @@ export async function enhanceLyrics(
         if (options.musicStyle) {
           const musicStyle = getMusicStyleById(options.musicStyle);
           if (musicStyle) {
-            // Extract a random segment from the Suno description
-            const segments = musicStyle.sunoDescription.split('.');
+            // Use custom description if provided
+            const description = customDescription || musicStyle.sunoDescription;
+            
+            // Extract a random segment from the description
+            const segments = description.split('.');
             const randomSegment = segments[Math.floor(Math.random() * segments.length)].trim();
             if (randomSegment) {
               enhancedLines.push("");
