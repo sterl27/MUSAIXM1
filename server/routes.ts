@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { enhanceLyricsRequestSchema } from "@shared/schema";
+import { enhanceLyricsRequestSchema, openAIEnhanceLyricsRequestSchema } from "@shared/schema";
 import { enhanceLyrics } from "./processors/enhancer";
+import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route for lyrics enhancement
@@ -41,6 +42,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error enhancing lyrics:", error);
       return res.status(500).json({ message: "Failed to enhance lyrics" });
+    }
+  });
+
+  // API route for OpenAI lyrics enhancement
+  app.post("/api/openai/enhance", async (req, res) => {
+    try {
+      // Validate request body
+      const validationResult = openAIEnhanceLyricsRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid request body",
+          errors: validationResult.error.errors
+        });
+      }
+      
+      const { lyrics, prompt, temperature, personaId, useAI } = validationResult.data;
+      
+      // Process lyrics through OpenAI enhancement
+      const enhancedLyrics = await enhanceLyricsWithOpenAI(lyrics, prompt, temperature, personaId, useAI);
+      
+      return res.status(200).json({ enhancedLyrics });
+    } catch (error) {
+      console.error("Error enhancing lyrics with OpenAI:", error);
+      return res.status(500).json({ message: "Failed to enhance lyrics with OpenAI" });
     }
   });
 
