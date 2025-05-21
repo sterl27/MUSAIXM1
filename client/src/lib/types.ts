@@ -29,6 +29,7 @@ export interface EnhancedLyrics {
 // Function to get all available personas
 export function getPersonas(): Persona[] {
   return [
+    // Hip-Hop & Rap Personas
     {
       id: "outkast",
       name: "OutKast",
@@ -52,6 +53,45 @@ export function getPersonas(): Persona[] {
       name: "T.I.",
       description: "Trap precision",
       icon: "target"
+    },
+    // Rock & Alternative Personas
+    {
+      id: "rock-ballad",
+      name: "Rock Ballad",
+      description: "Emotional power ballads",
+      icon: "music"
+    },
+    {
+      id: "alt-indie",
+      name: "Alt/Indie",
+      description: "Introspective and atmospheric",
+      icon: "headphones"
+    },
+    // Electronic & Dance Personas
+    {
+      id: "edm",
+      name: "EDM",
+      description: "High-energy dance music",
+      icon: "disc"
+    },
+    {
+      id: "ambient",
+      name: "Ambient",
+      description: "Atmospheric soundscapes",
+      icon: "cloud"
+    },
+    // Pop & R&B Personas
+    {
+      id: "pop-vocals",
+      name: "Pop Vocals",
+      description: "Catchy hooks and melodies",
+      icon: "mic"
+    },
+    {
+      id: "rnb-smooth",
+      name: "R&B Smooth",
+      description: "Soulful and melodic",
+      icon: "heart"
     }
   ];
 }
