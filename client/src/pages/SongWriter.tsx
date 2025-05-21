@@ -19,299 +19,507 @@ export default function SongWriter() {
   const [topic, setTopic] = useState("");
   const [mood, setMood] = useState("happy");
   const [genre, setGenre] = useState("");
-  const [structure, setStructure] = useState("verse-chorus-verse-chorus-bridge-chorus");
-  const [length, setLength] = useState([16]); // lines per verse
+  const [complexity, setComplexity] = useState([3]);
+  const [length, setLength] = useState<string>("medium");
+  const [structure, setStructure] = useState<string[]>(["verse", "chorus", "verse", "chorus", "bridge", "chorus"]);
+  const [useAI, setUseAI] = useState(true);
+  
+  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
+  const [selectedMusicStyle, setSelectedMusicStyle] = useState<MusicStyle | null>(null);
+  
   const [generatedLyrics, setGeneratedLyrics] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("topic");
   
-  // Get all personas and music styles
   const personas = getPersonas();
   const musicStyles = getMusicStyles();
   
-  // Selected styles
-  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(
-    personas[0] || null
-  );
-  
-  const [selectedMusicStyle, setSelectedMusicStyle] = useState<MusicStyle | null>(
-    null
-  );
-
-  const generateMutation = useMutation({
+  // Song generation function
+  const { mutate: generateSong } = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/songwriter/generate", {
-        topic,
-        mood,
-        genre: genre || (selectedMusicStyle?.name || ""),
-        structure,
-        linesPerVerse: length[0],
-        personaId: selectedPersona?.id || null
-      });
-      return res.json() as Promise<{ generatedLyrics: string }>;
-    },
-    onSuccess: (data) => {
-      setGeneratedLyrics(data.generatedLyrics);
-      setActiveTab("results");
+      setLoading(true);
       setError(null);
+      
+      // Get details for request
+      const personaId = selectedPersona?.id || null;
+      
+      try {
+        const response = await apiRequest({
+          url: "/api/songwriter",
+          method: "POST",
+          body: {
+            topic,
+            mood,
+            genre: selectedMusicStyle?.id || genre,
+            complexity: complexity[0],
+            length,
+            structure,
+            personaId,
+            useAI
+          }
+        });
+        
+        return response;
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+        return null;
+      } finally {
+        setLoading(false);
+      }
     },
+    
+    onSuccess: (data) => {
+      if (data && data.lyrics) {
+        setGeneratedLyrics(data.lyrics);
+      }
+    },
+    
     onError: (err: Error) => {
-      setError(err.message || "Failed to generate lyrics");
-      console.error("Error generating lyrics:", err);
+      setError(err.message);
     }
   });
-
+  
+  const handleAddSection = (section: string) => {
+    setStructure([...structure, section]);
+  };
+  
+  const handleRemoveSection = (index: number) => {
+    setStructure(structure.filter((_, i) => i !== index));
+  };
+  
+  const handleMoveSection = (index: number, direction: "up" | "down") => {
+    if (direction === "up" && index > 0) {
+      const newStructure = [...structure];
+      [newStructure[index - 1], newStructure[index]] = [newStructure[index], newStructure[index - 1]];
+      setStructure(newStructure);
+    } else if (direction === "down" && index < structure.length - 1) {
+      const newStructure = [...structure];
+      [newStructure[index], newStructure[index + 1]] = [newStructure[index + 1], newStructure[index]];
+      setStructure(newStructure);
+    }
+  };
+  
   const handleGenerate = () => {
-    if (!topic.trim() && !genre.trim() && !selectedMusicStyle) {
-      setError("Please enter a topic or select a genre/style");
+    if (!topic.trim()) {
+      setError("Please enter a topic for your song");
       return;
     }
     
-    setLoading(true);
-    generateMutation.mutate();
+    generateSong();
   };
-
+  
   const handleClear = () => {
-    setTopic("");
     setGeneratedLyrics(null);
     setError(null);
-    setActiveTab("topic");
   };
-
-  const copyToClipboard = async () => {
+  
+  const copyToClipboard = () => {
     if (generatedLyrics) {
-      try {
-        await navigator.clipboard.writeText(generatedLyrics);
-        // Show success message
-      } catch (err) {
-        console.error("Failed to copy to clipboard: ", err);
-      }
+      navigator.clipboard.writeText(generatedLyrics);
+    }
+  };
+  
+  // Get section name
+  const getSectionName = (section: string) => {
+    switch (section) {
+      case "verse": return "Verse";
+      case "chorus": return "Chorus";
+      case "bridge": return "Bridge";
+      case "intro": return "Intro";
+      case "outro": return "Outro";
+      case "pre-chorus": return "Pre-Chorus";
+      default: return section;
     }
   };
 
-  const moods = [
-    "happy", "sad", "energetic", "calm", "angry", 
-    "reflective", "hopeful", "dark", "uplifting"
-  ];
-
-  const songStructures = [
-    "verse-chorus-verse-chorus-bridge-chorus",
-    "verse-verse-chorus-verse-chorus",
-    "intro-verse-chorus-verse-chorus-outro",
-    "verse-pre-chorus-chorus-verse-pre-chorus-chorus-bridge-chorus",
-    "verse-chorus-verse-chorus"
-  ];
-
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <PageLayout title="AI Song Writer" description="Generate song lyrics based on your ideas">
+      <ToolsNavigation />
       
-      <main className="flex-grow container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">Song Writer</h1>
+      <Tabs defaultValue="basic" className="w-full">
+        <TabsList className="grid grid-cols-3 mb-6 w-full md:w-[400px]">
+          <TabsTrigger value="basic">Basic</TabsTrigger>
+          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="output">Generated Lyrics</TabsTrigger>
+        </TabsList>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 mb-6">
-            <TabsTrigger value="topic">Write Your Song</TabsTrigger>
-            <TabsTrigger value="results" disabled={!generatedLyrics}>Generated Lyrics</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="topic" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Input Options */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Song Details</CardTitle>
-                  <CardDescription>
-                    Enter details for your song
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="topic">Topic or Theme</Label>
-                    <Textarea
-                      id="topic"
-                      placeholder="What should your song be about?"
-                      value={topic}
-                      onChange={(e) => setTopic(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="mood">Mood</Label>
-                    <Select 
-                      value={mood} 
-                      onValueChange={setMood}
-                    >
-                      <SelectTrigger id="mood">
-                        <SelectValue placeholder="Select mood" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {moods.map((m) => (
-                          <SelectItem key={m} value={m}>
-                            {m.charAt(0).toUpperCase() + m.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="genre">Genre (or enter custom)</Label>
-                    <Input
-                      id="genre"
-                      placeholder="e.g., Hip Hop, R&B, Pop"
-                      value={genre}
-                      onChange={(e) => setGenre(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="musicStyle">Music Style Template</Label>
-                    <Select 
-                      value={selectedMusicStyle?.id || ""} 
-                      onValueChange={(value) => {
-                        const style = musicStyles.find(s => s.id === value);
-                        setSelectedMusicStyle(style || null);
-                        if (style) {
-                          setGenre(""); // Clear custom genre if style is selected
-                        }
-                      }}
-                    >
-                      <SelectTrigger id="musicStyle">
-                        <SelectValue placeholder="Select a style (optional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
-                        {musicStyles.map((style) => (
-                          <SelectItem key={style.id} value={style.id}>
-                            {style.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* Structure Options */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Song Structure</CardTitle>
-                  <CardDescription>
-                    Configure the structure of your song
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="structure">Song Structure</Label>
-                    <Select 
-                      value={structure} 
-                      onValueChange={setStructure}
-                    >
-                      <SelectTrigger id="structure">
-                        <SelectValue placeholder="Select structure" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {songStructures.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-')}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="length">Lines Per Verse: {length[0]}</Label>
-                    </div>
-                    <Slider
-                      id="length"
-                      min={4}
-                      max={24}
-                      step={4}
-                      value={length}
-                      onValueChange={setLength}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="persona">Artist Style</Label>
-                    <Select 
-                      value={selectedPersona?.id || ""} 
-                      onValueChange={(value) => {
-                        const persona = personas.find(p => p.id === value);
-                        setSelectedPersona(persona || null);
-                      }}
-                    >
-                      <SelectTrigger id="persona">
-                        <SelectValue placeholder="Select artist style" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {personas.map((persona) => (
-                          <SelectItem key={persona.id} value={persona.id}>
-                            {persona.name} - {persona.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <Button 
-                    onClick={handleGenerate} 
-                    disabled={loading}
-                    className="w-full mt-4"
-                  >
-                    {loading ? "Generating..." : "Generate Lyrics"}
-                  </Button>
-                  
-                  {error && (
-                    <div className="rounded-md bg-destructive/15 p-4 text-destructive">
-                      {error}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="results">
+        {/* Basic Options Tab */}
+        <TabsContent value="basic" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Generated Lyrics</CardTitle>
+                <CardTitle>Song Idea</CardTitle>
                 <CardDescription>
-                  Your AI-generated song lyrics
+                  Describe what you want your song to be about
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                {generatedLyrics ? (
-                  <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[400px]">
-                    {generatedLyrics}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center text-muted-foreground min-h-[400px]">
-                    No lyrics generated yet
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="topic">Topic or Theme</Label>
+                  <Input
+                    id="topic"
+                    placeholder="Enter the main topic of your song"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Example: "Love", "Heartbreak", "Summer vibes", "Overcoming challenges"
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="mood">Mood</Label>
+                  <RadioGroup
+                    value={mood}
+                    onValueChange={setMood}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="happy" id="happy" />
+                      <Label htmlFor="happy">Happy</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="sad" id="sad" />
+                      <Label htmlFor="sad">Sad</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="chill" id="chill" />
+                      <Label htmlFor="chill">Chill</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="energetic" id="energetic" />
+                      <Label htmlFor="energetic">Energetic</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="angry" id="angry" />
+                      <Label htmlFor="angry">Angry</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="reflective" id="reflective" />
+                      <Label htmlFor="reflective">Reflective</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="musicStyle">Music Style Template</Label>
+                  <Select 
+                    value={selectedMusicStyle?.id || "none"} 
+                    onValueChange={(value) => {
+                      const style = musicStyles.find(s => s.id === value);
+                      setSelectedMusicStyle(style || null);
+                      if (style) {
+                        setGenre(""); // Clear custom genre if style is selected
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="musicStyle">
+                      <SelectValue placeholder="Select a style (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      {musicStyles.map((style) => (
+                        <SelectItem key={style.id} value={style.id}>
+                          {style.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {!selectedMusicStyle && (
+                  <div className="space-y-2">
+                    <Label htmlFor="genre">Custom Genre</Label>
+                    <Input
+                      id="genre"
+                      placeholder="Enter a music genre"
+                      value={genre}
+                      onChange={(e) => setGenre(e.target.value)}
+                      disabled={!!selectedMusicStyle}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Example: "Pop", "Hip-hop", "Rock", "Country", "EDM"
+                    </p>
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={handleClear}>
-                  Start New Song
-                </Button>
+              <CardFooter>
                 <Button 
-                  onClick={copyToClipboard} 
-                  disabled={!generatedLyrics}
+                  onClick={handleGenerate} 
+                  disabled={loading || !topic.trim()}
+                  className="w-full"
                 >
-                  Copy to Clipboard
+                  {loading ? "Generating..." : "Generate Lyrics"}
                 </Button>
               </CardFooter>
             </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      <Footer />
-    </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Song Structure</CardTitle>
+                <CardDescription>
+                  Define how your song is structured
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="complexity">Complexity: {complexity[0]}</Label>
+                  <Slider
+                    id="complexity"
+                    min={1}
+                    max={5}
+                    step={1}
+                    value={complexity}
+                    onValueChange={setComplexity}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Simple</span>
+                    <span>Complex</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="length">Song Length</Label>
+                  <RadioGroup
+                    value={length}
+                    onValueChange={setLength}
+                    className="grid grid-cols-3 gap-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="short" id="short" />
+                      <Label htmlFor="short">Short</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="medium" id="medium" />
+                      <Label htmlFor="medium">Medium</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="long" id="long" />
+                      <Label htmlFor="long">Long</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4">
+                  <Label htmlFor="useAI" className="cursor-pointer">Use AI Generation</Label>
+                  <Switch 
+                    id="useAI" 
+                    checked={useAI} 
+                    onCheckedChange={setUseAI} 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="persona">Artist Style (Optional)</Label>
+                  <Select 
+                    value={selectedPersona?.id || ""} 
+                    onValueChange={(value) => {
+                      const persona = personas.find(p => p.id === value);
+                      setSelectedPersona(persona || null);
+                    }}
+                  >
+                    <SelectTrigger id="persona">
+                      <SelectValue placeholder="Select an artist style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {personas.map((persona) => (
+                        <SelectItem key={persona.id} value={persona.id}>
+                          {persona.name} - {persona.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Applies an artist's writing style to your lyrics
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Advanced Options Tab */}
+        <TabsContent value="advanced" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Song Structure</CardTitle>
+                <CardDescription>
+                  Arrange the sections of your song
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Current Structure</Label>
+                  <div className="border rounded-md p-4 space-y-2">
+                    {structure.map((section, index) => (
+                      <div 
+                        key={index} 
+                        className="flex justify-between items-center p-2 bg-muted rounded-md"
+                      >
+                        <span className="font-medium">{getSectionName(section)}</span>
+                        <div className="flex space-x-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleMoveSection(index, "up")}
+                            disabled={index === 0}
+                          >
+                            ↑
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleMoveSection(index, "down")}
+                            disabled={index === structure.length - 1}
+                          >
+                            ↓
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleRemoveSection(index)}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {structure.length === 0 && (
+                      <div className="text-center text-muted-foreground py-2">
+                        No sections added yet
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2 pt-4">
+                  <Label>Add Section</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("intro")}
+                    >
+                      Add Intro
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("verse")}
+                    >
+                      Add Verse
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("pre-chorus")}
+                    >
+                      Add Pre-Chorus
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("chorus")}
+                    >
+                      Add Chorus
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("bridge")}
+                    >
+                      Add Bridge
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => handleAddSection("outro")}
+                    >
+                      Add Outro
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setStructure(["verse", "chorus", "verse", "chorus", "bridge", "chorus"])}
+                >
+                  Reset to Default
+                </Button>
+              </CardFooter>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Settings</CardTitle>
+                <CardDescription>
+                  Configure AI generation options
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-muted/50 rounded-md p-4 space-y-3">
+                  <h3 className="font-medium">AI Features</h3>
+                  <p className="text-sm text-muted-foreground">
+                    When AI generation is enabled, our system will:
+                  </p>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Generate lyrics based on your topic and mood</li>
+                    <li>Apply the selected artist style (if chosen)</li>
+                    <li>Structure the song according to your preferences</li>
+                    <li>Add rhyming patterns and flow to match your genre</li>
+                  </ul>
+                  <div className="pt-2">
+                    <Button 
+                      onClick={handleGenerate} 
+                      disabled={loading || !topic.trim()}
+                      className="w-full"
+                    >
+                      {loading ? "Generating..." : "Generate Lyrics"}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Output Tab */}
+        <TabsContent value="output">
+          <Card>
+            <CardHeader>
+              <CardTitle>Generated Lyrics</CardTitle>
+              <CardDescription>
+                {generatedLyrics ? "Your AI-generated lyrics" : "Generated lyrics will appear here"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {generatedLyrics ? (
+                <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[400px]">
+                  {generatedLyrics}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center text-muted-foreground min-h-[400px]">
+                  No lyrics generated yet
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" onClick={handleClear}>
+                Start New Song
+              </Button>
+              <Button 
+                onClick={copyToClipboard} 
+                disabled={!generatedLyrics}
+              >
+                Copy to Clipboard
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </PageLayout>
   );
 }

@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageLayout from "@/components/layout/PageLayout";
+import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function SoundDesign() {
@@ -117,303 +117,284 @@ export default function SoundDesign() {
   };
   
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <PageLayout title="Sound Design" description="Create and customize sound effects and instruments">
+      <ToolsNavigation />
       
-      <main className="flex-grow container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">Sound Design</h1>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-6">
+          <TabsTrigger value="effects">Effects</TabsTrigger>
+          <TabsTrigger value="instruments">Instruments</TabsTrigger>
+          <TabsTrigger value="generator">AI Sound Generator</TabsTrigger>
+        </TabsList>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="effects">Effects</TabsTrigger>
-            <TabsTrigger value="instruments">Instruments</TabsTrigger>
-            <TabsTrigger value="generator">AI Sound Generator</TabsTrigger>
-          </TabsList>
-          
-          {/* Effects Tab */}
-          <TabsContent value="effects" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Audio Effects</CardTitle>
-                  <CardDescription>
-                    Add effects to your sound design chain
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="effect">Select Effect</Label>
-                    <Select 
-                      value={selectedEffect} 
-                      onValueChange={setSelectedEffect}
-                    >
-                      <SelectTrigger id="effect">
-                        <SelectValue placeholder="Select effect" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {effects.map((effect) => (
-                          <SelectItem key={effect.id} value={effect.id}>
-                            {effect.name} - {effect.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="intensity">Effect Intensity: {intensity[0]}%</Label>
-                    </div>
-                    <Slider
-                      id="intensity"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={intensity}
-                      onValueChange={setIntensity}
-                    />
-                  </div>
-                  
-                  <Button 
-                    onClick={addEffect} 
-                    className="w-full mt-4"
+        {/* Effects Tab */}
+        <TabsContent value="effects" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Audio Effects</CardTitle>
+                <CardDescription>
+                  Add effects to your sound design chain
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="effect">Select Effect</Label>
+                  <Select 
+                    value={selectedEffect} 
+                    onValueChange={setSelectedEffect}
                   >
-                    Add To Chain
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Effects Chain</CardTitle>
-                  <CardDescription>
-                    Your sound processing chain
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {effectsChain.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                      No effects added yet
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {effectsChain.map((effectId, index) => {
-                        const effect = effects.find(e => e.id === effectId);
-                        return (
-                          <div 
-                            key={`${effectId}-${index}`} 
-                            className="flex items-center justify-between p-3 bg-muted rounded-md"
-                          >
-                            <div>
-                              <span className="font-medium">{effect?.name}</span>
-                              <span className="text-sm text-muted-foreground ml-2">
-                                {intensity[0]}% intensity
-                              </span>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => removeEffect(effectId)}
-                            >
-                              Remove
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => setEffectsChain([])}
-                    disabled={effectsChain.length === 0}
-                  >
-                    Clear Chain
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* Instruments Tab */}
-          <TabsContent value="instruments" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Instruments</CardTitle>
-                  <CardDescription>
-                    Configure instruments for your sound design
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="instrument">Select Instrument</Label>
-                    <Select 
-                      value={selectedInstrument} 
-                      onValueChange={setSelectedInstrument}
-                    >
-                      <SelectTrigger id="instrument">
-                        <SelectValue placeholder="Select instrument" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {instruments.map((instrument) => (
-                          <SelectItem key={instrument.id} value={instrument.id}>
-                            {instrument.name} - {instrument.description}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SelectTrigger id="effect">
+                      <SelectValue placeholder="Select effect" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {effects.map((effect) => (
+                        <SelectItem key={effect.id} value={effect.id}>
+                          {effect.name} - {effect.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="intensity">Effect Intensity: {intensity[0]}%</Label>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="pitch">Pitch Adjustment: {pitch[0]} semitones</Label>
-                    </div>
-                    <Slider
-                      id="pitch"
-                      min={-12}
-                      max={12}
-                      step={1}
-                      value={pitch}
-                      onValueChange={setPitch}
-                    />
+                  <Slider
+                    id="intensity"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={intensity}
+                    onValueChange={setIntensity}
+                  />
+                </div>
+                
+                <Button 
+                  onClick={addEffect} 
+                  className="w-full mt-4"
+                >
+                  Add To Chain
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Effects Chain</CardTitle>
+                <CardDescription>
+                  Your sound processing chain
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {effectsChain.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    No effects added yet
                   </div>
-                  
-                  <Button 
-                    onClick={addInstrument} 
-                    className="w-full mt-4"
-                  >
-                    Add Instrument
-                  </Button>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Instrument Setup</CardTitle>
-                  <CardDescription>
-                    Your instrument configuration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {instrumentPresets.length === 0 ? (
-                    <div className="text-center text-muted-foreground py-8">
-                      No instruments added yet
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {instrumentPresets.map((preset, index) => (
+                ) : (
+                  <div className="space-y-2">
+                    {effectsChain.map((effectId, index) => {
+                      const effect = effects.find(e => e.id === effectId);
+                      return (
                         <div 
-                          key={index} 
+                          key={`${effectId}-${index}`} 
                           className="flex items-center justify-between p-3 bg-muted rounded-md"
                         >
                           <div>
-                            <span className="font-medium">{preset}</span>
+                            <span className="font-medium">{effect?.name}</span>
+                            <span className="text-sm text-muted-foreground ml-2">
+                              {intensity[0]}% intensity
+                            </span>
                           </div>
                           <Button 
                             variant="ghost" 
                             size="sm"
-                            onClick={() => removeInstrument(index)}
+                            onClick={() => removeEffect(effectId)}
                           >
                             Remove
                           </Button>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => setInstrumentPresets([])}
-                    disabled={instrumentPresets.length === 0}
-                  >
-                    Clear Instruments
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          {/* AI Sound Generator Tab */}
-          <TabsContent value="generator" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>AI Sound Designer</CardTitle>
-                  <CardDescription>
-                    Describe the sound you want to create
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Sound Description</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Describe the sound you want (e.g., 'A deep atmospheric pad with subtle movement and texture')"
-                      value={soundDescription}
-                      onChange={(e) => setSoundDescription(e.target.value)}
-                      className="min-h-[150px]"
-                    />
+                      );
+                    })}
                   </div>
-                  
-                  <Button 
-                    onClick={handleGenerateSuggestion} 
-                    disabled={loading || !soundDescription.trim()}
-                    className="w-full mt-4"
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setEffectsChain([])}
+                  disabled={effectsChain.length === 0}
+                >
+                  Clear Chain
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Instruments Tab */}
+        <TabsContent value="instruments" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Instruments</CardTitle>
+                <CardDescription>
+                  Configure instruments for your sound design
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="instrument">Select Instrument</Label>
+                  <Select 
+                    value={selectedInstrument} 
+                    onValueChange={setSelectedInstrument}
                   >
-                    {loading ? "Generating..." : "Get Sound Design Suggestions"}
-                  </Button>
-                  
-                  {error && (
-                    <div className="rounded-md bg-destructive/15 p-4 text-destructive">
-                      {error}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sound Design Suggestion</CardTitle>
-                  <CardDescription>
-                    AI-generated suggestions for your sound
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {aiSuggestion ? (
-                    <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[250px]">
-                      {aiSuggestion}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center text-muted-foreground min-h-[250px]">
-                      Enter a description and generate suggestions
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => {
-                      setSoundDescription("");
-                      setAiSuggestion(null);
-                    }}
-                    disabled={!aiSuggestion}
-                  >
-                    Clear
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      <Footer />
-    </div>
+                    <SelectTrigger id="instrument">
+                      <SelectValue placeholder="Select instrument" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {instruments.map((instrument) => (
+                        <SelectItem key={instrument.id} value={instrument.id}>
+                          {instrument.name} - {instrument.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="pitch">Pitch Adjustment: {pitch[0]} semitones</Label>
+                  </div>
+                  <Slider
+                    id="pitch"
+                    min={-12}
+                    max={12}
+                    step={1}
+                    value={pitch}
+                    onValueChange={setPitch}
+                  />
+                </div>
+                
+                <Button 
+                  onClick={addInstrument} 
+                  className="w-full mt-4"
+                >
+                  Add Instrument
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Instrument Setup</CardTitle>
+                <CardDescription>
+                  Your instrument configuration
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {instrumentPresets.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-8">
+                    No instruments added yet
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {instrumentPresets.map((preset, index) => (
+                      <div 
+                        key={index} 
+                        className="flex items-center justify-between p-3 bg-muted rounded-md"
+                      >
+                        <div>
+                          <span className="font-medium">{preset}</span>
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => removeInstrument(index)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setInstrumentPresets([])}
+                  disabled={instrumentPresets.length === 0}
+                >
+                  Clear Instruments
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* AI Sound Generator Tab */}
+        <TabsContent value="generator" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>AI Sound Designer</CardTitle>
+                <CardDescription>
+                  Describe the sound you want to create
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="description">Sound Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe the sound you want (e.g., 'A deep atmospheric pad with subtle movement and texture')"
+                    value={soundDescription}
+                    onChange={(e) => setSoundDescription(e.target.value)}
+                    className="min-h-[150px]"
+                  />
+                </div>
+                
+                <Button 
+                  onClick={handleGenerateSuggestion} 
+                  disabled={loading || !soundDescription.trim()}
+                  className="w-full mt-4"
+                >
+                  {loading ? "Generating..." : "Get Sound Design Suggestions"}
+                </Button>
+                
+                {error && (
+                  <div className="rounded-md bg-destructive/15 p-4 text-destructive">
+                    {error}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Sound Design Suggestion</CardTitle>
+                <CardDescription>
+                  AI-generated suggestions for your sound
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {aiSuggestion ? (
+                  <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[250px]">
+                    {aiSuggestion}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center text-muted-foreground min-h-[250px]">
+                    Enter a description and generate suggestions
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </PageLayout>
   );
 }
