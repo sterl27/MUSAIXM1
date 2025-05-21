@@ -22,10 +22,20 @@ interface ToolPanelProps {
 export default function ToolPanel({ options, onUpdateOptions }: ToolPanelProps) {
   return (
     <div className="bg-card rounded-xl shadow-lg p-5 border border-muted">
-      <h2 className="font-semibold text-xl mb-4 flex items-center">
+      <h2 className="font-semibold text-xl mb-3 flex items-center">
         <Settings className="text-accent mr-2" size={20} />
         Enhancement Tools
       </h2>
+      
+      {/* Tool Explanation */}
+      <div className="bg-muted/50 rounded-md p-3 mb-4 text-sm">
+        <h3 className="font-medium mb-1 text-foreground/80">Tool Options:</h3>
+        <ul className="list-disc list-inside text-muted-foreground space-y-1">
+          <li>Enable Suno Tags for AI music generation</li>
+          <li>Add FX Cues for vocal effects in your lyrics</li>
+          <li>Adjust flow strength to control style intensity</li>
+        </ul>
+      </div>
       
       <div className="space-y-5">
         {/* Suno Tags */}

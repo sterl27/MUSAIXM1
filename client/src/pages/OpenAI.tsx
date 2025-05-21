@@ -119,10 +119,19 @@ export default function OpenAI() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* OpenAI Prompt Guidance */}
+                <div className="bg-muted/50 rounded-md p-3 mb-2 text-sm">
+                  <h3 className="font-medium mb-1 text-foreground/80">AI Enhancement Tips:</h3>
+                  <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                    <li>Customize the prompt to guide AI enhancement</li>
+                    <li>Choose a persona to influence the writing style</li>
+                    <li>Adjust temperature for creativity vs consistency</li>
+                  </ul>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="persona">Select Persona</Label>
                   <Select 
-                    value={selectedPersona?.id || ""} 
+                    value={selectedPersona?.id || "default"} 
                     onValueChange={(value) => {
                       const persona = getPersonaById(value);
                       if (persona) {
@@ -134,6 +143,7 @@ export default function OpenAI() {
                       <SelectValue placeholder="Select a persona" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="default">Default</SelectItem>
                       {personas.map((persona) => (
                         <SelectItem key={persona.id} value={persona.id}>
                           {persona.name} - {persona.description}

@@ -182,7 +182,7 @@ export default function SongWriter() {
                         <SelectValue placeholder="Select a style (optional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {musicStyles.map((style) => (
                           <SelectItem key={style.id} value={style.id}>
                             {style.name}
