@@ -6,9 +6,10 @@ import { Persona, getPersonas } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import VoicePreview from "@/components/VoicePreview";
+import SoundSignature from "@/components/SoundSignature";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MusicIcon, Flame, Star } from "lucide-react";
+import { MusicIcon, Flame, Star, Activity } from "lucide-react";
 
 export default function Personas() {
   const [selectedPersona, setSelectedPersona] = useState<Persona>({
@@ -79,6 +80,15 @@ export default function Personas() {
                   <Badge variant="outline" className="bg-primary/5">Vocal Range</Badge>
                   <Badge variant="outline" className="bg-primary/5">Lyrical Themes</Badge>
                 </div>
+              </div>
+              
+              {/* Sound Signature Visualization */}
+              <div className="p-4 border rounded-md bg-card">
+                <h4 className="text-sm font-medium flex items-center mb-2">
+                  <Activity className="w-4 h-4 mr-2 text-blue-500" />
+                  Sound Signature
+                </h4>
+                <SoundSignature persona={selectedPersona} />
               </div>
               
               <VoicePreview 
