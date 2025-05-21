@@ -107,6 +107,52 @@ const userFormSchema = z.object({
   }).optional(),
 });
 
+// Form schema for pages
+const pageFormSchema = z.object({
+  title: z.string().min(3, {
+    message: "Title must be at least 3 characters.",
+  }),
+  slug: z.string().min(1, {
+    message: "Slug is required",
+  }).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: "Slug must contain only lowercase letters, numbers, and hyphens.",
+  }),
+  content: z.string().min(10, {
+    message: "Content must be at least 10 characters.",
+  }),
+  status: z.enum(["published", "draft"], {
+    required_error: "Please select a status.",
+  }),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+});
+
+// Form schema for blog posts
+const blogPostFormSchema = z.object({
+  title: z.string().min(3, {
+    message: "Title must be at least 3 characters.",
+  }),
+  slug: z.string().min(1, {
+    message: "Slug is required",
+  }).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+    message: "Slug must contain only lowercase letters, numbers, and hyphens.",
+  }),
+  excerpt: z.string().min(10, {
+    message: "Excerpt must be at least 10 characters.",
+  }).max(300, {
+    message: "Excerpt must not exceed 300 characters."
+  }),
+  content: z.string().min(50, {
+    message: "Content must be at least 50 characters.",
+  }),
+  status: z.enum(["published", "draft"], {
+    required_error: "Please select a status.",
+  }),
+  coverImage: z.string().optional(),
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+});
+
 // Define interfaces for pages and blog posts
 interface Page {
   id: number;
@@ -132,6 +178,8 @@ interface BlogPost {
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("users");
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingPage, setEditingPage] = useState<Page | null>(null);
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
   const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
   const [isAddPostDialogOpen, setIsAddPostDialogOpen] = useState(false);
@@ -139,7 +187,7 @@ export default function Admin() {
   const queryClient = useQueryClient();
 
   // Form for adding/editing users
-  const form = useForm<z.infer<typeof userFormSchema>>({
+  const userForm = useForm<z.infer<typeof userFormSchema>>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
       username: "",
@@ -148,11 +196,39 @@ export default function Admin() {
       role: "user",
     },
   });
+  
+  // Form for adding/editing pages
+  const pageForm = useForm<z.infer<typeof pageFormSchema>>({
+    resolver: zodResolver(pageFormSchema),
+    defaultValues: {
+      title: "",
+      slug: "",
+      content: "",
+      status: "draft",
+      metaTitle: "",
+      metaDescription: "",
+    },
+  });
+  
+  // Form for adding/editing blog posts
+  const postForm = useForm<z.infer<typeof blogPostFormSchema>>({
+    resolver: zodResolver(blogPostFormSchema),
+    defaultValues: {
+      title: "",
+      slug: "",
+      excerpt: "",
+      content: "",
+      status: "draft",
+      coverImage: "",
+      metaTitle: "",
+      metaDescription: "",
+    },
+  });
 
   // Reset form when editing user changes
   useEffect(() => {
     if (editingUser) {
-      form.reset({
+      userForm.reset({
         username: editingUser.username,
         email: editingUser.email,
         role: editingUser.role as "user" | "editor" | "admin" | "super_admin",
@@ -168,7 +244,7 @@ export default function Admin() {
         }
       });
     } else {
-      form.reset({
+      userForm.reset({
         username: "",
         email: "",
         password: "",
@@ -185,7 +261,57 @@ export default function Admin() {
         }
       });
     }
-  }, [editingUser, form]);
+  }, [editingUser, userForm]);
+  
+  // Reset page form when editing page changes
+  useEffect(() => {
+    if (editingPage) {
+      pageForm.reset({
+        title: editingPage.title,
+        slug: editingPage.slug,
+        content: "",  // We would typically fetch content from API
+        status: editingPage.status as "published" | "draft",
+        metaTitle: "",
+        metaDescription: ""
+      });
+    } else {
+      pageForm.reset({
+        title: "",
+        slug: "",
+        content: "",
+        status: "draft",
+        metaTitle: "",
+        metaDescription: ""
+      });
+    }
+  }, [editingPage, pageForm]);
+  
+  // Reset post form when editing post changes
+  useEffect(() => {
+    if (editingPost) {
+      postForm.reset({
+        title: editingPost.title,
+        slug: editingPost.slug,
+        excerpt: editingPost.excerpt,
+        content: "",  // We would typically fetch content from API
+        status: editingPost.status as "published" | "draft",
+        coverImage: "",
+        metaTitle: "",
+        metaDescription: ""
+      });
+    } else {
+      postForm.reset({
+        title: "",
+        slug: "",
+        excerpt: "",
+        content: "",
+        status: "draft",
+        coverImage: "",
+        metaTitle: "",
+        metaDescription: ""
+      });
+    }
+  }, [editingPost, postForm]);
 
   // Fetch users
   const { 
@@ -491,9 +617,71 @@ export default function Admin() {
     },
   });
 
-  // Form submission handler
-  const onSubmit = (data: z.infer<typeof userFormSchema>) => {
+  // Add/edit page mutation
+  const addEditPageMutation = useMutation({
+    mutationFn: async (pageData: z.infer<typeof pageFormSchema>) => {
+      // This would be replaced with actual API call
+      console.log("Adding/editing page:", pageData);
+      return pageData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/pages'] });
+      setIsAddPageDialogOpen(false);
+      setEditingPage(null);
+      toast({
+        title: editingPage ? "Page Updated" : "Page Created",
+        description: editingPage 
+          ? `Page "${pageForm.getValues().title}" has been updated.` 
+          : `Page "${pageForm.getValues().title}" has been created.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to ${editingPage ? "update" : "create"} page. ${error}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Add/edit blog post mutation
+  const addEditPostMutation = useMutation({
+    mutationFn: async (postData: z.infer<typeof blogPostFormSchema>) => {
+      // This would be replaced with actual API call
+      console.log("Adding/editing blog post:", postData);
+      return postData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/posts'] });
+      setIsAddPostDialogOpen(false);
+      setEditingPost(null);
+      toast({
+        title: editingPost ? "Blog Post Updated" : "Blog Post Created",
+        description: editingPost 
+          ? `Blog post "${postForm.getValues().title}" has been updated.` 
+          : `Blog post "${postForm.getValues().title}" has been created.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to ${editingPost ? "update" : "create"} blog post. ${error}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Form submission handlers
+  const onUserSubmit = (data: z.infer<typeof userFormSchema>) => {
     addEditUserMutation.mutate(data);
+  };
+  
+  const onPageSubmit = (data: z.infer<typeof pageFormSchema>) => {
+    addEditPageMutation.mutate(data);
+  };
+  
+  const onPostSubmit = (data: z.infer<typeof blogPostFormSchema>) => {
+    addEditPostMutation.mutate(data);
   };
 
   // Handle user deletion
@@ -582,10 +770,10 @@ export default function Admin() {
                             : "Fill in the details to add a new user to the system."}
                         </DialogDescription>
                       </DialogHeader>
-                      <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <Form {...userForm}>
+                        <form onSubmit={userForm.handleSubmit(onUserSubmit)} className="space-y-4">
                           <FormField
-                            control={form.control}
+                            control={userForm.control}
                             name="username"
                             render={({ field }) => (
                               <FormItem>
@@ -598,7 +786,7 @@ export default function Admin() {
                             )}
                           />
                           <FormField
-                            control={form.control}
+                            control={userForm.control}
                             name="email"
                             render={({ field }) => (
                               <FormItem>
@@ -612,7 +800,7 @@ export default function Admin() {
                           />
                           {!editingUser && (
                             <FormField
-                              control={form.control}
+                              control={userForm.control}
                               name="password"
                               render={({ field }) => (
                                 <FormItem>
@@ -626,7 +814,7 @@ export default function Admin() {
                             />
                           )}
                           <FormField
-                            control={form.control}
+                            control={userForm.control}
                             name="role"
                             render={({ field }) => (
                               <FormItem>
@@ -657,7 +845,7 @@ export default function Admin() {
                               <div className="space-y-2">
                                 <h5 className="text-sm font-medium">Page Permissions</h5>
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canCreatePages"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -924,10 +1112,149 @@ export default function Admin() {
               <TabsContent value="pages" className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold">Page Management</h3>
-                  <Button onClick={() => setIsAddPageDialogOpen(true)}>
-                    <PlusSquare className="h-4 w-4 mr-2" />
-                    Create New Page
-                  </Button>
+                  <Dialog open={isAddPageDialogOpen} onOpenChange={setIsAddPageDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button onClick={() => setEditingPage(null)}>
+                        <PlusSquare className="h-4 w-4 mr-2" />
+                        Create New Page
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>{editingPage ? "Edit Page" : "Create New Page"}</DialogTitle>
+                        <DialogDescription>
+                          {editingPage 
+                            ? "Update the page details below." 
+                            : "Fill in the details to create a new page."}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <Form {...pageForm}>
+                        <form onSubmit={pageForm.handleSubmit(onPageSubmit)} className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={pageForm.control}
+                              name="title"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Page Title</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="About Us" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={pageForm.control}
+                              name="slug"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Slug</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="about-us" {...field} />
+                                  </FormControl>
+                                  <FormDescription>
+                                    URL-friendly version of the title
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <FormField
+                            control={pageForm.control}
+                            name="content"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Content</FormLabel>
+                                <FormControl>
+                                  <textarea 
+                                    className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                                    placeholder="Page content goes here..."
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormField
+                              control={pageForm.control}
+                              name="status"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Status</FormLabel>
+                                  <FormControl>
+                                    <select
+                                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                      {...field}
+                                    >
+                                      <option value="draft">Draft</option>
+                                      <option value="published">Published</option>
+                                    </select>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          
+                          <div className="space-y-4 border-t pt-4">
+                            <h4 className="text-sm font-medium">SEO Settings</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <FormField
+                                control={pageForm.control}
+                                name="metaTitle"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Meta Title</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="SEO title (optional)" {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Leave blank to use page title
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              <FormField
+                                control={pageForm.control}
+                                name="metaDescription"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Meta Description</FormLabel>
+                                    <FormControl>
+                                      <Input placeholder="SEO description (optional)" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                          
+                          <DialogFooter>
+                            <Button 
+                              variant="outline" 
+                              type="button" 
+                              onClick={() => setIsAddPageDialogOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button type="submit">
+                              {addEditPageMutation.isPending 
+                                ? "Saving..." 
+                                : (editingPage ? "Update Page" : "Create Page")}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 
                 {pagesLoading ? (
