@@ -365,15 +365,26 @@ export default function StyleTransformer() {
                   />
                 </div>
                 
-                <div className="flex justify-end">
-                  <Button 
-                    disabled={!inputLyrics.trim()} 
-                    onClick={() => setActiveTab("style")}
-                    className="flex items-center"
-                  >
-                    Continue to Style Selection
-                    <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
+                <div className="flex flex-col space-y-4">
+                  <Alert variant="default" className="bg-primary/5 border-primary/20">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <AlertTitle>AI-Powered Style Transformation</AlertTitle>
+                    <AlertDescription>
+                      Transform your lyrics into different music styles using OpenAI's advanced language model.
+                      For best results, enter complete lyrics with clear sections (verses, chorus, etc.).
+                    </AlertDescription>
+                  </Alert>
+                  
+                  <div className="flex justify-end">
+                    <Button 
+                      disabled={!inputLyrics.trim()} 
+                      onClick={() => setActiveTab("style")}
+                      className="flex items-center"
+                    >
+                      Continue to Style Selection
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
               
