@@ -6,12 +6,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import OpenAI from "@/pages/OpenAI";
+import SongWriter from "@/pages/SongWriter";
+import SoundDesign from "@/pages/SoundDesign";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/openai" component={OpenAI} />
+      <Route path="/songwriter" component={SongWriter} />
+      <Route path="/sounddesign" component={SoundDesign} />
       <Route component={NotFound} />
     </Switch>
   );

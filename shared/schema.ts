@@ -56,9 +56,28 @@ export const openAIEnhanceLyricsRequestSchema = z.object({
   useAI: z.boolean().default(true)
 });
 
+// Schema for SongWriter request
+export const songwriterRequestSchema = z.object({
+  topic: z.string().optional(),
+  mood: z.string().default("happy"),
+  genre: z.string().optional(),
+  structure: z.string().default("verse-chorus-verse-chorus-bridge-chorus"),
+  linesPerVerse: z.number().min(4).max(24).default(16),
+  personaId: z.string().nullable()
+});
+
+// Schema for SoundDesign request
+export const soundDesignRequestSchema = z.object({
+  description: z.string().min(1, "Sound description is required"),
+  effects: z.array(z.string()).default([]),
+  instruments: z.array(z.string()).default([])
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertLyrics = z.infer<typeof insertLyricsSchema>;
 export type Lyrics = typeof lyrics.$inferSelect;
 export type EnhanceLyricsRequest = z.infer<typeof enhanceLyricsRequestSchema>;
 export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsRequestSchema>;
+export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
+export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
