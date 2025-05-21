@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Persona } from "@/lib/types";
 import { CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Info, BarChart3, Activity, Radio, RefreshCw } from "lucide-react";
 
 // Vocal characteristics to visualize
 interface VocalCharacteristics {
@@ -28,6 +31,8 @@ interface SoundSignatureProps {
   className?: string;
   showLabels?: boolean; // Whether to show labels below each bar
   compact?: boolean; // Whether to show a compact version of the visualization
+  darkMode?: boolean; // Whether to use dark mode colors
+  showViewToggle?: boolean; // Whether to show the view toggle option (bar chart vs radar)
 }
 
 export default function SoundSignature({ 
@@ -36,7 +41,9 @@ export default function SoundSignature({
   lyrics = "", 
   className = "",
   showLabels = true,
-  compact = false
+  compact = false,
+  darkMode = false,
+  showViewToggle = !compact
 }: SoundSignatureProps) {
   const [characteristics, setCharacteristics] = useState<VocalCharacteristics>({
     pitch: 5,
@@ -47,6 +54,9 @@ export default function SoundSignature({
   });
 
   const [compareCharacteristics, setCompareCharacteristics] = useState<VocalCharacteristics | null>(null);
+  const [viewMode, setViewMode] = useState<"bars" | "radar">("bars");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Helper function to get base characteristics for a persona
   const getBaseCharacteristics = (personaId: string): VocalCharacteristics => {
@@ -155,7 +165,139 @@ export default function SoundSignature({
   const getColor = (value: number): string => {
     // Color gradient from blue (cool) to red (hot)
     const hue = Math.max(0, Math.min(240 - (value - 1) * 24, 240));
-    return `hsl(${hue}, 100%, 50%)`;
+    return `hsl(${hue}, ${darkMode ? '80%' : '100%'}, ${darkMode ? '60%' : '50%'})`;
+  };
+  
+  // Function to draw the radar chart
+  const drawRadarChart = () => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const width = canvas.width;
+    const height = canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(centerX, centerY) * 0.8;
+    
+    // Draw background circles
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.75, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.25, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Draw axis lines
+    const characteristics = Object.keys(characteristicDescriptions);
+    const angleStep = (Math.PI * 2) / characteristics.length;
+    
+    characteristics.forEach((key, i) => {
+      const angle = i * angleStep - Math.PI / 2; // Start at top
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+      ctx.stroke();
+      
+      // Draw axis labels
+      const labelX = centerX + Math.cos(angle) * (radius + 15);
+      const labelY = centerY + Math.sin(angle) * (radius + 15);
+      
+      ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(key.charAt(0).toUpperCase() + key.slice(1), labelX, labelY);
+    });
+    
+    // Draw comparison data if available
+    if (compareCharacteristics) {
+      drawDataPoints(ctx, compareCharacteristics, centerX, centerY, radius, angleStep, 'rgba(150, 150, 150, 0.6)', true);
+    }
+    
+    // Draw main data
+    drawDataPoints(ctx, characteristics, centerX, centerY, radius, angleStep, 'rgba(56, 189, 248, 0.8)', false);
+  };
+  
+  // Function to draw data points on the radar chart
+  const drawDataPoints = (
+    ctx: CanvasRenderingContext2D, 
+    data: VocalCharacteristics,
+    centerX: number,
+    centerY: number,
+    radius: number,
+    angleStep: number,
+    color: string,
+    isComparison = false
+  ) => {
+    const characteristics = Object.keys(data) as Array<keyof VocalCharacteristics>;
+    
+    ctx.beginPath();
+    characteristics.forEach((key, i) => {
+      const value = data[key] / 10; // Normalize to 0-1
+      const angle = i * angleStep - Math.PI / 2; // Start at top
+      const x = centerX + Math.cos(angle) * radius * value;
+      const y = centerY + Math.sin(angle) * radius * value;
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    
+    // Close the path
+    const firstKey = characteristics[0];
+    const firstValue = data[firstKey] / 10;
+    const firstAngle = -Math.PI / 2; // Start at top
+    const firstX = centerX + Math.cos(firstAngle) * radius * firstValue;
+    const firstY = centerY + Math.sin(firstAngle) * radius * firstValue;
+    ctx.lineTo(firstX, firstY);
+    
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.4;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+    ctx.strokeStyle = color.replace('0.8', '1.0');
+    ctx.lineWidth = isComparison ? 1 : 2;
+    ctx.stroke();
+    
+    // Draw dots at each data point
+    characteristics.forEach((key, i) => {
+      const value = data[key] / 10; // Normalize to 0-1
+      const angle = i * angleStep - Math.PI / 2; // Start at top
+      const x = centerX + Math.cos(angle) * radius * value;
+      const y = centerY + Math.sin(angle) * radius * value;
+      
+      ctx.beginPath();
+      ctx.arc(x, y, isComparison ? 3 : 4, 0, Math.PI * 2);
+      ctx.fillStyle = isComparison 
+        ? 'rgba(150, 150, 150, 0.9)' 
+        : getColor(data[key]);
+      ctx.fill();
+      ctx.strokeStyle = darkMode ? '#ffffff' : '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
   };
 
   return (
