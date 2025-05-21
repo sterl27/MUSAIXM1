@@ -60,6 +60,11 @@ export default function ToolsNavigation() {
       label: "Personas"
     },
     {
+      href: "/style-transformer",
+      icon: <Wand2Icon size={18} />,
+      label: "Style Transformer"
+    },
+    {
       href: "/tools",
       icon: <Wand2Icon size={18} />,
       label: "Creative Tools"

@@ -10,6 +10,7 @@ import SongWriter from "@/pages/SongWriter";
 import SoundDesign from "@/pages/SoundDesign";
 import Personas from "@/pages/Personas";
 import CreativeTools from "@/pages/CreativeTools";
+import StyleTransformer from "@/pages/StyleTransformer";
 import Admin from "@/pages/Admin";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/sounddesign" component={SoundDesign} />
       <Route path="/personas" component={Personas} />
       <Route path="/tools" component={CreativeTools} />
+      <Route path="/style-transformer" component={StyleTransformer} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
