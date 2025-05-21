@@ -20,12 +20,13 @@ import {
   Wand2, 
   Music, 
   Sparkles, 
-  Mic, 
-  Save, 
   Copy, 
   RotateCcw, 
   AlertCircle,
-  Check
+  Check,
+  User,
+  Bot,
+  SlidersHorizontal
 } from "lucide-react";
 
 // Example style presets
@@ -595,27 +596,43 @@ export default function StyleTransformer() {
                       {transformedLyrics}
                     </div>
                     
-                    <Alert>
-                      <Check className="h-4 w-4" />
+                    <Alert className="bg-green-50 border-green-200">
+                      <Check className="h-4 w-4 text-green-500" />
                       <AlertTitle>Transformation Complete</AlertTitle>
                       <AlertDescription>
                         The lyrics have been transformed to match the {
                           stylePresets.find(s => s.id === selectedStyle)?.name
                         } style
                         {selectedMood ? ` with a ${selectedMood} mood` : ''}.
+                        {useAI && " Powered by OpenAI's advanced language model for professional results."}
                       </AlertDescription>
                     </Alert>
                     
                     <div className="pt-4 border-t">
-                      <h4 className="font-medium mb-2">Further Actions</h4>
-                      <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm">
-                          <Save className="h-4 w-4 mr-2" />
-                          Save to Library
+                      <h4 className="font-medium mb-2">What's Next?</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button variant="outline" size="sm" className="w-full justify-start"
+                          onClick={() => window.location.href = "/personas"}>
+                          <User className="h-4 w-4 mr-2" />
+                          Try Different Personas
                         </Button>
-                        <Button variant="outline" size="sm">
-                          <Mic className="h-4 w-4 mr-2" />
-                          Generate Voice Preview
+                        <Button variant="outline" size="sm" className="w-full justify-start"
+                          onClick={() => window.location.href = "/openai"}>
+                          <Bot className="h-4 w-4 mr-2" />
+                          OpenAI Enhancer
+                        </Button>
+                        <Button variant="outline" size="sm" className="w-full justify-start"
+                          onClick={() => window.location.href = "/sounddesign"}>
+                          <SlidersHorizontal className="h-4 w-4 mr-2" />
+                          Create Sound Design
+                        </Button>
+                        <Button 
+                          variant="default" 
+                          size="sm" 
+                          className="w-full justify-start bg-primary/90 hover:bg-primary"
+                          onClick={handleReset}>
+                          <Wand2 className="h-4 w-4 mr-2" />
+                          New Transformation
                         </Button>
                       </div>
                     </div>
