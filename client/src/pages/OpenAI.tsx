@@ -77,13 +77,10 @@ export default function OpenAI() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <PageLayout title="OpenAI Lyrics Enhancement" description="Use the power of AI to enhance your lyrics">
+      <ToolsNavigation />
       
-      <main className="flex-grow container mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold mb-6">OpenAI Lyrics Enhancement</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Input Section */}
           <div className="space-y-6">
             <Card>
@@ -236,9 +233,6 @@ export default function OpenAI() {
             </Card>
           </div>
         </div>
-      </main>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }

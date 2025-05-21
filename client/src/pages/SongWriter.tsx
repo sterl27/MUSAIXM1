@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageLayout from "@/components/layout/PageLayout";
+import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import { apiRequest } from "@/lib/queryClient";
 import { getMusicStyles, getPersonas, Persona, MusicStyle } from "@/lib/types";
 
