@@ -8,6 +8,8 @@ import Home from "@/pages/Home";
 import OpenAI from "@/pages/OpenAI";
 import SongWriter from "@/pages/SongWriter";
 import SoundDesign from "@/pages/SoundDesign";
+import Personas from "@/pages/Personas";
+import CreativeTools from "@/pages/CreativeTools";
 
 function Router() {
   return (
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/openai" component={OpenAI} />
       <Route path="/songwriter" component={SongWriter} />
       <Route path="/sounddesign" component={SoundDesign} />
+      <Route path="/personas" component={Personas} />
+      <Route path="/tools" component={CreativeTools} />
       <Route component={NotFound} />
     </Switch>
   );

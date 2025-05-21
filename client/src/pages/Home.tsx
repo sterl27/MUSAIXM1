@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageLayout from "@/components/layout/PageLayout";
+import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import PersonaSelector from "@/components/PersonaSelector";
 import MusicStyleSelector from "@/components/MusicStyleSelector";
 import ToolPanel from "@/components/ToolPanel";
@@ -72,53 +72,49 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+    <PageLayout>
+      <ToolsNavigation />
       
-      <main className="flex-grow container mx-auto px-4 py-6 overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 h-full">
-          {/* Left Panel - Tools */}
-          <div className="md:col-span-1 space-y-6">
-            <PersonaSelector 
-              selectedPersona={selectedPersona} 
-              onSelectPersona={setSelectedPersona} 
-            />
-            <MusicStyleSelector
-              selectedMusicStyle={options.musicStyle}
-              onSelectMusicStyle={handleSelectMusicStyle}
-              onDescriptionChange={setCustomMusicStyleDescription}
-            />
-            <ToolPanel 
-              options={options} 
-              onUpdateOptions={handleUpdateOptions} 
-            />
-          </div>
-          
-          {/* Middle Panel - Lyrics Input */}
-          <div className="md:col-span-1 flex flex-col">
-            <LyricsInput 
-              lyrics={lyrics} 
-              onLyricsChange={setLyrics} 
-              onEnhance={handleEnhance}
-              onClear={handleClearLyrics}
-              onPaste={handlePasteFromClipboard}
-              isEnhancing={isEnhancing}
-            />
-          </div>
-          
-          {/* Right Panel - Output/Results */}
-          <div className="md:col-span-1 flex flex-col">
-            <OutputPanel 
-              enhancedLyrics={enhancedLyrics} 
-              isEnhancing={isEnhancing} 
-              persona={selectedPersona}
-              error={error}
-            />
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 h-full">
+        {/* Left Panel - Tools */}
+        <div className="md:col-span-1 space-y-6">
+          <PersonaSelector 
+            selectedPersona={selectedPersona} 
+            onSelectPersona={setSelectedPersona} 
+          />
+          <MusicStyleSelector
+            selectedMusicStyle={options.musicStyle}
+            onSelectMusicStyle={handleSelectMusicStyle}
+            onDescriptionChange={setCustomMusicStyleDescription}
+          />
+          <ToolPanel 
+            options={options} 
+            onUpdateOptions={handleUpdateOptions} 
+          />
         </div>
-      </main>
-      
-      <Footer />
-    </div>
+        
+        {/* Middle Panel - Lyrics Input */}
+        <div className="md:col-span-1 flex flex-col">
+          <LyricsInput 
+            lyrics={lyrics} 
+            onLyricsChange={setLyrics} 
+            onEnhance={handleEnhance}
+            onClear={handleClearLyrics}
+            onPaste={handlePasteFromClipboard}
+            isEnhancing={isEnhancing}
+          />
+        </div>
+        
+        {/* Right Panel - Output/Results */}
+        <div className="md:col-span-1 flex flex-col">
+          <OutputPanel 
+            enhancedLyrics={enhancedLyrics} 
+            isEnhancing={isEnhancing} 
+            persona={selectedPersona}
+            error={error}
+          />
+        </div>
+      </div>
+    </PageLayout>
   );
 }

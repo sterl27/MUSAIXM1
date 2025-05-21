@@ -19,13 +19,13 @@ interface ToolNavItemProps {
 function ToolNavItem({ href, icon, label, isActive }: ToolNavItemProps) {
   return (
     <Link href={href}>
-      <a className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-md hover:bg-muted transition-colors",
+      <div className={cn(
+        "flex items-center gap-2 px-4 py-2 rounded-md hover:bg-muted transition-colors cursor-pointer",
         isActive && "bg-primary/10 text-primary font-medium"
       )}>
         {icon}
         <span>{label}</span>
-      </a>
+      </div>
     </Link>
   );
 }

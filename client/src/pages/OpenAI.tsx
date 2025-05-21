@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import PageLayout from "@/components/layout/PageLayout";
+import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import { apiRequest } from "@/lib/queryClient";
 import { Persona, getPersonaById, getPersonas } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
