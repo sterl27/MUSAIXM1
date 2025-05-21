@@ -1,5 +1,6 @@
 import { getPersonaById } from "@/lib/types";
 import { enhanceLyrics } from "./enhancer";
+import { log } from "../vite";
 
 /**
  * Enhance lyrics using OpenAI or fallback to built-in enhancer

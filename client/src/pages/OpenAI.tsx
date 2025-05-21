@@ -21,9 +21,12 @@ export default function OpenAI() {
   const [error, setError] = useState<string | null>(null);
   const [useAI, setUseAI] = useState(true);
 
+  // Get all available personas
+  const personas = getPersonas();
+  
   // Selected persona will be used as context for the AI
   const [selectedPersona, setSelectedPersona] = useState<Persona | null>(
-    getPersonaById("outkast") || null
+    personas[0] || null
   );
 
   const enhanceMutation = useMutation({
@@ -116,6 +119,33 @@ export default function OpenAI() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="persona">Select Persona</Label>
+                  <Select 
+                    value={selectedPersona?.id || ""} 
+                    onValueChange={(value) => {
+                      const persona = getPersonaById(value);
+                      if (persona) {
+                        setSelectedPersona(persona);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a persona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {personas.map((persona) => (
+                        <SelectItem key={persona.id} value={persona.id}>
+                          {persona.name} - {persona.description}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    The selected persona will influence the style of the enhanced lyrics
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="prompt">Custom Prompt</Label>
                   <Textarea
