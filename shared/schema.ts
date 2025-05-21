@@ -73,6 +73,20 @@ export const soundDesignRequestSchema = z.object({
   instruments: z.array(z.string()).default([])
 });
 
+// Schema for StyleTransformer request
+export const styleTransformerRequestSchema = z.object({
+  lyrics: z.string().min(1, "Lyrics cannot be empty"),
+  targetStyle: z.string().min(1, "Target style must be selected"),
+  mood: z.string().optional(),
+  strength: z.number().min(0.25).max(1).default(0.5),
+  preserveStructure: z.boolean().default(true),
+  keepRhymes: z.boolean().default(true),
+  maintainThemes: z.boolean().default(true),
+  enhanceImagery: z.boolean().default(false),
+  customInstructions: z.string().optional(),
+  useAI: z.boolean().default(true)
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertLyrics = z.infer<typeof insertLyricsSchema>;
@@ -81,3 +95,4 @@ export type EnhanceLyricsRequest = z.infer<typeof enhanceLyricsRequestSchema>;
 export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsRequestSchema>;
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
+export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;

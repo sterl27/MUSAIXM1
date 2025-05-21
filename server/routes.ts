@@ -5,12 +5,14 @@ import {
   enhanceLyricsRequestSchema, 
   openAIEnhanceLyricsRequestSchema,
   songwriterRequestSchema,
-  soundDesignRequestSchema
+  soundDesignRequestSchema,
+  styleTransformerRequestSchema
 } from "@shared/schema";
 import { enhanceLyrics } from "./processors/enhancer";
 import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
 import { generateSongLyrics } from "./processors/songwriter";
 import { generateSoundDesignSuggestion } from "./processors/sounddesign";
+import { transformLyrics } from "./processors/style-transformer";
 import { getAvailableVoices, generateSpeech, defaultVoiceMappings } from "./processors/elevenlabs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -212,6 +214,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const voiceId = defaultVoiceMappings[personaId] || defaultVoiceMappings.default;
     
     return res.status(200).json({ voiceId });
+  });
+
+  // API route for Style Transformer
+  app.post("/api/style-transformer/transform", async (req, res) => {
+    try {
+      // Validate request body
+      const validationResult = styleTransformerRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid request body",
+          errors: validationResult.error.errors
+        });
+      }
+      
+      const { 
+        lyrics, 
+        targetStyle, 
+        mood, 
+        strength, 
+        preserveStructure, 
+        keepRhymes, 
+        maintainThemes, 
+        enhanceImagery, 
+        customInstructions,
+        useAI 
+      } = validationResult.data;
+      
+      // Check if OpenAI API key is configured
+      if (useAI && !process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          message: "OpenAI API key is not configured" 
+        });
+      }
+      
+      // Transform lyrics using the style transformer
+      const transformedLyrics = await transformLyrics(
+        lyrics,
+        {
+          targetStyle,
+          mood,
+          strength,
+          preserveStructure,
+          keepRhymes,
+          maintainThemes,
+          enhanceImagery,
+          customInstructions
+        }
+      );
+      
+      return res.status(200).json({ transformedLyrics });
+    } catch (error) {
+      console.error("Error transforming lyrics:", error);
+      return res.status(500).json({ 
+        message: "Failed to transform lyrics",
+        error: error.message
+      });
+    }
   });
 
   const httpServer = createServer(app);
