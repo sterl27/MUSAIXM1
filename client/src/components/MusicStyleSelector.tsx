@@ -73,13 +73,23 @@ export default function MusicStyleSelector({
 
   return (
     <div className="bg-card rounded-xl shadow-lg p-5 border border-muted mt-6">
-      <h2 className="font-semibold text-xl mb-4 flex items-center">
+      <h2 className="font-semibold text-xl mb-3 flex items-center">
         <Disc className="text-secondary mr-2" size={20} />
         Music Style
       </h2>
       <p className="text-muted-foreground text-sm mb-4">
-        Select a music style to match your lyrics
+        Choose a production style to shape the sound of your music
       </p>
+      
+      {/* Style Suggestion */}
+      <div className="bg-muted/50 rounded-md p-3 mb-4 text-sm">
+        <h3 className="font-medium mb-1 text-foreground/80">Style Tips:</h3>
+        <ul className="list-disc list-inside text-muted-foreground space-y-1">
+          <li>Select a style that complements your lyrics and persona</li>
+          <li>Customize the description to add specific production elements</li>
+          <li>Production notes will be used to enhance your lyrics</li>
+        </ul>
+      </div>
       
       <div className="grid grid-cols-3 gap-3 mb-4">
         {musicStyles.map((style) => (

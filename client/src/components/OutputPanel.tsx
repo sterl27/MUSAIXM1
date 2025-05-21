@@ -90,32 +90,49 @@ export default function OutputPanel({
 
   return (
     <div className="bg-card rounded-xl shadow-lg p-5 border border-muted h-full flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-3">
         <h2 className="font-semibold text-xl flex items-center">
           <Sparkles className="text-secondary mr-2" size={20} />
-          Enhanced Lyrics
+          Enhanced Output
         </h2>
         <div className="flex space-x-2">
           <Button 
-            variant="ghost" 
-            size="icon" 
+            variant="outline" 
+            size="sm" 
             onClick={() => setShowOriginal(!showOriginal)}
-            className={`text-muted-foreground hover:text-foreground ${showOriginal ? 'text-secondary' : ''}`} 
+            className={`flex items-center ${showOriginal ? 'bg-secondary/10' : ''}`} 
             title="Toggle original/enhanced view"
             disabled={!enhancedLyrics}
           >
-            {showOriginal ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
+            {showOriginal ? <ToggleRight size={14} className="mr-1" /> : <ToggleLeft size={14} className="mr-1" />}
+            <span>{showOriginal ? 'Original' : 'Enhanced'}</span>
           </Button>
           <Button 
-            variant="ghost" 
-            size="icon" 
+            variant="outline" 
+            size="sm" 
             onClick={copyToClipboard} 
-            className="text-muted-foreground hover:text-foreground" 
+            className="flex items-center" 
             title="Copy to clipboard"
             disabled={!enhancedLyrics}
           >
-            <Copy size={16} />
+            <Copy size={14} className="mr-1" />
+            <span>Copy</span>
           </Button>
+        </div>
+      </div>
+      
+      {/* Output Explanation */}
+      <div className="bg-muted/50 rounded-md p-3 mb-3 text-sm">
+        <h3 className="font-medium mb-1 text-foreground/80">Output Legend:</h3>
+        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center">
+            <span className="suno-annotation py-1 px-2 mr-1">[SUNO: tag]</span>
+            <span>Music production tags</span>
+          </div>
+          <div className="flex items-center">
+            <span className="fx-annotation py-1 px-2 mr-1">[ECHO]</span>
+            <span>Vocal effect suggestions</span>
+          </div>
         </div>
       </div>
       
@@ -126,7 +143,7 @@ export default function OutputPanel({
               <div className="w-12 h-12 border-t-2 border-b-2 border-primary rounded-full animate-spin mb-4"></div>
               <p className="text-foreground">Enhancing your lyrics...</p>
               <p className="text-muted-foreground text-sm mt-2">
-                Applying {persona.name} style persona
+                Applying <span className="font-medium">{persona.name}</span> style persona
               </p>
             </div>
           ) : error ? (
@@ -135,11 +152,14 @@ export default function OutputPanel({
               <p className="text-center">{error}</p>
             </div>
           ) : enhancedLyrics ? (
-            formatLyrics(enhancedLyrics)
+            <div className="text-base">
+              {formatLyrics(enhancedLyrics)}
+            </div>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground py-8">
               <FileText className="h-8 w-8 mb-2" />
-              <p>Enhanced lyrics will appear here</p>
+              <p className="text-center">Your enhanced lyrics will appear here</p>
+              <p className="text-center text-sm mt-2">Enter lyrics and click "Enhance Lyrics" to begin</p>
             </div>
           )}
         </div>
@@ -147,8 +167,8 @@ export default function OutputPanel({
       
       {enhancedLyrics && (
         <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-muted-foreground">
-            Enhanced by <span className="text-primary">{persona.name}</span> persona
+          <div className="text-sm font-medium">
+            Enhanced with <span className="text-primary">{persona.name}</span> style
           </div>
           <Button 
             className="px-4 py-2 bg-secondary hover:bg-secondary/90 transition-colors rounded-md font-medium text-secondary-foreground flex items-center space-x-2"
