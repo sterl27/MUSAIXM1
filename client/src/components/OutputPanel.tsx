@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Persona } from "@/lib/types";
-import { Sparkles, ToggleLeft, ToggleRight, Copy, AlertCircle, FileText, Download } from "lucide-react";
+import { Sparkles, ToggleLeft, ToggleRight, Copy, AlertCircle, FileText, Download, Zap } from "lucide-react";
+import PersonaEnergyMeter from "./PersonaEnergyMeter";
 
 interface OutputPanelProps {
   enhancedLyrics: string | null;
@@ -166,18 +167,28 @@ export default function OutputPanel({
       </div>
       
       {enhancedLyrics && (
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm font-medium">
-            Enhanced with <span className="text-primary">{persona.name}</span> style
+        <>
+          {/* Persona Energy Meter */}
+          <div className="mt-4 mb-3">
+            <PersonaEnergyMeter 
+              persona={persona} 
+              lyrics={enhancedLyrics} 
+            />
           </div>
-          <Button 
-            className="px-4 py-2 bg-secondary hover:bg-secondary/90 transition-colors rounded-md font-medium text-secondary-foreground flex items-center space-x-2"
-            onClick={saveLyricsToFile}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            <span>Save Lyrics</span>
-          </Button>
-        </div>
+          
+          <div className="flex justify-between items-center mt-4">
+            <div className="text-sm font-medium">
+              Enhanced with <span className="text-primary">{persona.name}</span> style
+            </div>
+            <Button 
+              className="px-4 py-2 bg-secondary hover:bg-secondary/90 transition-colors rounded-md font-medium text-secondary-foreground flex items-center space-x-2"
+              onClick={saveLyricsToFile}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              <span>Save Lyrics</span>
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );
