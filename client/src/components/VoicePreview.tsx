@@ -5,14 +5,23 @@ import { Play, Volume2, Square, VolumeX, Settings, AlertTriangle } from "lucide-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
+// Voice interface for ElevenLabs API response
 interface Voice {
   voice_id: string;
   name: string;
   category?: string;
   description?: string;
   labels?: Record<string, string>;
+}
+
+// API response interfaces
+interface VoicesResponse {
+  voices: Voice[];
+}
+
+interface VoiceMappingResponse {
+  voiceId: string;
 }
 
 interface VoicePreviewProps {
@@ -35,12 +44,23 @@ export default function VoicePreview({ persona, sampleText }: VoicePreviewProps)
   const textToSpeak = sampleText || defaultText;
 
   // Fetch available voices
-  const { data: voicesData, isLoading: voicesLoading, error: voicesError } = useQuery({
+  const { data: voicesData, isLoading: voicesLoading, error: voicesError } = useQuery<Voice[]>({
     queryKey: ['/api/voices'],
     queryFn: async () => {
       try {
-        const response = await apiRequest('/api/voices');
-        return response.voices as Voice[];
+        const response = await fetch('/api/voices', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch voices');
+        }
+        
+        const data = await response.json() as VoicesResponse;
+        return data.voices;
       } catch (error) {
         console.error('Error fetching voices:', error);
         throw error;
@@ -50,26 +70,38 @@ export default function VoicePreview({ persona, sampleText }: VoicePreviewProps)
     enabled: showSettings, // Only fetch when settings are shown
   });
 
-  // Fetch the default voice mapping for this persona
-  const { data: voiceMappingData } = useQuery({
-    queryKey: ['/api/voice/mapping', persona.id],
-    queryFn: async () => {
+  // Effect to set the selected voice when mapping is fetched
+  useEffect(() => {
+    const fetchVoiceMapping = async () => {
       try {
-        const response = await apiRequest(`/api/voice/mapping/${persona.id}`);
-        return response.voiceId as string;
+        const response = await fetch(`/api/voice/mapping/${persona.id}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch voice mapping');
+        }
+        
+        const data = await response.json() as VoiceMappingResponse;
+        if (data.voiceId && !selectedVoiceId) {
+          setSelectedVoiceId(data.voiceId);
+          setDefaultVoiceId(data.voiceId);
+        }
       } catch (error) {
         console.error('Error fetching voice mapping:', error);
-        throw error;
+        // Fall back to a default voice if mapping fails
+        if (!selectedVoiceId) {
+          // This uses a voice ID from the ElevenLabs default voices
+          setSelectedVoiceId("21m00Tcm4TlvDq8ikWAM"); // Default voice (Rachel)
+        }
       }
-    },
-    retry: 1,
-    onSuccess: (data) => {
-      if (!selectedVoiceId) {
-        setSelectedVoiceId(data);
-        setDefaultVoiceId(data);
-      }
-    }
-  });
+    };
+
+    fetchVoiceMapping();
+  }, [persona.id, selectedVoiceId]);
 
   // Function to play audio
   const speak = async () => {
