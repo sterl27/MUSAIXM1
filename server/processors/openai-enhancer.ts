@@ -1,6 +1,38 @@
-import { getPersonaById } from "@/lib/types";
 import { enhanceLyrics } from "./enhancer";
 import { log } from "../vite";
+
+// Import needed types
+const personas = [
+  {
+    id: "outkast",
+    name: "OutKast",
+    description: "Southern flow",
+    icon: "crown"
+  },
+  {
+    id: "goodiemob",
+    name: "Goodie Mob",
+    description: "Soulful conscious",
+    icon: "brain"
+  },
+  {
+    id: "liljon",
+    name: "Lil Jon",
+    description: "Crunk energy",
+    icon: "zap"
+  },
+  {
+    id: "ti",
+    name: "T.I.",
+    description: "Trap precision",
+    icon: "target"
+  }
+];
+
+// Helper function to get persona by ID
+function getPersonaById(id: string) {
+  return personas.find(persona => persona.id === id);
+}
 
 /**
  * Enhance lyrics using OpenAI or fallback to built-in enhancer
