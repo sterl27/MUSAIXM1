@@ -47,10 +47,10 @@ export default function PersonaSelector({ selectedPersona, onSelectPersona }: Pe
     <div className="bg-card rounded-xl shadow-lg p-5 border border-muted">
       <h2 className="font-semibold text-xl mb-4 flex items-center">
         <Theater className="text-secondary mr-2" size={20} />
-        Persona Selection
+        Music Persona
       </h2>
       <p className="text-muted-foreground text-sm mb-4">
-        Choose a rap style/persona to enhance your lyrics
+        Choose a music persona to define genre, tempo, sound vibe, vocals and overall style
       </p>
       
       <div className="grid grid-cols-2 gap-3">
@@ -69,11 +69,8 @@ export default function PersonaSelector({ selectedPersona, onSelectPersona }: Pe
               htmlFor={`persona-${persona.id}`} 
               className="flex flex-col items-center p-3 border-2 border-muted rounded-lg cursor-pointer hover:bg-muted transition-colors peer-checked:border-secondary peer-checked:bg-muted"
             >
-              <div className="text-2xl mb-1">
-                {renderIcon(persona.icon)}
-              </div>
-              <span className="font-medium">{persona.name}</span>
-              <span className="text-xs text-muted-foreground">{persona.description}</span>
+              <span className="font-medium text-lg">{persona.name}</span>
+              <span className="text-sm text-muted-foreground mt-1">{persona.description}</span>
             </label>
             <div className="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-secondary">
               <CheckCircle size={16} />
@@ -92,10 +89,15 @@ export default function PersonaSelector({ selectedPersona, onSelectPersona }: Pe
           Hear how your lyrics might sound with this persona's voice
         </p>
         
-        <VoicePreview 
-          persona={selectedPersona} 
-          sampleText={getSampleTextForPersona(selectedPersona.id)}
-        />
+        <div className="bg-muted p-3 rounded-md">
+          <VoicePreview 
+            persona={selectedPersona} 
+            sampleText={getSampleTextForPersona(selectedPersona.id)}
+          />
+          <p className="text-xs text-muted-foreground mt-2 italic">
+            Using Microsoft David - English (United States)
+          </p>
+        </div>
       </div>
     </div>
   );

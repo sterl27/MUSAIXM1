@@ -39,19 +39,19 @@ export function getPersonas(): Persona[] {
       id: "goodiemob",
       name: "Goodie Mob",
       description: "Soul food vibes",
-      icon: "fire"
+      icon: "brain"
     },
     {
       id: "liljon",
       name: "Lil Jon",
       description: "Crunk energy",
-      icon: "volume-high"
+      icon: "zap"
     },
     {
       id: "ti",
       name: "T.I.",
       description: "Trap precision",
-      icon: "microphone"
+      icon: "target"
     }
   ];
 }
