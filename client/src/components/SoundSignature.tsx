@@ -185,29 +185,37 @@ export default function SoundSignature({
     const centerY = height / 2;
     const radius = Math.min(centerX, centerY) * 0.8;
     
+    // Create the characteristic keys in the right order
+    const orderedKeys: (keyof VocalCharacteristics)[] = ['pitch', 'richness', 'intensity', 'clarity', 'pace'];
+    const angleStep = (Math.PI * 2) / orderedKeys.length;
+    
+    // Draw background shape - gray pentagon
+    ctx.beginPath();
+    orderedKeys.forEach((_, i) => {
+      const angle = i * angleStep - Math.PI / 2; // Start at top
+      const x = centerX + Math.cos(angle) * radius;
+      const y = centerY + Math.sin(angle) * radius;
+      
+      if (i === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.closePath();
+    ctx.fillStyle = darkMode ? 'rgba(60, 60, 60, 0.1)' : 'rgba(240, 240, 240, 0.8)';
+    ctx.fill();
+    
     // Draw background circles
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.75, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.5, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius * 0.25, 0, Math.PI * 2);
-    ctx.stroke();
+    [0.25, 0.5, 0.75, 1].forEach(factor => {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius * factor, 0, Math.PI * 2);
+      ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+      ctx.stroke();
+    });
     
     // Draw axis lines
-    const characteristics = Object.keys(characteristicDescriptions);
-    const angleStep = (Math.PI * 2) / characteristics.length;
-    
-    characteristics.forEach((key, i) => {
+    orderedKeys.forEach((key, i) => {
       const angle = i * angleStep - Math.PI / 2; // Start at top
       const x = centerX + Math.cos(angle) * radius;
       const y = centerY + Math.sin(angle) * radius;
@@ -222,20 +230,30 @@ export default function SoundSignature({
       const labelX = centerX + Math.cos(angle) * (radius + 15);
       const labelY = centerY + Math.sin(angle) * (radius + 15);
       
-      ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(key.charAt(0).toUpperCase() + key.slice(1), labelX, labelY);
+      
+      // Draw small dots at each scale position
+      [0.25, 0.5, 0.75].forEach(factor => {
+        const dotX = centerX + Math.cos(angle) * radius * factor;
+        const dotY = centerY + Math.sin(angle) * radius * factor;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, 1, 0, Math.PI * 2);
+        ctx.fillStyle = darkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)';
+        ctx.fill();
+      });
     });
     
     // Draw comparison data if available
     if (compareCharacteristics) {
-      drawDataPoints(ctx, compareCharacteristics, centerX, centerY, radius, angleStep, 'rgba(150, 150, 150, 0.6)', true);
+      drawDataPoints(ctx, compareCharacteristics, centerX, centerY, radius, angleStep, 'rgba(150, 150, 150, 0.75)', true);
     }
     
-    // Draw main data
-    drawDataPoints(ctx, characteristics, centerX, centerY, radius, angleStep, 'rgba(56, 189, 248, 0.8)', false);
+    // Draw main data for the persona
+    drawDataPoints(ctx, characteristics, centerX, centerY, radius, angleStep, 'rgba(56, 189, 248, 0.9)', false);
   };
   
   // Function to draw data points on the radar chart
@@ -249,9 +267,13 @@ export default function SoundSignature({
     color: string,
     isComparison = false
   ) => {
-    const characteristics = Object.keys(data) as Array<keyof VocalCharacteristics>;
+    // Get the characteristic keys in the correct order
+    const characteristics: Array<keyof VocalCharacteristics> = ['pitch', 'richness', 'intensity', 'clarity', 'pace'];
     
+    // Start the path
     ctx.beginPath();
+    
+    // Draw the shape connecting all data points
     characteristics.forEach((key, i) => {
       const value = data[key] / 10; // Normalize to 0-1
       const angle = i * angleStep - Math.PI / 2; // Start at top
@@ -265,7 +287,7 @@ export default function SoundSignature({
       }
     });
     
-    // Close the path
+    // Close the shape
     const firstKey = characteristics[0];
     const firstValue = data[firstKey] / 10;
     const firstAngle = -Math.PI / 2; // Start at top
@@ -273,113 +295,227 @@ export default function SoundSignature({
     const firstY = centerY + Math.sin(firstAngle) * radius * firstValue;
     ctx.lineTo(firstX, firstY);
     
+    // Fill the shape with semi-transparent color
     ctx.fillStyle = color;
     ctx.globalAlpha = 0.4;
     ctx.fill();
     ctx.globalAlpha = 1.0;
-    ctx.strokeStyle = color.replace('0.8', '1.0');
+    
+    // Outline the shape
+    ctx.strokeStyle = color.replace('0.8', '1.0').replace('0.6', '0.8');
     ctx.lineWidth = isComparison ? 1 : 2;
     ctx.stroke();
     
-    // Draw dots at each data point
+    // Draw dots at each data point with glow effect
     characteristics.forEach((key, i) => {
       const value = data[key] / 10; // Normalize to 0-1
       const angle = i * angleStep - Math.PI / 2; // Start at top
       const x = centerX + Math.cos(angle) * radius * value;
       const y = centerY + Math.sin(angle) * radius * value;
       
+      // Draw glow effect
+      if (!isComparison) {
+        const dotColor = getColor(data[key]);
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = dotColor.replace(')', ', 0.3)').replace('hsl', 'hsla');
+        ctx.fill();
+      }
+      
+      // Draw the dot
       ctx.beginPath();
       ctx.arc(x, y, isComparison ? 3 : 4, 0, Math.PI * 2);
       ctx.fillStyle = isComparison 
         ? 'rgba(150, 150, 150, 0.9)' 
         : getColor(data[key]);
       ctx.fill();
-      ctx.strokeStyle = darkMode ? '#ffffff' : '#ffffff';
+      
+      // Add white outline to make dots stand out
+      ctx.strokeStyle = darkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.9)';
       ctx.lineWidth = 1;
       ctx.stroke();
     });
   };
 
+  // Effect to update radar chart when data changes
+  useEffect(() => {
+    if (viewMode === "radar" && !compact) {
+      requestAnimationFrame(() => drawRadarChart());
+    }
+  }, [characteristics, compareCharacteristics, viewMode, darkMode, compact]);
+  
+  // Handle animation when switching personas or view modes
+  useEffect(() => {
+    if (isAnimating) {
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnimating]);
+
   return (
-    <div className={`relative ${compact ? 'p-2' : 'p-4'} ${className}`}>
-      {!compact && <h3 className="text-sm font-medium mb-3">Sound Signature</h3>}
-      
-      <div className={`grid grid-cols-5 gap-${compact ? '1' : '2'} mb-${compact ? '2' : '4'}`}>
-        {Object.entries(characteristics).map(([key, value]) => {
-          const characteristicKey = key as keyof VocalCharacteristics;
-          const compareValue = compareCharacteristics ? compareCharacteristics[characteristicKey] : null;
+    <div className={`relative ${compact ? 'p-2' : 'p-4'} ${className} ${darkMode ? 'bg-gray-900 text-white' : ''}`}>
+      {!compact && (
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-sm font-medium">Sound Signature</h3>
           
-          return (
-            <TooltipProvider key={key}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center group">
-                    <div className="flex items-end h-[65px] justify-center">
-                      {/* Compare bar (if a comparison persona is provided) */}
-                      {compareValue !== null && (
+          {showViewToggle && (
+            <div className="flex items-center space-x-2">
+              <Button 
+                size="sm" 
+                variant={viewMode === "bars" ? "default" : "outline"} 
+                className="h-8 px-2 py-1"
+                onClick={() => {
+                  setViewMode("bars");
+                  setIsAnimating(true);
+                }}
+              >
+                <BarChart3 className="h-4 w-4 mr-1" />
+                <span className="text-xs">Bars</span>
+              </Button>
+              <Button 
+                size="sm" 
+                variant={viewMode === "radar" ? "default" : "outline"} 
+                className="h-8 px-2 py-1"
+                onClick={() => {
+                  setViewMode("radar");
+                  setIsAnimating(true);
+                  // Need to slightly delay drawing to ensure canvas is mounted
+                  setTimeout(() => drawRadarChart(), 50);
+                }}
+              >
+                <Activity className="h-4 w-4 mr-1" />
+                <span className="text-xs">Radar</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Bar Chart View */}
+      {viewMode === "bars" && (
+        <div className={`grid grid-cols-5 gap-${compact ? '1' : '2'} mb-${compact ? '2' : '4'} transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+          {Object.entries(characteristics).map(([key, value]) => {
+            const characteristicKey = key as keyof VocalCharacteristics;
+            const compareValue = compareCharacteristics ? compareCharacteristics[characteristicKey] : null;
+            
+            return (
+              <TooltipProvider key={key}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex flex-col items-center group">
+                      <div className="flex items-end h-[65px] justify-center">
+                        {/* Compare bar (if a comparison persona is provided) */}
+                        {compareValue !== null && (
+                          <div
+                            className="w-2 rounded-full transition-all duration-300 mr-1 opacity-70"
+                            style={{
+                              height: `${compareValue * 6}px`,
+                              backgroundColor: darkMode ? 'rgba(180, 180, 180, 0.6)' : 'rgba(100, 100, 100, 0.6)',
+                              boxShadow: darkMode ? '0 0 4px rgba(180, 180, 180, 0.4)' : '0 0 4px rgba(100, 100, 100, 0.4)'
+                            }}
+                          ></div>
+                        )}
+                        
+                        {/* Main persona bar */}
                         <div
-                          className="w-2 rounded-full transition-all duration-300 mr-1 opacity-70"
+                          className="w-4 rounded-full transition-all duration-300 group-hover:scale-110"
                           style={{
-                            height: `${compareValue * 6}px`,
-                            backgroundColor: 'rgba(100, 100, 100, 0.6)',
-                            boxShadow: '0 0 4px rgba(100, 100, 100, 0.4)'
+                            height: `${value * 6}px`,
+                            backgroundColor: getColor(value),
+                            boxShadow: `0 0 8px ${getColor(value)}80`
                           }}
                         ></div>
-                      )}
+                      </div>
                       
-                      {/* Main persona bar */}
-                      <div
-                        className="w-4 rounded-full transition-all duration-300 group-hover:scale-110"
-                        style={{
-                          height: `${value * 6}px`,
-                          backgroundColor: getColor(value),
-                          boxShadow: `0 0 8px ${getColor(value)}80`
-                        }}
-                      ></div>
-                    </div>
-                    
-                    {showLabels && (
-                      <>
-                        <span className="text-xs mt-2 capitalize">{key}</span>
-                        <span className="text-xs text-muted-foreground">{value}/10</span>
-                      </>
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[220px] p-3">
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium capitalize">{key}</span>
-                    <p className="text-xs">{characteristicDescriptions[key as keyof typeof characteristicDescriptions]}</p>
-                    <div className="text-xs mt-1">
-                      <strong>{persona.name}:</strong> {value}/10
-                      {compareValue !== null && comparePersona && (
-                        <div className="mt-1">
-                          <strong>{comparePersona.name}:</strong> {compareValue}/10
-                          <div className="text-xs mt-1">
-                            {compareValue > value
-                              ? `${comparePersona.name} has ${compareValue - value} points higher ${key} than ${persona.name}.`
-                              : compareValue < value
-                              ? `${comparePersona.name} has ${value - compareValue} points lower ${key} than ${persona.name}.`
-                              : `Both personas have the same ${key} level.`
-                            }
-                          </div>
-                        </div>
+                      {showLabels && (
+                        <>
+                          <span className="text-xs mt-2 capitalize">{key}</span>
+                          <span className="text-xs text-muted-foreground">{value}/10</span>
+                        </>
                       )}
                     </div>
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          );
-        })}
-      </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className={`max-w-[220px] p-3 ${darkMode ? 'bg-gray-800 text-white border-gray-700' : ''}`}>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium capitalize">{key}</span>
+                      <p className="text-xs">{characteristicDescriptions[key as keyof typeof characteristicDescriptions]}</p>
+                      <div className="text-xs mt-1">
+                        <strong>{persona.name}:</strong> {value}/10
+                        {compareValue !== null && comparePersona && (
+                          <div className="mt-1">
+                            <strong>{comparePersona.name}:</strong> {compareValue}/10
+                            <div className="text-xs mt-1">
+                              {compareValue > value
+                                ? `${comparePersona.name} has ${compareValue - value} points higher ${key} than ${persona.name}.`
+                                : compareValue < value
+                                ? `${comparePersona.name} has ${value - compareValue} points lower ${key} than ${persona.name}.`
+                                : `Both personas have the same ${key} level.`
+                              }
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </div>
+      )}
       
+      {/* Radar Chart View */}
+      {viewMode === "radar" && !compact && (
+        <div className={`w-full flex justify-center transition-opacity duration-300 ${isAnimating ? 'opacity-0' : 'opacity-100'}`}>
+          <div className="relative w-full max-w-[300px] aspect-square">
+            <canvas 
+              ref={canvasRef} 
+              width={300} 
+              height={300} 
+              className="w-full h-full"
+            ></canvas>
+            
+            {/* Legend */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center space-x-4 mt-2">
+              <div className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-1" 
+                  style={{ backgroundColor: 'rgba(56, 189, 248, 0.8)' }}
+                ></div>
+                <span className="text-xs">{persona.name}</span>
+              </div>
+              
+              {comparePersona && (
+                <div className="flex items-center">
+                  <div 
+                    className="w-3 h-3 rounded-full mr-1" 
+                    style={{ backgroundColor: 'rgba(150, 150, 150, 0.9)' }}
+                  ></div>
+                  <span className="text-xs">{comparePersona.name}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Info section */}
       {!compact && (
-        <div className="text-xs text-muted-foreground mt-2">
+        <div className="flex items-center text-xs text-muted-foreground mt-4">
+          <Info className="h-3 w-3 mr-1 inline" />
           {comparePersona 
             ? `Comparing vocal characteristics of ${persona.name} (primary) with ${comparePersona.name} (secondary).`
-            : `This visualization represents the vocal characteristics of ${persona.name}'s sound signature.`
+            : `This visualization represents the vocal characteristics that define ${persona.name}'s unique sound signature.`
           }
+        </div>
+      )}
+      
+      {/* Lyrics impact message if lyrics are provided */}
+      {!compact && lyrics && (
+        <div className="text-xs mt-2 text-primary italic">
+          * The current lyrics have slightly modified the base sound signature based on content analysis.
         </div>
       )}
     </div>
