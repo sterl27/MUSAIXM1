@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import PageLayout from "@/components/layout/PageLayout";
 import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import { Button } from "@/components/ui/button";
@@ -69,42 +70,85 @@ export default function StyleTransformer() {
   const [enhanceImagery, setEnhanceImagery] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transformationProgress, setTransformationProgress] = useState(0);
-  
-  // Mock transformed lyrics for demo
+  const [useAI, setUseAI] = useState(true);
   const [transformedLyrics, setTransformedLyrics] = useState<string | null>(null);
   
   // Handle the transformation process
   const transformLyricsMutation = useMutation({
     mutationFn: async () => {
-      // In a real app, this would be an API call to the OpenAI service
-      
-      // Simulate API processing time with progress updates
+      if (!selectedStyle) {
+        throw new Error("Please select a target style");
+      }
+
+      // Set processing state
       setIsProcessing(true);
-      setTransformationProgress(0);
+      setTransformationProgress(10);
       
-      // Create progress simulation
-      for (let i = 1; i <= 10; i++) {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setTransformationProgress(i * 10);
+      // Prepare the request data
+      const requestData = {
+        lyrics: inputLyrics,
+        targetStyle: selectedStyle,
+        mood: selectedMood || undefined,
+        strength: transformationStrength,
+        preserveStructure,
+        keepRhymes,
+        maintainThemes,
+        enhanceImagery,
+        customInstructions: customInstructions || undefined,
+        useAI: useAI
+      };
+      
+      try {
+        // Set progress to show the request is being processed
+        setTransformationProgress(30);
+        
+        // Make the API request
+        const response = await fetch('/api/style-transformer/transform', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestData)
+        });
+        
+        // Check if response is ok
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+        
+        // Parse response JSON
+        const data = await response.json();
+        setTransformationProgress(90);
+        
+        // Check if the response contains the transformed lyrics
+        if (data && data.transformedLyrics) {
+          setTransformedLyrics(data.transformedLyrics);
+          setTransformationProgress(100);
+          setIsProcessing(false);
+          return data.transformedLyrics;
+        } else {
+          throw new Error("Received invalid response from the server");
+        }
+      } catch (error) {
+        // Fall back to local transformation if the API fails
+        console.warn("API request failed, falling back to local transformation:", error);
+        
+        // Use fallback transformation functions
+        let result = "";
+        if (selectedStyle === "rap-trap") {
+          result = transformToTrapStyle(inputLyrics);
+        } else if (selectedStyle === "pop-mainstream") {
+          result = transformToPopStyle(inputLyrics);
+        } else if (selectedStyle === "rock-classic") {
+          result = transformToRockStyle(inputLyrics);
+        } else {
+          // Generic transformation for other styles
+          result = `[Transformed to ${selectedStyle} style]\n\n${transformWithAIPrompts(inputLyrics)}`;
+        }
+        
+        setTransformedLyrics(result);
+        setTransformationProgress(100);
+        setIsProcessing(false);
+        return result;
       }
-      
-      // Generate sample transformed lyrics based on style
-      let result = "";
-      if (selectedStyle === "rap-trap") {
-        result = transformToTrapStyle(inputLyrics);
-      } else if (selectedStyle === "pop-mainstream") {
-        result = transformToPopStyle(inputLyrics);
-      } else if (selectedStyle === "rock-classic") {
-        result = transformToRockStyle(inputLyrics);
-      } else {
-        // Generic transformation for other styles
-        result = `[Transformed to ${selectedStyle} style]\n\n${transformWithAIPrompts(inputLyrics)}`;
-      }
-      
-      setTransformedLyrics(result);
-      setIsProcessing(false);
-      
-      return result;
     },
     onSuccess: () => {
       toast({
@@ -388,6 +432,22 @@ export default function StyleTransformer() {
                       <h3 className="text-lg font-medium mb-2">Transformation Settings</h3>
                       
                       <div className="space-y-4">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Switch
+                            id="use-ai"
+                            checked={useAI}
+                            onCheckedChange={setUseAI}
+                          />
+                          <Label htmlFor="use-ai" className="cursor-pointer">
+                            Use AI-Powered Transformation
+                          </Label>
+                          {useAI && (
+                            <Badge variant="outline" className="ml-auto">
+                              OpenAI
+                            </Badge>
+                          )}
+                        </div>
+                        
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <Label htmlFor="strength">Transformation Strength</Label>
