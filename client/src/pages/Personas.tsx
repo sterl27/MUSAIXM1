@@ -19,6 +19,8 @@ export default function Personas() {
     icon: "crown"
   });
   
+  const [comparePersona, setComparePersona] = useState<Persona | null>(null);
+  const [isComparing, setIsComparing] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("all");
   
   const personas = getPersonas();
@@ -84,11 +86,61 @@ export default function Personas() {
               
               {/* Sound Signature Visualization */}
               <div className="p-4 border rounded-md bg-card">
-                <h4 className="text-sm font-medium flex items-center mb-2">
-                  <Activity className="w-4 h-4 mr-2 text-blue-500" />
-                  Sound Signature
-                </h4>
-                <SoundSignature persona={selectedPersona} />
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-medium flex items-center">
+                    <Activity className="w-4 h-4 mr-2 text-blue-500" />
+                    Sound Signature
+                  </h4>
+                  <div className="flex items-center">
+                    <label htmlFor="compare-toggle" className="text-xs mr-2 cursor-pointer select-none">
+                      Compare Mode
+                    </label>
+                    <input 
+                      type="checkbox" 
+                      id="compare-toggle"
+                      checked={isComparing}
+                      onChange={(e) => {
+                        setIsComparing(e.target.checked);
+                        if (!e.target.checked) {
+                          setComparePersona(null);
+                        }
+                      }}
+                      className="form-checkbox h-3 w-3 text-primary rounded cursor-pointer"
+                    />
+                  </div>
+                </div>
+                
+                {isComparing && (
+                  <div className="mb-4 p-3 bg-muted/40 rounded-md">
+                    <p className="text-xs mb-2">Select a persona to compare with {selectedPersona.name}:</p>
+                    <div className="grid grid-cols-2 gap-2 max-h-[120px] overflow-y-auto">
+                      {personas
+                        .filter(p => p.id !== selectedPersona.id)
+                        .map(persona => (
+                          <div 
+                            key={persona.id}
+                            onClick={() => setComparePersona(persona)}
+                            className={`p-2 rounded-md cursor-pointer text-xs flex items-center ${
+                              comparePersona?.id === persona.id 
+                                ? 'bg-primary/10 border border-primary/30' 
+                                : 'bg-background/60 border border-border hover:border-primary/20'
+                            }`}
+                          >
+                            <Avatar className="h-6 w-6 mr-2">
+                              <AvatarFallback className="text-[10px]">{persona.name[0]}</AvatarFallback>
+                            </Avatar>
+                            <span className="truncate">{persona.name}</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+                )}
+                
+                <SoundSignature 
+                  persona={selectedPersona} 
+                  comparePersona={isComparing ? comparePersona : null} 
+                />
               </div>
               
               <VoicePreview 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Persona } from "@/lib/types";
 import { CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Vocal characteristics to visualize
 interface VocalCharacteristics {
@@ -11,13 +12,32 @@ interface VocalCharacteristics {
   pace: number;       // Scale of 1-10, slow to fast
 }
 
-interface SoundSignatureProps {
-  persona: Persona;
-  lyrics?: string; // Optional lyrics that might influence the signature
-  className?: string;
+// Descriptions for each vocal characteristic
+const characteristicDescriptions = {
+  pitch: "The relative highness or lowness of a vocal tone. Lower values indicate deeper voices, higher values indicate higher-pitched voices.",
+  richness: "The fullness and warmth of the vocal tone. Lower values sound thin or sparse, higher values have more depth and resonance.",
+  intensity: "The perceived power and emotional force. Lower values sound gentle or reserved, higher values are more forceful and commanding.",
+  clarity: "How clear and distinct the vocals sound. Lower values indicate more raspy or gritty vocals, higher values sound cleaner and more defined.",
+  pace: "The tempo and rhythm of vocal delivery. Lower values indicate slower, more methodical delivery, higher values reflect faster flows or tempos."
 }
 
-export default function SoundSignature({ persona, lyrics = "", className = "" }: SoundSignatureProps) {
+interface SoundSignatureProps {
+  persona: Persona;
+  comparePersona?: Persona | null; // Optional persona to compare with
+  lyrics?: string; // Optional lyrics that might influence the signature
+  className?: string;
+  showLabels?: boolean; // Whether to show labels below each bar
+  compact?: boolean; // Whether to show a compact version of the visualization
+}
+
+export default function SoundSignature({ 
+  persona, 
+  comparePersona = null, 
+  lyrics = "", 
+  className = "",
+  showLabels = true,
+  compact = false
+}: SoundSignatureProps) {
   const [characteristics, setCharacteristics] = useState<VocalCharacteristics>({
     pitch: 5,
     richness: 5,
@@ -26,63 +46,65 @@ export default function SoundSignature({ persona, lyrics = "", className = "" }:
     pace: 5
   });
 
+  const [compareCharacteristics, setCompareCharacteristics] = useState<VocalCharacteristics | null>(null);
+
+  // Helper function to get base characteristics for a persona
+  const getBaseCharacteristics = (personaId: string): VocalCharacteristics => {
+    switch (personaId) {
+      // Rap personas
+      case "kendrick":
+        return { pitch: 6, richness: 7, intensity: 8, clarity: 9, pace: 7 };
+      case "drake":
+        return { pitch: 5, richness: 6, intensity: 6, clarity: 8, pace: 6 };
+      case "future":
+        return { pitch: 4, richness: 8, intensity: 7, clarity: 4, pace: 6 };
+      case "jcole":
+        return { pitch: 5, richness: 7, intensity: 6, clarity: 8, pace: 5 };
+      case "travis":
+        return { pitch: 4, richness: 6, intensity: 7, clarity: 5, pace: 6 };
+      case "nicki":
+        return { pitch: 8, richness: 6, intensity: 9, clarity: 7, pace: 8 };
+      case "outkast":
+        return { pitch: 7, richness: 8, intensity: 8, clarity: 7, pace: 8 };
+        
+      // Rock personas
+      case "rock-classic":
+        return { pitch: 6, richness: 9, intensity: 9, clarity: 7, pace: 6 };
+      case "rock-punk":
+        return { pitch: 7, richness: 6, intensity: 10, clarity: 5, pace: 9 };
+      case "rock-indie":
+        return { pitch: 6, richness: 7, intensity: 6, clarity: 8, pace: 5 };
+        
+      // Electronic personas
+      case "electronic-edm":
+        return { pitch: 5, richness: 5, intensity: 8, clarity: 7, pace: 9 };
+      case "electronic-ambient":
+        return { pitch: 4, richness: 9, intensity: 4, clarity: 9, pace: 3 };
+      case "electronic-techno":
+        return { pitch: 5, richness: 6, intensity: 8, clarity: 6, pace: 10 };
+        
+      // Pop personas
+      case "pop-mainstream":
+        return { pitch: 7, richness: 7, intensity: 7, clarity: 9, pace: 7 };
+      case "pop-indie":
+        return { pitch: 6, richness: 6, intensity: 5, clarity: 8, pace: 5 };
+        
+      // R&B personas
+      case "rnb-classic":
+        return { pitch: 6, richness: 9, intensity: 6, clarity: 8, pace: 4 };
+      case "rnb-modern":
+        return { pitch: 7, richness: 8, intensity: 7, clarity: 8, pace: 6 };
+        
+      // Default/fallback
+      default:
+        return { pitch: 5, richness: 5, intensity: 5, clarity: 5, pace: 5 };
+    }
+  };
+  
   // Calculate vocal characteristics based on persona
   useEffect(() => {
-    // Define base characteristics for each persona type
-    const getBaseCharacteristics = (): VocalCharacteristics => {
-      switch (persona.id) {
-        // Rap personas
-        case "kendrick":
-          return { pitch: 6, richness: 7, intensity: 8, clarity: 9, pace: 7 };
-        case "drake":
-          return { pitch: 5, richness: 6, intensity: 6, clarity: 8, pace: 6 };
-        case "future":
-          return { pitch: 4, richness: 8, intensity: 7, clarity: 4, pace: 6 };
-        case "jcole":
-          return { pitch: 5, richness: 7, intensity: 6, clarity: 8, pace: 5 };
-        case "travis":
-          return { pitch: 4, richness: 6, intensity: 7, clarity: 5, pace: 6 };
-        case "nicki":
-          return { pitch: 8, richness: 6, intensity: 9, clarity: 7, pace: 8 };
-        case "outkast":
-          return { pitch: 7, richness: 8, intensity: 8, clarity: 7, pace: 8 };
-          
-        // Rock personas
-        case "rock-classic":
-          return { pitch: 6, richness: 9, intensity: 9, clarity: 7, pace: 6 };
-        case "rock-punk":
-          return { pitch: 7, richness: 6, intensity: 10, clarity: 5, pace: 9 };
-        case "rock-indie":
-          return { pitch: 6, richness: 7, intensity: 6, clarity: 8, pace: 5 };
-          
-        // Electronic personas
-        case "electronic-edm":
-          return { pitch: 5, richness: 5, intensity: 8, clarity: 7, pace: 9 };
-        case "electronic-ambient":
-          return { pitch: 4, richness: 9, intensity: 4, clarity: 9, pace: 3 };
-        case "electronic-techno":
-          return { pitch: 5, richness: 6, intensity: 8, clarity: 6, pace: 10 };
-          
-        // Pop personas
-        case "pop-mainstream":
-          return { pitch: 7, richness: 7, intensity: 7, clarity: 9, pace: 7 };
-        case "pop-indie":
-          return { pitch: 6, richness: 6, intensity: 5, clarity: 8, pace: 5 };
-          
-        // R&B personas
-        case "rnb-classic":
-          return { pitch: 6, richness: 9, intensity: 6, clarity: 8, pace: 4 };
-        case "rnb-modern":
-          return { pitch: 7, richness: 8, intensity: 7, clarity: 8, pace: 6 };
-          
-        // Default/fallback
-        default:
-          return { pitch: 5, richness: 5, intensity: 5, clarity: 5, pace: 5 };
-      }
-    };
-    
     // Get base characteristics
-    const baseCharacteristics = getBaseCharacteristics();
+    const baseCharacteristics = getBaseCharacteristics(persona.id);
     
     // Adjust based on lyrics if provided
     if (lyrics) {
@@ -118,6 +140,16 @@ export default function SoundSignature({ persona, lyrics = "", className = "" }:
       setCharacteristics(baseCharacteristics);
     }
   }, [persona.id, lyrics]);
+  
+  // Calculate characteristics for comparison persona if provided
+  useEffect(() => {
+    if (comparePersona) {
+      const compareCharacteristics = getBaseCharacteristics(comparePersona.id);
+      setCompareCharacteristics(compareCharacteristics);
+    } else {
+      setCompareCharacteristics(null);
+    }
+  }, [comparePersona]);
 
   // Function to get color based on value
   const getColor = (value: number): string => {
@@ -127,29 +159,87 @@ export default function SoundSignature({ persona, lyrics = "", className = "" }:
   };
 
   return (
-    <div className={`relative p-4 ${className}`}>
-      <h3 className="text-sm font-medium mb-3">Sound Signature</h3>
+    <div className={`relative ${compact ? 'p-2' : 'p-4'} ${className}`}>
+      {!compact && <h3 className="text-sm font-medium mb-3">Sound Signature</h3>}
       
-      <div className="grid grid-cols-5 gap-2 mb-4">
-        {Object.entries(characteristics).map(([key, value]) => (
-          <div key={key} className="flex flex-col items-center">
-            <div
-              className="w-4 rounded-full transition-all duration-300"
-              style={{
-                height: `${value * 6}px`,
-                backgroundColor: getColor(value),
-                boxShadow: `0 0 8px ${getColor(value)}80`
-              }}
-            ></div>
-            <span className="text-xs mt-2 capitalize">{key}</span>
-            <span className="text-xs text-muted-foreground">{value}/10</span>
-          </div>
-        ))}
+      <div className={`grid grid-cols-5 gap-${compact ? '1' : '2'} mb-${compact ? '2' : '4'}`}>
+        {Object.entries(characteristics).map(([key, value]) => {
+          const characteristicKey = key as keyof VocalCharacteristics;
+          const compareValue = compareCharacteristics ? compareCharacteristics[characteristicKey] : null;
+          
+          return (
+            <TooltipProvider key={key}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center group">
+                    <div className="flex items-end h-[65px] justify-center">
+                      {/* Compare bar (if a comparison persona is provided) */}
+                      {compareValue !== null && (
+                        <div
+                          className="w-2 rounded-full transition-all duration-300 mr-1 opacity-70"
+                          style={{
+                            height: `${compareValue * 6}px`,
+                            backgroundColor: 'rgba(100, 100, 100, 0.6)',
+                            boxShadow: '0 0 4px rgba(100, 100, 100, 0.4)'
+                          }}
+                        ></div>
+                      )}
+                      
+                      {/* Main persona bar */}
+                      <div
+                        className="w-4 rounded-full transition-all duration-300 group-hover:scale-110"
+                        style={{
+                          height: `${value * 6}px`,
+                          backgroundColor: getColor(value),
+                          boxShadow: `0 0 8px ${getColor(value)}80`
+                        }}
+                      ></div>
+                    </div>
+                    
+                    {showLabels && (
+                      <>
+                        <span className="text-xs mt-2 capitalize">{key}</span>
+                        <span className="text-xs text-muted-foreground">{value}/10</span>
+                      </>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] p-3">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium capitalize">{key}</span>
+                    <p className="text-xs">{characteristicDescriptions[key as keyof typeof characteristicDescriptions]}</p>
+                    <div className="text-xs mt-1">
+                      <strong>{persona.name}:</strong> {value}/10
+                      {compareValue !== null && comparePersona && (
+                        <div className="mt-1">
+                          <strong>{comparePersona.name}:</strong> {compareValue}/10
+                          <div className="text-xs mt-1">
+                            {compareValue > value
+                              ? `${comparePersona.name} has ${compareValue - value} points higher ${key} than ${persona.name}.`
+                              : compareValue < value
+                              ? `${comparePersona.name} has ${value - compareValue} points lower ${key} than ${persona.name}.`
+                              : `Both personas have the same ${key} level.`
+                            }
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })}
       </div>
       
-      <div className="text-xs text-muted-foreground mt-2">
-        This visualization represents the vocal characteristics of {persona.name}'s sound signature.
-      </div>
+      {!compact && (
+        <div className="text-xs text-muted-foreground mt-2">
+          {comparePersona 
+            ? `Comparing vocal characteristics of ${persona.name} (primary) with ${comparePersona.name} (secondary).`
+            : `This visualization represents the vocal characteristics of ${persona.name}'s sound signature.`
+          }
+        </div>
+      )}
     </div>
   );
 }
