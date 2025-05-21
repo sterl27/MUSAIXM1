@@ -11,6 +11,7 @@ import { enhanceLyrics } from "./processors/enhancer";
 import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
 import { generateSongLyrics } from "./processors/songwriter";
 import { generateSoundDesignSuggestion } from "./processors/sounddesign";
+import { getAvailableVoices, generateSpeech, defaultVoiceMappings } from "./processors/elevenlabs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API route for lyrics enhancement
@@ -136,6 +137,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error generating sound design suggestions:", error);
       return res.status(500).json({ message: "Failed to generate sound design suggestions" });
     }
+  });
+
+  // API route to get available ElevenLabs voices
+  app.get("/api/voices", async (req, res) => {
+    try {
+      // Check if API key is configured
+      if (!process.env.ELEVENLABS_API_KEY) {
+        return res.status(500).json({ 
+          message: "ElevenLabs API key is not configured" 
+        });
+      }
+      
+      // Get available voices
+      const voices = await getAvailableVoices();
+      
+      return res.status(200).json({ voices });
+    } catch (error) {
+      console.error("Error fetching voices:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch voices from ElevenLabs" 
+      });
+    }
+  });
+  
+  // API route to get voice preview
+  app.post("/api/voice/preview", async (req, res) => {
+    try {
+      const { text, voiceId, modelId, stability, similarityBoost } = req.body;
+      
+      // Validate inputs
+      if (!text || !voiceId) {
+        return res.status(400).json({ 
+          message: "Missing required parameters: text and voiceId are required" 
+        });
+      }
+      
+      // Check if API key is configured
+      if (!process.env.ELEVENLABS_API_KEY) {
+        return res.status(500).json({ 
+          message: "ElevenLabs API key is not configured" 
+        });
+      }
+      
+      // Generate speech
+      const audioBuffer = await generateSpeech(
+        text, 
+        voiceId, 
+        modelId,
+        stability || 0.5,
+        similarityBoost || 0.75
+      );
+      
+      // Send audio data
+      res.set('Content-Type', 'audio/mpeg');
+      res.send(audioBuffer);
+    } catch (error) {
+      console.error("Error generating voice preview:", error);
+      return res.status(500).json({ 
+        message: "Failed to generate voice preview" 
+      });
+    }
+  });
+  
+  // API route to get default voice for persona
+  app.get("/api/voice/mapping/:personaId", (req, res) => {
+    const { personaId } = req.params;
+    
+    if (!personaId) {
+      return res.status(400).json({ message: "Persona ID is required" });
+    }
+    
+    // Get voice mapping for persona
+    const voiceId = defaultVoiceMappings[personaId] || defaultVoiceMappings.default;
+    
+    return res.status(200).json({ voiceId });
   });
 
   const httpServer = createServer(app);
