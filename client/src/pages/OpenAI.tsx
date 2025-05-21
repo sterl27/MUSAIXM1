@@ -32,18 +32,19 @@ export default function OpenAI() {
       try {
         const personaId = selectedPersona?.id || null;
         
-        const response = await apiRequest<{ enhancedLyrics: string }>({
-          url: "/api/openai-enhance",
-          method: "POST",
-          body: {
+        const response = await apiRequest(
+          "POST",
+          "/api/openai-enhance",
+          {
             lyrics,
             prompt,
             temperature: temperature[0],
             personaId: usePersona ? personaId : null
           }
-        });
+        );
         
-        return response;
+        const data = await response.json();
+        return data;
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -57,7 +58,7 @@ export default function OpenAI() {
     },
     
     onSuccess: (data) => {
-      if (data) {
+      if (data && data.enhancedLyrics) {
         setEnhancedLyrics(data.enhancedLyrics);
       }
     },

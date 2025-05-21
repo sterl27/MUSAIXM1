@@ -44,10 +44,10 @@ export default function SongWriter() {
       const personaId = selectedPersona?.id || null;
       
       try {
-        const response = await apiRequest({
-          url: "/api/songwriter",
-          method: "POST",
-          body: {
+        const response = await apiRequest(
+          "POST",
+          "/api/songwriter",
+          {
             topic,
             mood,
             genre: selectedMusicStyle?.id || genre,
@@ -57,9 +57,10 @@ export default function SongWriter() {
             personaId,
             useAI
           }
-        });
+        );
         
-        return response;
+        const data = await response.json();
+        return data;
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -326,7 +327,7 @@ export default function SongWriter() {
                       <SelectValue placeholder="Select an artist style" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {personas.map((persona) => (
                         <SelectItem key={persona.id} value={persona.id}>
                           {persona.name} - {persona.description}
