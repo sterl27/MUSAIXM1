@@ -42,14 +42,26 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Users, Shield, ListMusic, Settings, User, Plus, Edit, Trash2 } from "lucide-react";
+import { Users, Shield, ListMusic, Settings, User, Plus, Edit, Trash2, FileText, BookOpen, PlusSquare } from "lucide-react";
 
 // Types
+interface UserPermissions {
+  canCreatePages: boolean;
+  canEditPages: boolean;
+  canDeletePages: boolean;
+  canCreatePosts: boolean;
+  canEditPosts: boolean;
+  canDeletePosts: boolean;
+  canManageUsers: boolean;
+  canManageSettings: boolean;
+}
+
 interface User {
   id: number;
   username: string;
   email: string;
   role: string;
+  permissions?: UserPermissions;
   createdAt: string;
   lastLogin?: string;
 }
@@ -80,15 +92,49 @@ const userFormSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters.",
   }).optional(),
-  role: z.enum(["user", "admin"], {
+  role: z.enum(["user", "editor", "admin", "super_admin"], {
     required_error: "Please select a role.",
   }),
+  permissions: z.object({
+    canCreatePages: z.boolean().default(false),
+    canEditPages: z.boolean().default(false),
+    canDeletePages: z.boolean().default(false),
+    canCreatePosts: z.boolean().default(false),
+    canEditPosts: z.boolean().default(false),
+    canDeletePosts: z.boolean().default(false),
+    canManageUsers: z.boolean().default(false),
+    canManageSettings: z.boolean().default(false),
+  }).optional(),
 });
+
+// Define interfaces for pages and blog posts
+interface Page {
+  id: number;
+  title: string;
+  slug: string;
+  status: "published" | "draft";
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  status: "published" | "draft";
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState("users");
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isAddPageDialogOpen, setIsAddPageDialogOpen] = useState(false);
+  const [isAddPostDialogOpen, setIsAddPostDialogOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -109,7 +155,17 @@ export default function Admin() {
       form.reset({
         username: editingUser.username,
         email: editingUser.email,
-        role: editingUser.role as "user" | "admin",
+        role: editingUser.role as "user" | "editor" | "admin" | "super_admin",
+        permissions: editingUser.permissions || {
+          canCreatePages: false,
+          canEditPages: false,
+          canDeletePages: false,
+          canCreatePosts: false,
+          canEditPosts: false,
+          canDeletePosts: false,
+          canManageUsers: false,
+          canManageSettings: false,
+        }
       });
     } else {
       form.reset({
@@ -117,6 +173,16 @@ export default function Admin() {
         email: "",
         password: "",
         role: "user",
+        permissions: {
+          canCreatePages: false,
+          canEditPages: false,
+          canDeletePages: false,
+          canCreatePosts: false,
+          canEditPosts: false,
+          canDeletePosts: false,
+          canManageUsers: false,
+          canManageSettings: false,
+        }
       });
     }
   }, [editingUser, form]);
@@ -130,16 +196,196 @@ export default function Admin() {
     queryKey: ['/api/admin/users'],
     queryFn: async () => {
       try {
-        // Temporary mock data - would be replaced with actual API call
+        // Sample data - would be connected to actual API endpoint
         return [
-          { id: 1, username: "admin", email: "admin@example.com", role: "admin", createdAt: "2023-07-15", lastLogin: "2023-09-10" },
-          { id: 2, username: "john_doe", email: "john@example.com", role: "user", createdAt: "2023-07-20", lastLogin: "2023-09-05" },
-          { id: 3, username: "jane_doe", email: "jane@example.com", role: "user", createdAt: "2023-08-01", lastLogin: "2023-08-28" },
-          { id: 4, username: "rapper1", email: "rapper1@example.com", role: "user", createdAt: "2023-08-15" },
-          { id: 5, username: "singer42", email: "singer@example.com", role: "user", createdAt: "2023-09-01", lastLogin: "2023-09-01" },
+          { 
+            id: 1, 
+            username: "admin", 
+            email: "admin@example.com", 
+            role: "super_admin", 
+            permissions: {
+              canCreatePages: true,
+              canEditPages: true,
+              canDeletePages: true,
+              canCreatePosts: true,
+              canEditPosts: true,
+              canDeletePosts: true,
+              canManageUsers: true,
+              canManageSettings: true
+            },
+            createdAt: "2023-07-15", 
+            lastLogin: "2023-09-10" 
+          },
+          { 
+            id: 2, 
+            username: "john_doe", 
+            email: "john@example.com", 
+            role: "editor", 
+            permissions: {
+              canCreatePages: true,
+              canEditPages: true,
+              canDeletePages: false,
+              canCreatePosts: true,
+              canEditPosts: true,
+              canDeletePosts: false,
+              canManageUsers: false,
+              canManageSettings: false
+            },
+            createdAt: "2023-07-20", 
+            lastLogin: "2023-09-05" 
+          },
+          { 
+            id: 3, 
+            username: "jane_doe", 
+            email: "jane@example.com", 
+            role: "user", 
+            permissions: {
+              canCreatePages: false,
+              canEditPages: false,
+              canDeletePages: false,
+              canCreatePosts: false,
+              canEditPosts: false,
+              canDeletePosts: false,
+              canManageUsers: false,
+              canManageSettings: false
+            },
+            createdAt: "2023-08-01", 
+            lastLogin: "2023-08-28" 
+          },
+          { 
+            id: 4, 
+            username: "rapper1", 
+            email: "rapper1@example.com", 
+            role: "user", 
+            createdAt: "2023-08-15" 
+          },
+          { 
+            id: 5, 
+            username: "singer42", 
+            email: "singer@example.com", 
+            role: "user", 
+            createdAt: "2023-09-01", 
+            lastLogin: "2023-09-01" 
+          },
         ] as User[];
       } catch (error) {
         console.error("Error fetching users:", error);
+        throw error;
+      }
+    },
+    retry: 1,
+  });
+  
+  // Fetch pages
+  const {
+    data: pages = [],
+    isLoading: pagesLoading,
+    error: pagesError
+  } = useQuery({
+    queryKey: ['/api/admin/pages'],
+    queryFn: async () => {
+      try {
+        // Sample data - would be connected to actual API endpoint
+        return [
+          {
+            id: 1,
+            title: "Home Page",
+            slug: "home",
+            status: "published",
+            createdBy: 1,
+            createdAt: "2023-07-10",
+            updatedAt: "2023-08-15"
+          },
+          {
+            id: 2,
+            title: "About Us",
+            slug: "about",
+            status: "published",
+            createdBy: 2,
+            createdAt: "2023-07-12",
+            updatedAt: "2023-08-10"
+          },
+          {
+            id: 3,
+            title: "Contact Page",
+            slug: "contact",
+            status: "published",
+            createdBy: 1,
+            createdAt: "2023-07-20",
+            updatedAt: "2023-07-20"
+          },
+          {
+            id: 4,
+            title: "Privacy Policy",
+            slug: "privacy",
+            status: "draft",
+            createdBy: 2,
+            createdAt: "2023-08-05",
+            updatedAt: "2023-08-05"
+          }
+        ] as Page[];
+      } catch (error) {
+        console.error("Error fetching pages:", error);
+        throw error;
+      }
+    },
+    retry: 1,
+  });
+  
+  // Fetch blog posts
+  const {
+    data: posts = [],
+    isLoading: postsLoading,
+    error: postsError
+  } = useQuery({
+    queryKey: ['/api/admin/posts'],
+    queryFn: async () => {
+      try {
+        // Sample data - would be connected to actual API endpoint
+        return [
+          {
+            id: 1,
+            title: "Getting Started with Lyric Enhancement",
+            slug: "getting-started-lyric-enhancement",
+            excerpt: "Learn how to enhance your lyrics with our AI-powered tools",
+            status: "published",
+            createdBy: 1,
+            createdAt: "2023-08-01",
+            updatedAt: "2023-08-01"
+          },
+          {
+            id: 2,
+            title: "Top 10 Music Style Combinations",
+            slug: "top-10-music-style-combinations",
+            excerpt: "Discover the most interesting music style combinations for your lyrics",
+            status: "published",
+            createdBy: 2,
+            createdAt: "2023-08-15",
+            updatedAt: "2023-08-16"
+          },
+          {
+            id: 3,
+            title: "Voice Preview Feature Announcement",
+            slug: "voice-preview-feature",
+            excerpt: "Exciting new voice preview feature is now available",
+            status: "published",
+            createdBy: 1,
+            createdAt: "2023-09-01",
+            updatedAt: "2023-09-01"
+          },
+          {
+            id: 4,
+            title: "Upcoming Features in 2023",
+            slug: "upcoming-features-2023",
+            excerpt: "A sneak peek at our product roadmap for the rest of 2023",
+            status: "draft",
+            createdBy: 1,
+            createdAt: "2023-09-10",
+            updatedAt: "2023-09-12"
+          }
+        ] as BlogPost[];
+      } catch (error) {
+        console.error("Error fetching blog posts:", error);
         throw error;
       }
     },
@@ -269,10 +515,18 @@ export default function Admin() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="users" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid grid-cols-4 mb-6">
+              <TabsList className="grid grid-cols-6 mb-6">
                 <TabsTrigger value="users" className="flex items-center">
                   <Users className="h-4 w-4 mr-2" />
                   Users
+                </TabsTrigger>
+                <TabsTrigger value="pages" className="flex items-center">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Pages
+                </TabsTrigger>
+                <TabsTrigger value="posts" className="flex items-center">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Blog Posts
                 </TabsTrigger>
                 <TabsTrigger value="lyrics" className="flex items-center">
                   <ListMusic className="h-4 w-4 mr-2" />
@@ -302,6 +556,16 @@ export default function Admin() {
                             email: "",
                             password: "",
                             role: "user",
+                            permissions: {
+                              canCreatePages: false,
+                              canEditPages: false,
+                              canDeletePages: false,
+                              canCreatePosts: false,
+                              canEditPosts: false,
+                              canDeletePosts: false,
+                              canManageUsers: false,
+                              canManageSettings: false,
+                            }
                           });
                         }}
                       >
@@ -373,13 +637,188 @@ export default function Admin() {
                                     {...field}
                                   >
                                     <option value="user">User</option>
+                                    <option value="editor">Editor</option>
                                     <option value="admin">Admin</option>
+                                    <option value="super_admin">Super Admin</option>
                                   </select>
                                 </FormControl>
+                                <FormDescription>
+                                  User role determines base access level
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
+                          
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-medium">Permissions</h4>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border rounded-md p-4">
+                              <div className="space-y-2">
+                                <h5 className="text-sm font-medium">Page Permissions</h5>
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canCreatePages"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Create Pages
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canEditPages"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Edit Pages
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canDeletePages"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Delete Pages
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <h5 className="text-sm font-medium">Blog Permissions</h5>
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canCreatePosts"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Create Posts
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canEditPosts"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Edit Posts
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canDeletePosts"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Delete Posts
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                              
+                              <div className="space-y-2">
+                                <h5 className="text-sm font-medium">Admin Permissions</h5>
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canManageUsers"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Manage Users
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={form.control}
+                                  name="permissions.canManageSettings"
+                                  render={({ field }) => (
+                                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                                      <FormControl>
+                                        <input
+                                          type="checkbox"
+                                          checked={field.value}
+                                          onChange={field.onChange}
+                                          className="h-4 w-4"
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="text-sm font-normal">
+                                        Can Manage Settings
+                                      </FormLabel>
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                            </div>
+                          </div>
                           <DialogFooter>
                             <Button 
                               variant="outline" 
@@ -481,6 +920,152 @@ export default function Admin() {
                 )}
               </TabsContent>
 
+              {/* Pages Tab */}
+              <TabsContent value="pages" className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Page Management</h3>
+                  <Button onClick={() => setIsAddPageDialogOpen(true)}>
+                    <PlusSquare className="h-4 w-4 mr-2" />
+                    Create New Page
+                  </Button>
+                </div>
+                
+                {pagesLoading ? (
+                  <div className="flex justify-center p-6">
+                    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                  </div>
+                ) : pagesError ? (
+                  <div className="p-6 text-center text-destructive">
+                    Error loading pages. Please try again.
+                  </div>
+                ) : (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px]">ID</TableHead>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Slug</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Created By</TableHead>
+                          <TableHead>Last Updated</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pages.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="h-24 text-center">
+                              No pages found. Create your first page to get started.
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          pages.map((page) => (
+                            <TableRow key={page.id}>
+                              <TableCell className="font-medium">{page.id}</TableCell>
+                              <TableCell>{page.title}</TableCell>
+                              <TableCell className="font-mono text-xs">{page.slug}</TableCell>
+                              <TableCell>
+                                <Badge variant={page.status === "published" ? "default" : "secondary"}>
+                                  {page.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {users.find(u => u.id === page.createdBy)?.username || `User #${page.createdBy}`}
+                              </TableCell>
+                              <TableCell>{new Date(page.updatedAt).toLocaleDateString()}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end space-x-2">
+                                  <Button variant="ghost" size="icon">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+              
+              {/* Blog Posts Tab */}
+              <TabsContent value="posts" className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Blog Post Management</h3>
+                  <Button onClick={() => setIsAddPostDialogOpen(true)}>
+                    <PlusSquare className="h-4 w-4 mr-2" />
+                    Create New Post
+                  </Button>
+                </div>
+                
+                {postsLoading ? (
+                  <div className="flex justify-center p-6">
+                    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+                  </div>
+                ) : postsError ? (
+                  <div className="p-6 text-center text-destructive">
+                    Error loading blog posts. Please try again.
+                  </div>
+                ) : (
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[50px]">ID</TableHead>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Slug</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Author</TableHead>
+                          <TableHead>Last Updated</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {posts.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={7} className="h-24 text-center">
+                              No blog posts found. Create your first post to get started.
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          posts.map((post) => (
+                            <TableRow key={post.id}>
+                              <TableCell className="font-medium">{post.id}</TableCell>
+                              <TableCell className="font-medium">{post.title}</TableCell>
+                              <TableCell className="font-mono text-xs">{post.slug}</TableCell>
+                              <TableCell>
+                                <Badge variant={post.status === "published" ? "default" : "secondary"}>
+                                  {post.status}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                {users.find(u => u.id === post.createdBy)?.username || `User #${post.createdBy}`}
+                              </TableCell>
+                              <TableCell>{new Date(post.updatedAt).toLocaleDateString()}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end space-x-2">
+                                  <Button variant="ghost" size="icon">
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </TabsContent>
+              
               {/* Lyrics Tab */}
               <TabsContent value="lyrics" className="space-y-4">
                 <div className="flex justify-between items-center">
