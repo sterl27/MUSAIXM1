@@ -10,6 +10,7 @@ import SongWriter from "@/pages/SongWriter";
 import SoundDesign from "@/pages/SoundDesign";
 import Personas from "@/pages/Personas";
 import CreativeTools from "@/pages/CreativeTools";
+import Admin from "@/pages/Admin";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/sounddesign" component={SoundDesign} />
       <Route path="/personas" component={Personas} />
       <Route path="/tools" component={CreativeTools} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
