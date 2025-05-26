@@ -26,28 +26,30 @@ export default function PersonaEnergyMeter({
   // Enhanced energy calculation with more sophisticated analysis
   const energyAnalysis = React.useMemo(() => {
     if (!persona || !lyrics) return { 
-      level: 50, 
+      level: 0, 
       factors: [], 
-      intensity: 'Balanced',
+      intensity: 'Silent',
       rhymeComplexity: 0,
       wordDiversity: 0,
-      emotionalIntensity: 0
+      emotionalIntensity: 0,
+      flowDensity: 0,
+      creativityScore: 0
     };
     
-    // Base energy levels per persona type (expanded)
+    // Base energy levels per persona type (using generic style names)
     const baseEnergyMap: Record<string, number> = {
-      'kendrick': 85,
-      'drake': 65,
-      'future': 80,
-      'jcole': 70,
-      'travis': 85,
-      'nicki': 90,
-      'outkast': 80,
-      'eminem': 95,
-      'jayz': 75,
-      'kanye': 80,
-      'nas': 75,
-      'biggie': 70,
+      'lyrical-genius': 85,
+      'melodic-storyteller': 65,
+      'atmospheric-producer': 80,
+      'conscious-rapper': 70,
+      'experimental-artist': 85,
+      'versatile-performer': 90,
+      'southern-innovator': 80,
+      'technical-master': 95,
+      'business-mogul': 75,
+      'creative-visionary': 80,
+      'street-poet': 75,
+      'smooth-operator': 70,
       'tupac': 85,
       'rock-classic': 75,
       'rock-punk': 95,
@@ -153,13 +155,24 @@ export default function PersonaEnergyMeter({
     else if (finalEnergy < 95) intensity = 'Intense';
     else intensity = 'Explosive';
     
+    // Calculate flow density (syllables per line)
+    const totalSyllables = words.reduce((count, word) => {
+      return count + Math.max(1, word.replace(/[^aeiouAEIOU]/g, '').length);
+    }, 0);
+    const flowDensity = Math.min(100, (totalSyllables / Math.max(lines.length, 1)) * 5);
+    
+    // Calculate creativity score (combination of diversity, complexity, and uniqueness)
+    const creativityScore = Math.min(100, (wordDiversity + rhymeComplexity + flowDensity) / 3);
+
     return {
       level: finalEnergy,
       factors,
       intensity,
       rhymeComplexity,
       wordDiversity,
-      emotionalIntensity
+      emotionalIntensity,
+      flowDensity,
+      creativityScore
     };
   }, [persona, lyrics]);
   
