@@ -128,18 +128,7 @@ export default function SongNotebook() {
       description="Write, create, and save your lyrics with AI assistance"
     >
       
-      <div className="space-y-6">
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-3">
-          <Button variant="outline" onClick={clearAll} className="gap-2">
-            <FileText className="h-4 w-4" />
-            New Song
-          </Button>
-          <Button onClick={saveLyricsAsFile} className="musaix-gradient-button gap-2">
-            <Download className="h-4 w-4" />
-            Save Lyrics
-          </Button>
-        </div>
+      <div className="space-y-4">
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -344,6 +333,18 @@ Verse 2:
                 </div>
               </CardContent>
             </Card>
+
+            {/* Action Buttons Below Text Window */}
+            <div className="flex justify-center gap-3">
+              <Button variant="outline" onClick={clearAll} className="gap-2">
+                <FileText className="h-4 w-4" />
+                New Song
+              </Button>
+              <Button onClick={saveLyricsAsFile} className="musaix-gradient-button gap-2">
+                <Download className="h-4 w-4" />
+                Save Lyrics
+              </Button>
+            </div>
           </div>
         </div>
       </div>
