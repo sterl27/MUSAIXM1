@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLayout from "@/components/layout/PageLayout";
 import ToolsNavigation from "@/components/layout/ToolsNavigation";
+import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import { apiRequest } from "@/lib/queryClient";
 import { getMusicStyles, getPersonas, Persona, MusicStyle } from "@/lib/types";
 

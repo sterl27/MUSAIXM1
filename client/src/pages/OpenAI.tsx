@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import PageLayout from "@/components/layout/PageLayout";
 import ToolsNavigation from "@/components/layout/ToolsNavigation";
+import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import { apiRequest } from "@/lib/queryClient";
 import { Persona, getPersonaById, getPersonas } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -225,10 +226,31 @@ export default function OpenAI() {
               </Button>
             </CardFooter>
           </Card>
+          {/* Energy Meter */}
+          {lyrics && (
+            <PersonaEnergyMeter 
+              persona={usePersona ? selectedPersona : null}
+              lyrics={lyrics}
+              className="w-full"
+              showDetails={true}
+              animateOnChange={true}
+            />
+          )}
         </div>
 
         {/* Output Section */}
-        <div>
+        <div className="space-y-6">
+          {/* Energy Meter for Enhanced Lyrics */}
+          {enhancedLyrics && (
+            <PersonaEnergyMeter 
+              persona={usePersona ? selectedPersona : null}
+              lyrics={enhancedLyrics}
+              className="w-full"
+              showDetails={true}
+              animateOnChange={true}
+            />
+          )}
+          
           <Card className="h-full">
             <CardHeader>
               <CardTitle>Enhanced Lyrics</CardTitle>
