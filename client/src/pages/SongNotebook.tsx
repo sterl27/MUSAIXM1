@@ -28,42 +28,37 @@ export default function SongNotebook() {
   const personas = getPersonas();
 
   // AI Enhancement mutation
-  const { mutate: getAiSuggestion } = useMutation({
+  const { mutate: triggerAiSuggestion, isPending: isGenerating } = useMutation({
     mutationFn: async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/openai-enhance", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            lyrics: aiPrompt || "Generate creative lyrics",
-            prompt: `Generate creative lyrics based on: ${aiPrompt}`,
-            temperature: 0.8,
-            personaId: selectedPersona?.id || null
-          }),
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error("Failed to get AI suggestion");
-        }
-        
-        const data = await response.json();
-        return data.enhancedLyrics;
-      } catch (error) {
+      const response = await fetch("/api/openai-enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lyrics: aiPrompt || "Generate creative lyrics",
+          prompt: `Generate creative lyrics based on: ${aiPrompt}`,
+          temperature: 0.8,
+          personaId: selectedPersona?.id || null
+        }),
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
         throw new Error("Failed to get AI suggestion");
-      } finally {
-        setLoading(false);
       }
+      
+      const data = await response.json();
+      return data.enhancedLyrics;
     },
     onSuccess: (data) => {
       setAiSuggestion(data);
+      setLoading(false);
       toast({
         title: "AI suggestion ready!",
         description: "Check the AI sidebar for creative inspiration.",
       });
     },
     onError: (error: Error) => {
+      setLoading(false);
       toast({
         title: "AI Error",
         description: error.message,
@@ -71,6 +66,11 @@ export default function SongNotebook() {
       });
     }
   });
+
+  const getAiSuggestion = () => {
+    setLoading(true);
+    triggerAiSuggestion();
+  };
 
   // Save lyrics as TXT file
   const saveLyricsAsFile = () => {
