@@ -3,26 +3,35 @@
 @tailwind utilities;
 
 :root {
-  --background: 220 36% 12%;
-  --foreground: 200 10% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
+  /* Musaix Dark Theme - Black background with vibrant gradients */
+  --background: 0 0% 0%; /* Pure black background */
+  --foreground: 0 0% 100%; /* Pure white text */
+  --muted: 0 0% 8%; /* Very dark gray for muted elements */
+  --muted-foreground: 0 0% 70%; /* Light gray for muted text */
+  --popover: 0 0% 5%; /* Nearly black for popovers */
   --popover-foreground: 0 0% 98%;
-  --card: 240 13% 13%;
+  --card: 0 0% 5%; /* Nearly black for cards */
   --card-foreground: 0 0% 98%;
-  --border: 240 12% 19%;
-  --input: 240 10% 15%;
-  --primary: 267 90% 56%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 35 93% 51%;
-  --secondary-foreground: 210 20% 12%;
-  --accent: 160 84% 39%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
+  --border: 0 0% 15%; /* Dark border */
+  --input: 0 0% 8%; /* Dark input background */
+  
+  /* Musaix gradient colors */
+  --primary: 321 100% 61%; /* Pink from gradient (#FF4081) */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 45 100% 51%; /* Yellow from gradient (#FFC107) */
+  --secondary-foreground: 0 0% 0%;
+  --accent: 293 45% 51%; /* Purple from gradient (#AB47BC) */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 100% 50%;
   --destructive-foreground: 0 0% 98%;
-  --ring: 267 92% 58%;
-  --radius: 0.5rem;
+  --ring: 321 100% 61%; /* Pink ring color */
+  --radius: 0.75rem;
+  
+  /* Custom Musaix gradient colors */
+  --musaix-yellow: #FFC107;
+  --musaix-pink: #FF4081;
+  --musaix-purple: #AB47BC;
+  --musaix-blue: #3F51B5;
 
   --sidebar-background: 240 10% 3.9%;
   --sidebar-foreground: 0 0% 98%;
@@ -102,4 +111,106 @@
 
 .fx-annotation {
   @apply text-primary text-opacity-80;
+}
+
+/* Musaix Custom Gradient Styles */
+.musaix-gradient-bg {
+  background: linear-gradient(to bottom, var(--musaix-yellow), var(--musaix-pink), var(--musaix-purple), var(--musaix-blue));
+}
+
+.musaix-gradient-text {
+  background: linear-gradient(to right, var(--musaix-pink), var(--musaix-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+.musaix-gradient-button {
+  background: linear-gradient(135deg, var(--musaix-yellow), var(--musaix-pink), var(--musaix-purple), var(--musaix-blue));
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.musaix-gradient-button:hover {
+  background: linear-gradient(135deg, var(--musaix-pink), var(--musaix-purple), var(--musaix-blue), var(--musaix-yellow));
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 64, 129, 0.3);
+}
+
+.musaix-gradient-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.musaix-gradient-button:hover::before {
+  left: 100%;
+}
+
+.musaix-hero-bg {
+  background: radial-gradient(ellipse at center, rgba(255, 193, 7, 0.1) 0%, rgba(255, 64, 129, 0.1) 25%, rgba(171, 71, 188, 0.1) 50%, rgba(63, 81, 181, 0.1) 75%, rgba(0, 0, 0, 1) 100%);
+}
+
+.musaix-card-border {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--background), var(--background)) padding-box,
+              linear-gradient(135deg, var(--musaix-yellow), var(--musaix-pink), var(--musaix-purple), var(--musaix-blue)) border-box;
+}
+
+.musaix-glow {
+  box-shadow: 0 0 20px rgba(255, 64, 129, 0.3), 0 0 40px rgba(171, 71, 188, 0.2);
+}
+
+.musaix-text-glow {
+  text-shadow: 0 0 10px rgba(255, 64, 129, 0.5), 0 0 20px rgba(171, 71, 188, 0.3);
+}
+
+/* Animated gradient background */
+@keyframes musaix-gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.musaix-animated-bg {
+  background: linear-gradient(-45deg, var(--musaix-yellow), var(--musaix-pink), var(--musaix-purple), var(--musaix-blue));
+  background-size: 400% 400%;
+  animation: musaix-gradient-shift 15s ease infinite;
+}
+
+/* Glassmorphism effect with Musaix colors */
+.musaix-glass {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 64, 129, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom scrollbar with Musaix colors */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--musaix-pink), var(--musaix-purple));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--musaix-yellow), var(--musaix-pink));
 }
