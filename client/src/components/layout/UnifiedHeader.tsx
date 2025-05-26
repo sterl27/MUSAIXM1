@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -9,6 +10,7 @@ import {
   DropdownMenuSeparator 
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth, useLogout } from "@/hooks/useAuth";
 import { 
   Music, 
   Bot, 
@@ -29,8 +31,14 @@ import {
 export default function UnifiedHeader() {
   const [location] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const logoutMutation = useLogout();
 
   const isActive = (path: string) => location === path;
+
+  const handleLogout = async () => {
+    await logoutMutation.mutateAsync();
+  };
 
   const creativeTools = [
     { href: "/openai", icon: <Bot size={16} />, label: "AI Enhancer", description: "OpenAI-powered lyric enhancement" },
@@ -159,14 +167,52 @@ export default function UnifiedHeader() {
             </NavLink>
           </nav>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth Section */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" className="text-white hover:text-[#FF4081] hover:bg-white/5">
-              Sign In
-            </Button>
-            <Button className="musaix-gradient-button">
-              Sign Up
-            </Button>
+            {isLoading ? (
+              <div className="w-8 h-8 animate-spin rounded-full border-2 border-[#FF4081] border-t-transparent"></div>
+            ) : isAuthenticated && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/5">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.profileImageUrl || undefined} />
+                      <AvatarFallback className="bg-[#FF4081] text-white text-sm">
+                        {user.firstName?.[0]}{user.lastName?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden lg:block">{user.firstName} {user.lastName}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
+                    <p className="text-xs text-gray-400">{user.email}</p>
+                  </div>
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuItem 
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                    className="text-white hover:bg-gray-800 cursor-pointer"
+                  >
+                    {logoutMutation.isPending ? "Signing out..." : "Sign Out"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-white hover:text-[#FF4081] hover:bg-white/5">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="musaix-gradient-button">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}

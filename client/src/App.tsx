@@ -15,6 +15,8 @@ import StyleTransformer from "@/pages/StyleTransformer";
 import RhymeGenerator from "@/pages/RhymeGenerator";
 import FlowAnalyzer from "@/pages/FlowAnalyzer";
 import StructureFormatter from "@/pages/StructureFormatter";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 import Admin from "@/pages/Admin";
 
 function Router() {
@@ -31,6 +33,8 @@ function Router() {
       <Route path="/rhyme-generator" component={RhymeGenerator} />
       <Route path="/flow-analyzer" component={FlowAnalyzer} />
       <Route path="/structure-formatter" component={StructureFormatter} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
