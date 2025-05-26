@@ -489,37 +489,65 @@ export default function SongWriter() {
         </TabsContent>
         
         {/* Output Tab */}
-        <TabsContent value="output">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generated Lyrics</CardTitle>
-              <CardDescription>
-                {generatedLyrics ? "Your AI-generated lyrics" : "Generated lyrics will appear here"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {generatedLyrics ? (
-                <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[400px]">
-                  {generatedLyrics}
-                </div>
-              ) : (
-                <div className="flex items-center justify-center text-muted-foreground min-h-[400px]">
-                  No lyrics generated yet
-                </div>
+        <TabsContent value="output" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Generated Lyrics</CardTitle>
+                  <CardDescription>
+                    {generatedLyrics ? "Your AI-generated lyrics" : "Generated lyrics will appear here"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {generatedLyrics ? (
+                    <div className="whitespace-pre-wrap bg-muted p-4 rounded-md min-h-[400px]">
+                      {generatedLyrics}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center text-muted-foreground min-h-[400px]">
+                      No lyrics generated yet
+                    </div>
+                  )}
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Button variant="outline" onClick={handleClear}>
+                    Start New Song
+                  </Button>
+                  <Button 
+                    onClick={copyToClipboard} 
+                    disabled={!generatedLyrics}
+                  >
+                    Copy to Clipboard
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+            
+            {/* Energy Meter Sidebar */}
+            <div className="space-y-6">
+              {generatedLyrics && (
+                <PersonaEnergyMeter 
+                  persona={selectedPersona}
+                  lyrics={generatedLyrics}
+                  className="w-full"
+                  showDetails={true}
+                  animateOnChange={true}
+                />
               )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={handleClear}>
-                Start New Song
-              </Button>
-              <Button 
-                onClick={copyToClipboard} 
-                disabled={!generatedLyrics}
-              >
-                Copy to Clipboard
-              </Button>
-            </CardFooter>
-          </Card>
+              
+              {!generatedLyrics && (
+                <Card className="musaix-card-border bg-black/50">
+                  <CardContent className="p-6 text-center">
+                    <div className="space-y-2">
+                      <div className="text-gray-400 text-2xl">🎵</div>
+                      <p className="text-sm text-gray-400">Generate lyrics to see energy analysis</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </PageLayout>
