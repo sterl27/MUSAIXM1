@@ -864,7 +864,7 @@ export default function Admin() {
                                   )}
                                 />
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canEditPages"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -883,7 +883,7 @@ export default function Admin() {
                                   )}
                                 />
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canDeletePages"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -906,7 +906,7 @@ export default function Admin() {
                               <div className="space-y-2">
                                 <h5 className="text-sm font-medium">Blog Permissions</h5>
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canCreatePosts"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -925,7 +925,7 @@ export default function Admin() {
                                   )}
                                 />
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canEditPosts"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -944,7 +944,7 @@ export default function Admin() {
                                   )}
                                 />
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canDeletePosts"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -967,7 +967,7 @@ export default function Admin() {
                               <div className="space-y-2">
                                 <h5 className="text-sm font-medium">Admin Permissions</h5>
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canManageUsers"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
@@ -986,7 +986,7 @@ export default function Admin() {
                                   )}
                                 />
                                 <FormField
-                                  control={form.control}
+                                  control={userForm.control}
                                   name="permissions.canManageSettings"
                                   render={({ field }) => (
                                     <FormItem className="flex flex-row items-center space-x-2 space-y-0">
