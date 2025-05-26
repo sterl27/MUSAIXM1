@@ -31,14 +31,14 @@ export function getPersonas(): Persona[] {
   return [
     // Hip-Hop & Rap Personas
     {
-      id: "outkast",
-      name: "OutKast",
+      id: "southern",
+      name: "Southern Style",
       description: "Southern flow",
       icon: "crown"
     },
     {
-      id: "goodiemob",
-      name: "Goodie Mob",
+      id: "soulful",
+      name: "Soulful Rap",
       description: "Soul food vibes",
       icon: "brain"
     },
