@@ -43,15 +43,15 @@ export function getPersonas(): Persona[] {
       icon: "brain"
     },
     {
-      id: "liljon",
-      name: "Lil Jon",
-      description: "Crunk energy",
+      id: "crunk",
+      name: "Crunk Style",
+      description: "High energy crunk",
       icon: "zap"
     },
     {
-      id: "ti",
-      name: "T.I.",
-      description: "Trap precision",
+      id: "trap",
+      name: "Trap Style",
+      description: "Precise trap flow",
       icon: "target"
     },
     // Rock & Alternative Personas
