@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PageLayout from "@/components/layout/PageLayout";
-import ToolsNavigation from "@/components/layout/ToolsNavigation";
+import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import { apiRequest } from "@/lib/queryClient";
 import { Persona, getPersonas } from "@/lib/types";
@@ -119,26 +118,22 @@ export default function SongNotebook() {
   };
 
   return (
-    <PageLayout>
-      <ToolsNavigation />
+    <UnifiedPageLayout 
+      title="Song Notebook"
+      description="Write, create, and save your lyrics with AI assistance"
+    >
       
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold musaix-gradient-text">Song Notebook</h1>
-            <p className="text-gray-400 mt-1">Write, create, and save your lyrics with AI assistance</p>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={clearAll} className="gap-2">
-              <FileText className="h-4 w-4" />
-              New Song
-            </Button>
-            <Button onClick={saveLyricsAsFile} className="musaix-gradient-button gap-2">
-              <Download className="h-4 w-4" />
-              Save Lyrics
-            </Button>
-          </div>
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" onClick={clearAll} className="gap-2">
+            <FileText className="h-4 w-4" />
+            New Song
+          </Button>
+          <Button onClick={saveLyricsAsFile} className="musaix-gradient-button gap-2">
+            <Download className="h-4 w-4" />
+            Save Lyrics
+          </Button>
         </div>
 
         {/* Main Content */}
@@ -347,6 +342,6 @@ Verse 2:
           </div>
         </div>
       </div>
-    </PageLayout>
+    </UnifiedPageLayout>
   );
 }

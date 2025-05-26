@@ -2,29 +2,13 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import UnifiedHeader from "@/components/layout/UnifiedHeader";
 import { ArrowRight, Sparkles, Mic, Music, Wand2, Bot, Zap } from "lucide-react";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
-      <header className="border-b border-white/10 bg-black">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Music className="h-8 w-8 text-[#FF4081]" />
-            <h1 className="text-2xl font-bold musaix-gradient-text">Musaix Rap Pro</h1>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-white hover:text-[#FF4081] hover:bg-white/5" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button className="musaix-gradient-button" asChild>
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <UnifiedHeader />
       
       {/* Hero section */}
       <section className="flex-1 musaix-hero-bg relative overflow-hidden">
