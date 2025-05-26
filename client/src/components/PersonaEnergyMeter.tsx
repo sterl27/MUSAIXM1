@@ -273,7 +273,7 @@ export default function PersonaEnergyMeter({
           {/* Detailed Analysis */}
           {showDetails && (
             <div className="space-y-3 pt-4 border-t border-gray-700">
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                   <div className="text-sm font-medium text-[#FF4081]">
                     {Math.round(energyAnalysis.rhymeComplexity)}%
@@ -291,6 +291,28 @@ export default function PersonaEnergyMeter({
                     {Math.round(energyAnalysis.emotionalIntensity)}%
                   </div>
                   <div className="text-xs text-gray-400">Emotion</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-[#3F51B5]">
+                    {Math.round(energyAnalysis.flowDensity)}%
+                  </div>
+                  <div className="text-xs text-gray-400">Flow</div>
+                </div>
+              </div>
+              
+              {/* Overall Creativity Score */}
+              <div className="pt-3 border-t border-gray-800">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-300">Creativity Score</span>
+                  <span className="text-lg font-bold musaix-gradient-text">
+                    {Math.round(energyAnalysis.creativityScore)}%
+                  </span>
+                </div>
+                <div className="mt-2 h-2 bg-gray-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-[#3F51B5] via-[#AB47BC] to-[#FF4081] rounded-full transition-all duration-1000"
+                    style={{ width: `${energyAnalysis.creativityScore}%` }}
+                  />
                 </div>
               </div>
               
