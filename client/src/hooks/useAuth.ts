@@ -8,17 +8,17 @@ interface AuthResponse {
 }
 
 export function useAuth() {
-  const { data: user, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return {
-    user: user?.user,
+    user: data?.user,
     isLoading,
     error,
-    isAuthenticated: !!user?.user,
+    isAuthenticated: !!data?.user,
   };
 }
 
@@ -27,11 +27,19 @@ export function useRegister() {
   
   return useMutation({
     mutationFn: async (data: RegisterRequest): Promise<AuthResponse> => {
-      return apiRequest("/api/auth/register", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -44,11 +52,19 @@ export function useLogin() {
   
   return useMutation({
     mutationFn: async (data: LoginRequest): Promise<AuthResponse> => {
-      return apiRequest("/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
@@ -61,9 +77,17 @@ export function useLogout() {
   
   return useMutation({
     mutationFn: async (): Promise<{ message: string }> => {
-      return apiRequest("/api/auth/logout", {
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: 'include',
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Logout failed");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
