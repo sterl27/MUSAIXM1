@@ -1,17 +1,55 @@
-import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb, varchar, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User schema remains the same
+// Session storage table for authentication
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
+
+// Enhanced user schema with OAuth support
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  email: varchar("email", { length: 255 }).unique(),
+  username: varchar("username", { length: 100 }).unique(),
+  password: varchar("password", { length: 255 }), // Optional for OAuth users
+  firstName: varchar("first_name", { length: 100 }),
+  lastName: varchar("last_name", { length: 100 }),
+  profileImageUrl: text("profile_image_url"),
+  provider: varchar("provider", { length: 50 }).default("local"), // 'local', 'google'
+  providerId: varchar("provider_id", { length: 255 }),
+  emailVerified: boolean("email_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
+  email: true,
   username: true,
   password: true,
+  firstName: true,
+  lastName: true,
+});
+
+// Registration schema
+export const registerSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  username: z.string().min(3, "Username must be at least 3 characters").max(50, "Username must be less than 50 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: z.string().min(1, "First name is required").max(50),
+  lastName: z.string().min(1, "Last name is required").max(50),
+});
+
+// Login schema
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(1, "Password is required"),
 });
 
 // Create lyrics schema
@@ -91,6 +129,8 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertLyrics = z.infer<typeof insertLyricsSchema>;
 export type Lyrics = typeof lyrics.$inferSelect;
+export type RegisterRequest = z.infer<typeof registerSchema>;
+export type LoginRequest = z.infer<typeof loginSchema>;
 export type EnhanceLyricsRequest = z.infer<typeof enhanceLyricsRequestSchema>;
 export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsRequestSchema>;
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
