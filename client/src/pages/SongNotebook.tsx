@@ -210,12 +210,12 @@ export default function SongNotebook() {
 
                     {/* Generate Button */}
                     <Button 
-                      onClick={() => getAiSuggestion()} 
-                      disabled={loading || !aiPrompt.trim()}
+                      onClick={getAiSuggestion} 
+                      disabled={loading || isGenerating || !aiPrompt.trim()}
                       className="w-full musaix-gradient-button gap-2"
                     >
                       <Sparkles className="h-4 w-4" />
-                      {loading ? "Generating..." : "Get AI Suggestion"}
+                      {(loading || isGenerating) ? "Generating..." : "Get AI Suggestion"}
                     </Button>
 
                     {/* AI Suggestion */}
