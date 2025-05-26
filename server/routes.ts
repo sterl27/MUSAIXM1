@@ -6,8 +6,12 @@ import {
   openAIEnhanceLyricsRequestSchema,
   songwriterRequestSchema,
   soundDesignRequestSchema,
-  styleTransformerRequestSchema
+  styleTransformerRequestSchema,
+  registerSchema,
+  loginSchema
 } from "@shared/schema";
+import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
+import passport from "passport";
 import { enhanceLyrics } from "./processors/enhancer";
 import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
 import { generateSongLyrics } from "./processors/songwriter";
@@ -16,6 +20,91 @@ import { transformLyrics } from "./processors/style-transformer";
 import { getAvailableVoices, generateSpeech, defaultVoiceMappings } from "./processors/elevenlabs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  await setupAuth(app);
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const validationResult = registerSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed",
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { email, username, password, firstName, lastName } = validationResult.data;
+
+      // Check if user already exists
+      const existingEmail = await storage.getUserByEmail(email);
+      if (existingEmail) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+
+      const existingUsername = await storage.getUserByUsername(username);
+      if (existingUsername) {
+        return res.status(409).json({ message: "Username already taken" });
+      }
+
+      // Hash password and create user
+      const hashedPassword = await hashPassword(password);
+      const user = await storage.createUser({
+        email,
+        username,
+        password: hashedPassword,
+        firstName,
+        lastName,
+      });
+
+      // Remove password from response
+      const { password: _, ...userResponse } = user;
+      res.json({ user: userResponse, message: "Registration successful" });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
+    const user = req.user as any;
+    const { password: _, ...userResponse } = user;
+    res.json({ user: userResponse, message: "Login successful" });
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logout successful" });
+    });
+  });
+
+  app.get("/api/auth/user", (req, res) => {
+    if (req.isAuthenticated()) {
+      const user = req.user as any;
+      const { password: _, ...userResponse } = user;
+      res.json({ user: userResponse });
+    } else {
+      res.status(401).json({ message: "Not authenticated" });
+    }
+  });
+
+  // Google OAuth routes
+  app.get("/api/auth/google", 
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
+
+  app.get("/api/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res) => {
+      // Successful authentication, redirect to home
+      res.redirect("/");
+    }
+  );
+
   // API route for lyrics enhancement
   app.post("/api/enhance", async (req, res) => {
     try {
