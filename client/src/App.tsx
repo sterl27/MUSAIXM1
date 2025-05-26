@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import OpenAI from "@/pages/OpenAI";
 import SongWriter from "@/pages/SongWriter";
+import SongNotebook from "@/pages/SongNotebook";
 import SoundDesign from "@/pages/SoundDesign";
 import Personas from "@/pages/Personas";
 import CreativeTools from "@/pages/CreativeTools";
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/openai" component={OpenAI} />
       <Route path="/songwriter" component={SongWriter} />
+      <Route path="/notebook" component={SongNotebook} />
       <Route path="/sounddesign" component={SoundDesign} />
       <Route path="/personas" component={Personas} />
       <Route path="/tools" component={CreativeTools} />

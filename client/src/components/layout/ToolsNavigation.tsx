@@ -6,7 +6,8 @@ import {
   Bot, 
   PenToolIcon, 
   Wand2Icon, 
-  SlidersHorizontal
+  SlidersHorizontal,
+  BookOpen
 } from "lucide-react";
 
 interface ToolNavItemProps {
@@ -48,6 +49,11 @@ export default function ToolsNavigation() {
       href: "/songwriter",
       icon: <PenToolIcon size={18} />,
       label: "Song Writer"
+    },
+    {
+      href: "/notebook",
+      icon: <BookOpen size={18} />,
+      label: "Song Notebook"
     },
     {
       href: "/sounddesign",

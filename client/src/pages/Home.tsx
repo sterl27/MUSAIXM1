@@ -48,15 +48,15 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <Button size="lg" className="musaix-gradient-button gap-2 text-white font-semibold py-3 px-6" asChild>
-                  <Link href="/openai">
-                    Get Started
+                  <Link href="/notebook">
+                    Start Writing
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="gap-2 border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10 hover:border-[#FF4081] transition-all duration-300" asChild>
-                  <Link href="/personas">
-                    Explore Personas
-                    <Mic className="h-5 w-5" />
+                  <Link href="/openai">
+                    Try AI Enhancer
+                    <Bot className="h-5 w-5" />
                   </Link>
                 </Button>
               </div>
