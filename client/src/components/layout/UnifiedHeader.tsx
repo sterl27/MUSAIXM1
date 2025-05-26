@@ -21,7 +21,9 @@ import {
   ChevronDown,
   Menu,
   Settings,
-  Home
+  Home,
+  Activity,
+  FileText
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -34,6 +36,9 @@ export default function UnifiedHeader() {
     { href: "/openai", icon: <Bot size={16} />, label: "AI Enhancer", description: "OpenAI-powered lyric enhancement" },
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
+    { href: "/rhyme-generator", icon: <Sparkles size={16} />, label: "Rhyme Generator", description: "Find perfect rhymes for your lyrics" },
+    { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
+    { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
     { href: "/style-transformer", icon: <Wand2 size={16} />, label: "Style Transformer", description: "Transform lyrics between styles" },
   ];

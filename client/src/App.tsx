@@ -12,6 +12,9 @@ import SoundDesign from "@/pages/SoundDesign";
 import Personas from "@/pages/Personas";
 import CreativeTools from "@/pages/CreativeTools";
 import StyleTransformer from "@/pages/StyleTransformer";
+import RhymeGenerator from "@/pages/RhymeGenerator";
+import FlowAnalyzer from "@/pages/FlowAnalyzer";
+import StructureFormatter from "@/pages/StructureFormatter";
 import Admin from "@/pages/Admin";
 
 function Router() {
@@ -25,6 +28,9 @@ function Router() {
       <Route path="/personas" component={Personas} />
       <Route path="/tools" component={CreativeTools} />
       <Route path="/style-transformer" component={StyleTransformer} />
+      <Route path="/rhyme-generator" component={RhymeGenerator} />
+      <Route path="/flow-analyzer" component={FlowAnalyzer} />
+      <Route path="/structure-formatter" component={StructureFormatter} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
