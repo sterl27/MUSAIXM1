@@ -6,8 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import PageLayout from "@/components/layout/PageLayout";
-import ToolsNavigation from "@/components/layout/ToolsNavigation";
+import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import { apiRequest } from "@/lib/queryClient";
 import { Persona, getPersonaById, getPersonas } from "@/lib/types";
@@ -95,8 +94,10 @@ export default function OpenAI() {
   };
 
   return (
-    <PageLayout title="OpenAI Lyrics Enhancement" description="Use the power of AI to enhance your lyrics">
-      <ToolsNavigation />
+    <UnifiedPageLayout 
+      title="AI Enhancer"
+      description="Transform your lyrics with OpenAI's advanced language models"
+    >
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input Section */}
@@ -276,6 +277,6 @@ export default function OpenAI() {
           </Card>
         </div>
       </div>
-    </PageLayout>
+    </UnifiedPageLayout>
   );
 }
