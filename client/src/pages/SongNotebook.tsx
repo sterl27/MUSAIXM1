@@ -143,64 +143,7 @@ export default function SongNotebook() {
 
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Writing Area */}
-          <div className="lg:col-span-3 space-y-4">
-            {/* Song Title */}
-            <Card className="musaix-card-border bg-black/50">
-              <CardContent className="p-4">
-                <Label htmlFor="song-title" className="text-white font-medium">Song Title</Label>
-                <Input
-                  id="song-title"
-                  placeholder="Enter your song title..."
-                  value={songTitle}
-                  onChange={(e) => setSongTitle(e.target.value)}
-                  className="mt-2 bg-gray-800 border-gray-600 text-white"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Lyrics Editor */}
-            <Card className="musaix-card-border bg-black/50">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Music2 className="h-5 w-5 text-[#FF4081]" />
-                    <CardTitle className="text-white">Lyrics</CardTitle>
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {lyrics.split('\n').length} lines • {lyrics.split(/\s+/).filter(w => w.length > 0).length} words
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Textarea 
-                  placeholder="Start writing your lyrics here...
-
-Verse 1:
-[Your lyrics here]
-
-Chorus:
-[Your lyrics here]
-
-Verse 2:
-[Your lyrics here]"
-                  value={lyrics}
-                  onChange={(e) => setLyrics(e.target.value)}
-                  className="min-h-[500px] bg-gray-900 border-gray-600 text-white text-lg leading-relaxed font-mono resize-none"
-                />
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-xs text-gray-500">
-                    Auto-saves locally as you type
-                  </div>
-                  <Button variant="ghost" onClick={() => setLyrics("")} className="text-gray-400 hover:text-white">
-                    Clear
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* AI Sidebar */}
+          {/* AI Sidebar - Left */}
           <div className="lg:col-span-1 space-y-6">
             {/* Energy Meter */}
             {lyrics && (
@@ -241,17 +184,21 @@ Verse 2:
                     <div className="space-y-2">
                       <Label className="text-white">Style</Label>
                       <Select 
-                        value={selectedPersona?.id || ""} 
+                        value={selectedPersona?.id || "none"} 
                         onValueChange={(value) => {
-                          const persona = personas.find(p => p.id === value);
-                          setSelectedPersona(persona || null);
+                          if (value === "none") {
+                            setSelectedPersona(null);
+                          } else {
+                            const persona = personas.find(p => p.id === value);
+                            setSelectedPersona(persona || null);
+                          }
                         }}
                       >
                         <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                           <SelectValue placeholder="Select style" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Default</SelectItem>
+                          <SelectItem value="none">Default</SelectItem>
                           {personas.map((persona) => (
                             <SelectItem key={persona.id} value={persona.id}>
                               {persona.name}
@@ -338,6 +285,63 @@ Verse 2:
                 >
                   ❤️ Personal Story
                 </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Writing Area - Right */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Song Title */}
+            <Card className="musaix-card-border bg-black/50">
+              <CardContent className="p-4">
+                <Label htmlFor="song-title" className="text-white font-medium">Song Title</Label>
+                <Input
+                  id="song-title"
+                  placeholder="Enter your song title..."
+                  value={songTitle}
+                  onChange={(e) => setSongTitle(e.target.value)}
+                  className="mt-2 bg-gray-800 border-gray-600 text-white"
+                />
+              </CardContent>
+            </Card>
+
+            {/* Lyrics Editor */}
+            <Card className="musaix-card-border bg-black/50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Music2 className="h-5 w-5 text-[#FF4081]" />
+                    <CardTitle className="text-white">Lyrics</CardTitle>
+                  </div>
+                  <div className="text-sm text-gray-400">
+                    {lyrics.split('\n').length} lines • {lyrics.split(/\s+/).filter(w => w.length > 0).length} words
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Textarea 
+                  placeholder="Start writing your lyrics here...
+
+Verse 1:
+[Your lyrics here]
+
+Chorus:
+[Your lyrics here]
+
+Verse 2:
+[Your lyrics here]"
+                  value={lyrics}
+                  onChange={(e) => setLyrics(e.target.value)}
+                  className="min-h-[500px] bg-gray-900 border-gray-600 text-white text-lg leading-relaxed font-mono resize-none"
+                />
+                <div className="flex justify-between items-center mt-4">
+                  <div className="text-xs text-gray-500">
+                    Auto-saves locally as you type
+                  </div>
+                  <Button variant="ghost" onClick={() => setLyrics("")} className="text-gray-400 hover:text-white">
+                    Clear
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
