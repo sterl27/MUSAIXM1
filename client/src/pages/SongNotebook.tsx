@@ -142,9 +142,9 @@ export default function SongNotebook() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* AI Sidebar - Left */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-4">
             {/* Energy Meter */}
             {lyrics && (
               <PersonaEnergyMeter 
@@ -215,7 +215,7 @@ export default function SongNotebook() {
                         placeholder="Describe your idea, theme, or what you need help with..."
                         value={aiPrompt}
                         onChange={(e) => setAiPrompt(e.target.value)}
-                        className="h-20 bg-gray-800 border-gray-600 text-white"
+                        className="h-32 bg-gray-800 border-gray-600 text-white"
                       />
                     </div>
 
@@ -290,7 +290,7 @@ export default function SongNotebook() {
           </div>
 
           {/* Main Writing Area - Right */}
-          <div className="lg:col-span-3 space-y-4">
+          <div className="lg:col-span-2 space-y-4">
             {/* Song Title */}
             <Card className="musaix-card-border bg-black/50">
               <CardContent className="p-4">
@@ -332,7 +332,7 @@ Verse 2:
 [Your lyrics here]"
                   value={lyrics}
                   onChange={(e) => setLyrics(e.target.value)}
-                  className="min-h-[500px] bg-gray-900 border-gray-600 text-white text-lg leading-relaxed font-mono resize-none"
+                  className="min-h-[600px] bg-gray-900 border-gray-600 text-white text-lg leading-relaxed font-mono resize-none"
                 />
                 <div className="flex justify-between items-center mt-4">
                   <div className="text-xs text-gray-500">
