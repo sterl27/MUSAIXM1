@@ -9,7 +9,8 @@ import {
   styleTransformerRequestSchema,
   registerSchema,
   loginSchema,
-  artistProfileRequestSchema
+  artistProfileRequestSchema,
+  playlistRequestSchema
 } from "@shared/schema";
 import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
 import passport from "passport";
@@ -436,6 +437,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error uploading song:", error);
       return res.status(500).json({ 
         message: "Failed to upload song",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Playlist Routes
+  app.get("/api/playlists", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const playlists = await storage.getUserPlaylists(userId);
+      
+      return res.status(200).json(playlists);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch playlists",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.post("/api/playlists", requireAuth, async (req: any, res) => {
+    try {
+      const validationResult = playlistRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed",
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const userId = req.user.id;
+      const playlistData = validationResult.data;
+      
+      const playlist = await storage.createPlaylist(userId, playlistData);
+      
+      return res.status(201).json(playlist);
+    } catch (error) {
+      console.error("Error creating playlist:", error);
+      return res.status(500).json({ 
+        message: "Failed to create playlist",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get songs from artist profile
+  app.get("/api/artist-profile/songs", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const profile = await storage.getArtistProfile(userId);
+      
+      if (!profile) {
+        return res.status(200).json([]);
+      }
+      
+      return res.status(200).json(profile.songs || []);
+    } catch (error) {
+      console.error("Error fetching songs:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch songs",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

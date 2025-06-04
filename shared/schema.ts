@@ -184,6 +184,32 @@ export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsReque
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
 export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;
+// Playlists table
+export const playlists = pgTable("playlists", {
+  id: varchar("id").primaryKey().notNull(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name").notNull(),
+  description: text("description").default(""),
+  songIds: text("song_ids").array().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPlaylistSchema = createInsertSchema(playlists).pick({
+  name: true,
+  description: true,
+  songIds: true,
+});
+
+export const playlistRequestSchema = z.object({
+  name: z.string().min(1, "Playlist name is required"),
+  description: z.string().default(""),
+  songs: z.array(z.string()).default([]),
+});
+
 export type InsertArtistProfile = z.infer<typeof insertArtistProfileSchema>;
 export type ArtistProfile = typeof artistProfiles.$inferSelect;
 export type ArtistProfileRequest = z.infer<typeof artistProfileRequestSchema>;
+export type InsertPlaylist = z.infer<typeof insertPlaylistSchema>;
+export type Playlist = typeof playlists.$inferSelect;
+export type PlaylistRequest = z.infer<typeof playlistRequestSchema>;

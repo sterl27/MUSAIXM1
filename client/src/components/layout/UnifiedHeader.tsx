@@ -55,6 +55,7 @@ export default function UnifiedHeader() {
   const explorePages = [
     { href: "/personas", icon: <Users size={16} />, label: "Artist Personas", description: "Explore different artist styles" },
     { href: "/tools", icon: <Sparkles size={16} />, label: "Creative Tools", description: "Additional creative utilities" },
+    { href: "/music-player", icon: <Music size={16} />, label: "Music Player", description: "Play and manage your music collection" },
   ];
 
   const NavLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => (
