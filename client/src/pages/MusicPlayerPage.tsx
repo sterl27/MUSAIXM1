@@ -126,7 +126,7 @@ export default function MusicPlayerPage() {
   }) || [];
 
   // Get unique genres
-  const genres = Array.from(new Set(userSongs.map(song => song.genre).filter(Boolean)));
+  const genres = Array.from(new Set(userSongs.map(song => song.genre).filter(Boolean))) as string[];
 
   const handleCreatePlaylist = () => {
     if (!newPlaylistName.trim()) {
@@ -301,7 +301,7 @@ export default function MusicPlayerPage() {
                           key={genre}
                           variant={selectedGenre === genre ? "default" : "outline"}
                           size="sm"
-                          onClick={() => setSelectedGenre(genre)}
+                          onClick={() => setSelectedGenre(genre || null)}
                           className="text-xs"
                         >
                           {genre}

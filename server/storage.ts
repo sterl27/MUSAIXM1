@@ -35,8 +35,8 @@ export interface IStorage {
   upsertArtistProfile(userId: number, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
 
   // Playlist operations
-  getUserPlaylists(userId: string): Promise<Playlist[]>;
-  createPlaylist(userId: string, playlistData: PlaylistRequest): Promise<Playlist>;
+  getUserPlaylists(userId: number): Promise<Playlist[]>;
+  createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -189,7 +189,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Playlist operations
-  async getUserPlaylists(userId: string): Promise<Playlist[]> {
+  async getUserPlaylists(userId: number): Promise<Playlist[]> {
     const userPlaylists = await db
       .select()
       .from(playlists)
@@ -198,12 +198,13 @@ export class DatabaseStorage implements IStorage {
     return userPlaylists;
   }
 
-  async createPlaylist(userId: string, playlistData: PlaylistRequest): Promise<Playlist> {
+  async createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist> {
     const playlistId = `playlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     const [playlist] = await db
       .insert(playlists)
       .values({
+        id: playlistId,
         userId,
         name: playlistData.name,
         description: playlistData.description || "",
