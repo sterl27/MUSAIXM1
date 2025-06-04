@@ -25,7 +25,8 @@ import {
   Settings,
   Home,
   Activity,
-  FileText
+  FileText,
+  User
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -189,6 +190,13 @@ export default function UnifiedHeader() {
                     <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
                     <p className="text-xs text-gray-400">{user.email}</p>
                   </div>
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <Link href="/artist-profile">
+                    <DropdownMenuItem className="text-white hover:bg-gray-800 cursor-pointer">
+                      <User className="h-4 w-4 mr-2" />
+                      Artist Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <DropdownMenuSeparator className="bg-gray-700" />
                   <DropdownMenuItem 
                     onClick={handleLogout}
