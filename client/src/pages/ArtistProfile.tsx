@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Save, Upload, Music, Image, User, Plus, X, Play } from "lucide-react";
+import SoundSignatureVisualizer from "@/components/SoundSignatureVisualizer";
 import { useToast } from "@/hooks/use-toast";
 
 interface ArtistProfile {
