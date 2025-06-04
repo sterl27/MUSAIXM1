@@ -20,6 +20,7 @@ import Register from "@/pages/Register";
 import Admin from "@/pages/Admin";
 import ArtistProfile from "@/pages/ArtistProfile";
 import MusicPlayerPage from "@/pages/MusicPlayerPage";
+import SoundSignaturePage from "@/pages/SoundSignaturePage";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/artist-profile" component={ArtistProfile} />
       <Route path="/music-player" component={MusicPlayerPage} />
+      <Route path="/sound-signature" component={SoundSignaturePage} />
       <Route component={NotFound} />
     </Switch>
   );

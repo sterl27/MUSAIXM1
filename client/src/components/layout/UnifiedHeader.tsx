@@ -26,7 +26,8 @@ import {
   Home,
   Activity,
   FileText,
-  User
+  User,
+  Waves
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -56,6 +57,7 @@ export default function UnifiedHeader() {
     { href: "/personas", icon: <Users size={16} />, label: "Artist Personas", description: "Explore different artist styles" },
     { href: "/tools", icon: <Sparkles size={16} />, label: "Creative Tools", description: "Additional creative utilities" },
     { href: "/music-player", icon: <Music size={16} />, label: "Music Player", description: "Play and manage your music collection" },
+    { href: "/sound-signature", icon: <Waves size={16} />, label: "Sound Signature", description: "Visualize vocal characteristics" },
   ];
 
   const NavLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => (

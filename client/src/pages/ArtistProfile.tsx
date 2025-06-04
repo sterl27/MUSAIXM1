@@ -555,6 +555,22 @@ export default function ArtistProfile() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Sound Signature Section */}
+        {profile && (
+          <div className="mt-8">
+            <SoundSignature 
+              artistProfile={{
+                artistName: profile.artistName,
+                genre: profile.genre,
+                influences: profile.influences?.join(', '),
+                style: profile.bio
+              }}
+              showViewToggle={true}
+              compact={false}
+            />
+          </div>
+        )}
       </div>
     </UnifiedPageLayout>
   );
