@@ -504,6 +504,166 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Routes
+  // Get user statistics
+  app.get("/api/admin/stats/users", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const stats = await storage.getUserStats();
+      return res.status(200).json(stats);
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch user statistics",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get system statistics
+  app.get("/api/admin/stats/system", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const stats = await storage.getSystemStats();
+      return res.status(200).json(stats);
+    } catch (error) {
+      console.error("Error fetching system stats:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch system statistics",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get all users (admin only)
+  app.get("/api/admin/users", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const users = await storage.getAllUsers();
+      return res.status(200).json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch users",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Create user (admin only)
+  app.post("/api/admin/users", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const userData = req.body;
+      const newUser = await storage.createAdminUser(userData);
+      return res.status(201).json(newUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return res.status(500).json({ 
+        message: "Failed to create user",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Update user (admin only)
+  app.put("/api/admin/users/:id", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const userId = parseInt(req.params.id);
+      const userData = req.body;
+      const updatedUser = await storage.updateAdminUser(userId, userData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      return res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return res.status(500).json({ 
+        message: "Failed to update user",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Delete user (admin only)
+  app.delete("/api/admin/users/:id", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const userId = parseInt(req.params.id);
+      const success = await storage.deleteAdminUser(userId);
+      
+      if (!success) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      return res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return res.status(500).json({ 
+        message: "Failed to delete user",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get system settings
+  app.get("/api/admin/settings", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const settings = await storage.getSystemSettings();
+      return res.status(200).json(settings);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch settings",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Update system settings
+  app.put("/api/admin/settings", requireAuth, async (req: any, res) => {
+    try {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: "Admin access required" });
+      }
+
+      const settingsData = req.body;
+      const updatedSettings = await storage.updateSystemSettings(settingsData);
+      return res.status(200).json(updatedSettings);
+    } catch (error) {
+      console.error("Error updating settings:", error);
+      return res.status(500).json({ 
+        message: "Failed to update settings",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

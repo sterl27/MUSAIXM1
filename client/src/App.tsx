@@ -13,7 +13,7 @@ import FlowAnalyzer from "@/pages/FlowAnalyzer";
 import StructureFormatter from "@/pages/StructureFormatter";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import Admin from "@/pages/Admin";
+import AdminDashboard from "@/pages/AdminDashboard";
 import ArtistProfile from "@/pages/ArtistProfile";
 import MusicPlayerPage from "@/pages/MusicPlayerPage";
 import SoundSignaturePage from "@/pages/SoundSignaturePage";
@@ -30,7 +30,7 @@ function Router() {
       <Route path="/structure-formatter" component={StructureFormatter} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
-      <Route path="/admin" component={Admin} />
+      <Route path="/admin" component={AdminDashboard} />
       <Route path="/artist-profile" component={ArtistProfile} />
       <Route path="/music-player" component={MusicPlayerPage} />
       <Route path="/sound-signature" component={SoundSignaturePage} />

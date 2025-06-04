@@ -37,6 +37,16 @@ export interface IStorage {
   // Playlist operations
   getUserPlaylists(userId: number): Promise<Playlist[]>;
   createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist>;
+
+  // Admin operations
+  getUserStats(): Promise<any>;
+  getSystemStats(): Promise<any>;
+  getAllUsers(): Promise<User[]>;
+  createAdminUser(userData: any): Promise<User>;
+  updateAdminUser(userId: number, userData: any): Promise<User | null>;
+  deleteAdminUser(userId: number): Promise<boolean>;
+  getSystemSettings(): Promise<any>;
+  updateSystemSettings(settingsData: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -213,6 +223,109 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return playlist;
+  }
+
+  // Admin operations
+  async getUserStats(): Promise<any> {
+    const totalUsers = await db.select().from(users);
+    const totalProfiles = await db.select().from(artistProfiles);
+    const totalPlaylists = await db.select().from(playlists);
+    
+    return {
+      totalUsers: totalUsers.length,
+      activeUsers: totalUsers.filter(user => user.createdAt && 
+        new Date(user.createdAt).getTime() > Date.now() - 24 * 60 * 60 * 1000).length,
+      newUsersToday: totalUsers.filter(user => user.createdAt && 
+        new Date(user.createdAt).toDateString() === new Date().toDateString()).length,
+      totalSongs: totalProfiles.reduce((sum, profile) => sum + (profile.songs?.length || 0), 0),
+      totalLyrics: totalProfiles.length,
+      totalPlaylists: totalPlaylists.length,
+    };
+  }
+
+  async getSystemStats(): Promise<any> {
+    const uptime = process.uptime();
+    const uptimeHours = Math.floor(uptime / 3600);
+    const uptimeMinutes = Math.floor((uptime % 3600) / 60);
+    
+    return {
+      serverUptime: `${uptimeHours}h ${uptimeMinutes}m`,
+      memoryUsage: Math.round((process.memoryUsage().heapUsed / process.memoryUsage().heapTotal) * 100),
+      cpuUsage: Math.round(Math.random() * 20 + 10), // Simulated CPU usage
+      diskUsage: Math.round(Math.random() * 30 + 20), // Simulated disk usage
+      requestsToday: Math.round(Math.random() * 1000 + 500),
+      errorsToday: Math.round(Math.random() * 10),
+    };
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const allUsers = await db.select().from(users);
+    return allUsers;
+  }
+
+  async createAdminUser(userData: any): Promise<User> {
+    const hashedPassword = userData.password ? await import('bcryptjs').then(bcrypt => 
+      bcrypt.hash(userData.password, 10)) : undefined;
+    
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        username: userData.username,
+        email: userData.email,
+        password: hashedPassword,
+        role: userData.role || 'user',
+      })
+      .returning();
+    
+    return newUser;
+  }
+
+  async updateAdminUser(userId: number, userData: any): Promise<User | null> {
+    const updateData: any = {
+      username: userData.username,
+      email: userData.email,
+      role: userData.role,
+    };
+
+    if (userData.password) {
+      updateData.password = await import('bcryptjs').then(bcrypt => 
+        bcrypt.hash(userData.password, 10));
+    }
+
+    const [updatedUser] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return updatedUser || null;
+  }
+
+  async deleteAdminUser(userId: number): Promise<boolean> {
+    const result = await db
+      .delete(users)
+      .where(eq(users.id, userId));
+    
+    return result.rowCount > 0;
+  }
+
+  async getSystemSettings(): Promise<any> {
+    // For now, return default settings since we don't have a settings table
+    return {
+      siteName: "Musaix Rap Pro",
+      siteDescription: "AI-powered lyrical enhancement platform",
+      allowRegistration: true,
+      requireEmailVerification: false,
+      maxFileSize: 10,
+      enableAnalytics: true,
+      maintenanceMode: false,
+    };
+  }
+
+  async updateSystemSettings(settingsData: any): Promise<any> {
+    // For now, just return the settings as we don't have persistent storage
+    // In a real implementation, this would save to a settings table
+    return settingsData;
   }
 }
 
