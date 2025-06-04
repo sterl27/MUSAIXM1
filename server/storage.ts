@@ -1,10 +1,13 @@
 import { 
   users, 
   artistProfiles,
+  playlists,
   type User, 
   type RegisterRequest,
   type ArtistProfile,
-  type ArtistProfileRequest 
+  type ArtistProfileRequest,
+  type Playlist,
+  type PlaylistRequest
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -30,6 +33,10 @@ export interface IStorage {
   // Artist Profile operations
   getArtistProfile(userId: number): Promise<ArtistProfile | undefined>;
   upsertArtistProfile(userId: number, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
+
+  // Playlist operations
+  getUserPlaylists(userId: string): Promise<Playlist[]>;
+  createPlaylist(userId: string, playlistData: PlaylistRequest): Promise<Playlist>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -179,6 +186,32 @@ export class DatabaseStorage implements IStorage {
         .returning();
       return newProfile;
     }
+  }
+
+  // Playlist operations
+  async getUserPlaylists(userId: string): Promise<Playlist[]> {
+    const userPlaylists = await db
+      .select()
+      .from(playlists)
+      .where(eq(playlists.userId, userId));
+    
+    return userPlaylists;
+  }
+
+  async createPlaylist(userId: string, playlistData: PlaylistRequest): Promise<Playlist> {
+    const playlistId = `playlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const [playlist] = await db
+      .insert(playlists)
+      .values({
+        userId,
+        name: playlistData.name,
+        description: playlistData.description || "",
+        songIds: playlistData.songs || [],
+      })
+      .returning();
+    
+    return playlist;
   }
 }
 

@@ -187,7 +187,7 @@ export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSche
 // Playlists table
 export const playlists = pgTable("playlists", {
   id: varchar("id").primaryKey().notNull(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   name: varchar("name").notNull(),
   description: text("description").default(""),
   songIds: text("song_ids").array().default([]),
