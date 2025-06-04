@@ -1,4 +1,11 @@
-import { users, type User, type RegisterRequest } from "@shared/schema";
+import { 
+  users, 
+  artistProfiles,
+  type User, 
+  type RegisterRequest,
+  type ArtistProfile,
+  type ArtistProfileRequest 
+} from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -19,6 +26,10 @@ export interface IStorage {
     provider: string;
     providerId: string;
   }): Promise<User>;
+
+  // Artist Profile operations
+  getArtistProfile(userId: string): Promise<ArtistProfile | undefined>;
+  upsertArtistProfile(userId: string, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -114,6 +125,60 @@ export class DatabaseStorage implements IStorage {
       provider: profile.provider,
       providerId: profile.providerId,
     });
+  }
+
+  // Artist Profile operations
+  async getArtistProfile(userId: string): Promise<ArtistProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(artistProfiles)
+      .where(eq(artistProfiles.userId, userId));
+    return profile || undefined;
+  }
+
+  async upsertArtistProfile(userId: string, profileData: ArtistProfileRequest): Promise<ArtistProfile> {
+    const profileId = `profile_${userId}_${Date.now()}`;
+    
+    // Check if profile exists
+    const existingProfile = await this.getArtistProfile(userId);
+    
+    if (existingProfile) {
+      // Update existing profile
+      const [updatedProfile] = await db
+        .update(artistProfiles)
+        .set({
+          artistName: profileData.artistName,
+          bio: profileData.bio,
+          genre: profileData.genre,
+          location: profileData.location,
+          influences: profileData.influences,
+          socialLinks: profileData.socialLinks,
+          photos: profileData.photos,
+          songs: profileData.songs,
+          updatedAt: new Date(),
+        })
+        .where(eq(artistProfiles.userId, userId))
+        .returning();
+      return updatedProfile;
+    } else {
+      // Create new profile
+      const [newProfile] = await db
+        .insert(artistProfiles)
+        .values({
+          id: profileId,
+          userId,
+          artistName: profileData.artistName,
+          bio: profileData.bio,
+          genre: profileData.genre,
+          location: profileData.location,
+          influences: profileData.influences,
+          socialLinks: profileData.socialLinks,
+          photos: profileData.photos,
+          songs: profileData.songs,
+        })
+        .returning();
+      return newProfile;
+    }
   }
 }
 

@@ -125,6 +125,54 @@ export const styleTransformerRequestSchema = z.object({
   useAI: z.boolean().default(true)
 });
 
+// Artist Profiles table
+export const artistProfiles = pgTable("artist_profiles", {
+  id: varchar("id").primaryKey().notNull(),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  artistName: varchar("artist_name").notNull(),
+  bio: text("bio").default(""),
+  genre: varchar("genre").default(""),
+  location: varchar("location").default(""),
+  influences: text("influences").array().default([]),
+  socialLinks: jsonb("social_links").default({}),
+  photos: text("photos").array().default([]),
+  songs: jsonb("songs").default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertArtistProfileSchema = createInsertSchema(artistProfiles).pick({
+  artistName: true,
+  bio: true,
+  genre: true,
+  location: true,
+  influences: true,
+  socialLinks: true,
+  photos: true,
+  songs: true,
+});
+
+export const artistProfileRequestSchema = z.object({
+  artistName: z.string().min(1, "Artist name is required"),
+  bio: z.string().default(""),
+  genre: z.string().default(""),
+  location: z.string().default(""),
+  influences: z.array(z.string()).default([]),
+  socialLinks: z.object({
+    instagram: z.string().optional(),
+    twitter: z.string().optional(),
+    spotify: z.string().optional(),
+    soundcloud: z.string().optional(),
+  }).default({}),
+  photos: z.array(z.string()).default([]),
+  songs: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    fileUrl: z.string(),
+    uploadDate: z.string(),
+  })).default([]),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertLyrics = z.infer<typeof insertLyricsSchema>;
@@ -136,3 +184,6 @@ export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsReque
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
 export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;
+export type InsertArtistProfile = z.infer<typeof insertArtistProfileSchema>;
+export type ArtistProfile = typeof artistProfiles.$inferSelect;
+export type ArtistProfileRequest = z.infer<typeof artistProfileRequestSchema>;

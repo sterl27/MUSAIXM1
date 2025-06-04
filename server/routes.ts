@@ -8,7 +8,8 @@ import {
   soundDesignRequestSchema,
   styleTransformerRequestSchema,
   registerSchema,
-  loginSchema
+  loginSchema,
+  artistProfileRequestSchema
 } from "@shared/schema";
 import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
 import passport from "passport";
@@ -358,6 +359,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error transforming lyrics:", error);
       return res.status(500).json({ 
         message: "Failed to transform lyrics",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Artist Profile Routes
+  app.get("/api/artist-profile", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const profile = await storage.getArtistProfile(userId);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      return res.status(200).json(profile);
+    } catch (error) {
+      console.error("Error fetching artist profile:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch profile",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.post("/api/artist-profile", requireAuth, async (req: any, res) => {
+    try {
+      const validationResult = artistProfileRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed",
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const userId = req.user.id;
+      const profileData = validationResult.data;
+      
+      const profile = await storage.upsertArtistProfile(userId, profileData);
+      
+      return res.status(200).json(profile);
+    } catch (error) {
+      console.error("Error saving artist profile:", error);
+      return res.status(500).json({ 
+        message: "Failed to save profile",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // File Upload Routes (placeholder - requires multer middleware)
+  app.post("/api/upload/photo", requireAuth, async (req: any, res) => {
+    try {
+      // This would need multer middleware for actual file handling
+      return res.status(501).json({ 
+        message: "Photo upload not yet implemented - requires file storage setup" 
+      });
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+      return res.status(500).json({ 
+        message: "Failed to upload photo",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  app.post("/api/upload/song", requireAuth, async (req: any, res) => {
+    try {
+      // This would need multer middleware for actual file handling
+      return res.status(501).json({ 
+        message: "Song upload not yet implemented - requires file storage setup" 
+      });
+    } catch (error) {
+      console.error("Error uploading song:", error);
+      return res.status(500).json({ 
+        message: "Failed to upload song",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
