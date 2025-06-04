@@ -237,7 +237,10 @@ export class DatabaseStorage implements IStorage {
         new Date(user.createdAt).getTime() > Date.now() - 24 * 60 * 60 * 1000).length,
       newUsersToday: totalUsers.filter(user => user.createdAt && 
         new Date(user.createdAt).toDateString() === new Date().toDateString()).length,
-      totalSongs: totalProfiles.reduce((sum, profile) => sum + (profile.songs?.length || 0), 0),
+      totalSongs: totalProfiles.reduce((sum, profile) => {
+        const songs = profile.songs;
+        return sum + (Array.isArray(songs) ? songs.length : 0);
+      }, 0),
       totalLyrics: totalProfiles.length,
       totalPlaylists: totalPlaylists.length,
     };
@@ -270,7 +273,6 @@ export class DatabaseStorage implements IStorage {
     const [newUser] = await db
       .insert(users)
       .values({
-        username: userData.username,
         email: userData.email,
         password: hashedPassword,
         role: userData.role || 'user',
@@ -282,7 +284,6 @@ export class DatabaseStorage implements IStorage {
 
   async updateAdminUser(userId: number, userData: any): Promise<User | null> {
     const updateData: any = {
-      username: userData.username,
       email: userData.email,
       role: userData.role,
     };

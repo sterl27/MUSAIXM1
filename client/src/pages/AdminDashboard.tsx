@@ -184,10 +184,20 @@ export default function AdminDashboard() {
       const url = selectedUser ? `/api/admin/users/${selectedUser.id}` : "/api/admin/users";
       const method = selectedUser ? "PUT" : "POST";
       
-      return await apiRequest(url, {
+      const response = await fetch(url, {
         method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
         body: JSON.stringify(userData),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -212,9 +222,16 @@ export default function AdminDashboard() {
   // Delete user mutation
   const { mutate: deleteUser } = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest(`/api/admin/users/${userId}`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: "DELETE",
+        credentials: 'include',
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -236,10 +253,20 @@ export default function AdminDashboard() {
   // Update settings mutation
   const { mutate: saveSettings, isPending: isSavingSettings } = useMutation({
     mutationFn: async (settingsData: SystemSettings) => {
-      return await apiRequest("/api/admin/settings", {
+      const response = await fetch("/api/admin/settings", {
         method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
         body: JSON.stringify(settingsData),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/settings"] });
@@ -420,7 +447,7 @@ export default function AdminDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell className="text-gray-300">
-                            {new Date(user.createdAt).toLocaleDateString()}
+                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
@@ -435,7 +462,7 @@ export default function AdminDashboard() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => deleteUser(user.id)}
+                                  onClick={() => user.id && deleteUser(user.id.toString())}
                                 >
                                   <Trash2 className="h-4 w-4 text-red-400" />
                                 </Button>
