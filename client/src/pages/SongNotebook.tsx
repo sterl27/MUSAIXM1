@@ -11,21 +11,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import { apiRequest } from "@/lib/queryClient";
-import { Persona, getPersonas } from "@/lib/types";
+import { Persona } from "@/lib/types";
 import { Download, Save, Sparkles, Bot, FileText, Music2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SongNotebook() {
   const [lyrics, setLyrics] = useState("");
   const [songTitle, setSongTitle] = useState("");
-  const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
+  const [artistStyle, setArtistStyle] = useState("");
+  const [artistGenre, setArtistGenre] = useState("");
+  const [artistInfluences, setArtistInfluences] = useState("");
   const [aiPrompt, setAiPrompt] = useState("");
   const [useAI, setUseAI] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
   
   const { toast } = useToast();
-  const personas = getPersonas();
 
   // AI Enhancement mutation
   const { mutate: triggerAiSuggestion, isPending: isGenerating } = useMutation({
@@ -35,9 +36,9 @@ export default function SongNotebook() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lyrics: aiPrompt || "Generate creative lyrics",
-          prompt: `Generate creative lyrics based on: ${aiPrompt}`,
+          prompt: `Generate creative lyrics in the style of: ${artistStyle} (Genre: ${artistGenre}, Influences: ${artistInfluences}). Based on: ${aiPrompt}`,
           temperature: 0.8,
-          personaId: selectedPersona?.id || null
+          personaId: null
         }),
         credentials: 'include',
       });
@@ -137,7 +138,7 @@ export default function SongNotebook() {
             {/* Energy Meter */}
             {lyrics && (
               <PersonaEnergyMeter 
-                persona={selectedPersona}
+                persona={artistStyle ? { id: 'custom', name: artistStyle, description: `${artistGenre} artist influenced by ${artistInfluences}`, icon: '🎤' } : null}
                 lyrics={lyrics}
                 className="w-full"
                 showDetails={true}
@@ -169,32 +170,37 @@ export default function SongNotebook() {
 
                 {useAI && (
                   <>
-                    {/* Persona Selection */}
+                    {/* Artist Style */}
                     <div className="space-y-2">
-                      <Label className="text-white">Style</Label>
-                      <Select 
-                        value={selectedPersona?.id || "none"} 
-                        onValueChange={(value) => {
-                          if (value === "none") {
-                            setSelectedPersona(null);
-                          } else {
-                            const persona = personas.find(p => p.id === value);
-                            setSelectedPersona(persona || null);
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                          <SelectValue placeholder="Select style" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Default</SelectItem>
-                          {personas.map((persona) => (
-                            <SelectItem key={persona.id} value={persona.id}>
-                              {persona.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label className="text-white">Your Artist Style</Label>
+                      <Input
+                        value={artistStyle}
+                        onChange={(e) => setArtistStyle(e.target.value)}
+                        placeholder="e.g., Melodic storyteller, Technical wordplay, Conscious rap..."
+                        className="bg-gray-800 border-gray-600 text-white"
+                      />
+                    </div>
+
+                    {/* Genre */}
+                    <div className="space-y-2">
+                      <Label className="text-white">Genre</Label>
+                      <Input
+                        value={artistGenre}
+                        onChange={(e) => setArtistGenre(e.target.value)}
+                        placeholder="e.g., Hip Hop, R&B, Alternative, Pop Rap..."
+                        className="bg-gray-800 border-gray-600 text-white"
+                      />
+                    </div>
+
+                    {/* Influences */}
+                    <div className="space-y-2">
+                      <Label className="text-white">Musical Influences</Label>
+                      <Input
+                        value={artistInfluences}
+                        onChange={(e) => setArtistInfluences(e.target.value)}
+                        placeholder="e.g., Kendrick Lamar, J. Cole, Frank Ocean..."
+                        className="bg-gray-800 border-gray-600 text-white"
+                      />
                     </div>
 
                     {/* AI Prompt */}
