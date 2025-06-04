@@ -307,7 +307,7 @@ export class DatabaseStorage implements IStorage {
       .delete(users)
       .where(eq(users.id, userId));
     
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async getSystemSettings(): Promise<any> {
