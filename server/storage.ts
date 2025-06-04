@@ -28,8 +28,8 @@ export interface IStorage {
   }): Promise<User>;
 
   // Artist Profile operations
-  getArtistProfile(userId: string): Promise<ArtistProfile | undefined>;
-  upsertArtistProfile(userId: string, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
+  getArtistProfile(userId: number): Promise<ArtistProfile | undefined>;
+  upsertArtistProfile(userId: number, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -128,7 +128,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Artist Profile operations
-  async getArtistProfile(userId: string): Promise<ArtistProfile | undefined> {
+  async getArtistProfile(userId: number): Promise<ArtistProfile | undefined> {
     const [profile] = await db
       .select()
       .from(artistProfiles)
@@ -136,7 +136,7 @@ export class DatabaseStorage implements IStorage {
     return profile || undefined;
   }
 
-  async upsertArtistProfile(userId: string, profileData: ArtistProfileRequest): Promise<ArtistProfile> {
+  async upsertArtistProfile(userId: number, profileData: ArtistProfileRequest): Promise<ArtistProfile> {
     const profileId = `profile_${userId}_${Date.now()}`;
     
     // Check if profile exists

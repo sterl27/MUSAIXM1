@@ -128,7 +128,7 @@ export const styleTransformerRequestSchema = z.object({
 // Artist Profiles table
 export const artistProfiles = pgTable("artist_profiles", {
   id: varchar("id").primaryKey().notNull(),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   artistName: varchar("artist_name").notNull(),
   bio: text("bio").default(""),
   genre: varchar("genre").default(""),
