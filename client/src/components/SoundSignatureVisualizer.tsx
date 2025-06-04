@@ -224,11 +224,11 @@ export default function SoundSignatureVisualizer({
     ctx.globalAlpha = 0.3;
     
     ctx.beginPath();
-    characteristics.forEach((char, index) => {
+    Object.entries(characteristics).forEach(([char, value], index) => {
       const angle = index * angleStep - Math.PI / 2;
-      const value = characteristics[char as keyof VocalCharacteristics] / 10;
-      const x = centerX + radius * value * Math.cos(angle);
-      const y = centerY + radius * value * Math.sin(angle);
+      const normalizedValue = (value as number) / 10;
+      const x = centerX + radius * normalizedValue * Math.cos(angle);
+      const y = centerY + radius * normalizedValue * Math.sin(angle);
       
       if (index === 0) {
         ctx.moveTo(x, y);
@@ -244,11 +244,11 @@ export default function SoundSignatureVisualizer({
     
     // Draw points
     ctx.fillStyle = '#FF4081';
-    characteristics.forEach((char, index) => {
+    Object.entries(characteristics).forEach(([char, value], index) => {
       const angle = index * angleStep - Math.PI / 2;
-      const value = characteristics[char as keyof VocalCharacteristics] / 10;
-      const x = centerX + radius * value * Math.cos(angle);
-      const y = centerY + radius * value * Math.sin(angle);
+      const normalizedValue = (value as number) / 10;
+      const x = centerX + radius * normalizedValue * Math.cos(angle);
+      const y = centerY + radius * normalizedValue * Math.sin(angle);
       
       ctx.beginPath();
       ctx.arc(x, y, 4, 0, 2 * Math.PI);
