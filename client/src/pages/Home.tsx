@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import UnifiedHeader from "@/components/layout/UnifiedHeader";
-import { ArrowRight, Sparkles, Mic, Music, Wand2, Bot, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Mic, Music, Wand2, Bot, Zap, Brain, Target, TrendingUp, Volume2, Palette, FileText } from "lucide-react";
 
 export default function Home() {
   return (
@@ -32,14 +32,14 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row gap-4 pt-6">
                 <Button size="lg" className="musaix-gradient-button gap-2 text-white font-semibold py-3 px-6" asChild>
-                  <Link href="/notebook">
+                  <Link href="/songwriter">
                     Start Writing
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="gap-2 border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10 hover:border-[#FF4081] transition-all duration-300" asChild>
-                  <Link href="/openai">
-                    Try AI Enhancer
+                  <Link href="/complexity-scoring">
+                    Try AI Analysis
                     <Bot className="h-5 w-5" />
                   </Link>
                 </Button>
@@ -120,35 +120,168 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow">
-              <CardContent className="p-8">
-                <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#FF4081] to-[#AB47BC] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Bot className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">AI-Powered Enhancement</h3>
-                <p className="text-gray-300 leading-relaxed">Transform your lyrics with OpenAI's advanced language models for professional-quality results that match industry standards.</p>
-              </CardContent>
-            </Card>
+            <Link href="/songwriter">
+              <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow cursor-pointer">
+                <CardContent className="p-8">
+                  <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#FF4081] to-[#AB47BC] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Bot className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">AI-Powered Enhancement</h3>
+                  <p className="text-gray-300 leading-relaxed">Transform your lyrics with advanced AI models for professional-quality results that match industry standards.</p>
+                  <div className="mt-4 flex items-center text-[#FF4081] text-sm font-medium">
+                    Try Now <ArrowRight className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow">
-              <CardContent className="p-8">
-                <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#FFC107] to-[#FF4081] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Mic className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Artist Personas</h3>
-                <p className="text-gray-300 leading-relaxed">Apply the style and flow of legendary artists to your lyrics with our persona-based enhancement engine.</p>
-              </CardContent>
-            </Card>
+            <Link href="/complexity-scoring">
+              <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow cursor-pointer">
+                <CardContent className="p-8">
+                  <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#FFC107] to-[#FF4081] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Brain className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">Complexity Analysis</h3>
+                  <p className="text-gray-300 leading-relaxed">Analyze lyric complexity across linguistic, structural, semantic, and creative dimensions with AI insights.</p>
+                  <div className="mt-4 flex items-center text-[#FF4081] text-sm font-medium">
+                    Analyze Now <ArrowRight className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
             
-            <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow">
-              <CardContent className="p-8">
-                <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#AB47BC] to-[#3F51B5] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Wand2 className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Style Transformer</h3>
-                <p className="text-gray-300 leading-relaxed">Switch between musical styles and genres with our advanced style transformation technology.</p>
-              </CardContent>
-            </Card>
+            <Link href="/energy-meter">
+              <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow cursor-pointer">
+                <CardContent className="p-8">
+                  <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#AB47BC] to-[#3F51B5] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Zap className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">Energy Visualization</h3>
+                  <p className="text-gray-300 leading-relaxed">Visualize creative intensity and energy patterns with real-time persona-based analytics.</p>
+                  <div className="mt-4 flex items-center text-[#FF4081] text-sm font-medium">
+                    Explore <ArrowRight className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Advanced Features Section */}
+      <section className="bg-gradient-to-b from-black via-gray-900 to-black py-20 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#FF4081]/5 via-transparent to-[#AB47BC]/5"></div>
+        <div className="relative z-10 container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">
+              <span className="text-white">Professional </span>
+              <span className="musaix-gradient-text">AI Tools</span>
+            </h2>
+            <p className="text-gray-300 text-lg max-w-2xl mx-auto">Advanced creative production tools for professional lyric development</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Link href="/lyric-animator">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#FF4081] to-[#AB47BC] flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Lyric Animator</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">8 dynamic animation styles for visual lyric presentation</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Animate <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/style-transformer">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#FFC107] to-[#FF4081] flex items-center justify-center">
+                      <Palette className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Style Transformer</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">Transform lyrics across different musical styles and genres</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Transform <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/sound-design">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#AB47BC] to-[#3F51B5] flex items-center justify-center">
+                      <Volume2 className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Sound Design</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">AI-powered sound design suggestions and production tips</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Design <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/flow-analyzer">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#4CAF50] to-[#FFC107] flex items-center justify-center">
+                      <TrendingUp className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Flow Analyzer</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">Advanced flow pattern analysis and rhythm optimization</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Analyze <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/structure-formatter">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#9C27B0] to-[#FF4081] flex items-center justify-center">
+                      <Target className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Structure Formatter</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">Professional song structure formatting and organization</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Format <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/artist-profile">
+              <Card className="musaix-card-border bg-black/30 hover:bg-black/50 transition-all duration-300 group cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-r from-[#FF5722] to-[#FFC107] flex items-center justify-center">
+                      <Mic className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-white">Artist Profile</h3>
+                  </div>
+                  <p className="text-gray-300 text-sm leading-relaxed">Build your professional artist identity and portfolio</p>
+                  <div className="mt-3 flex items-center text-[#FF4081] text-xs font-medium">
+                    Create <ArrowRight className="h-3 w-3 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>
@@ -166,13 +299,17 @@ export default function Home() {
             Join thousands of artists using <span className="musaix-gradient-text font-semibold">Musaix Rap Pro</span> to create better lyrics faster with AI-powered enhancements that transform your creative process.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <Button size="lg" className="musaix-gradient-button gap-3 text-white font-semibold py-4 px-8 text-lg">
-              <Link href="/signup">Sign Up Free</Link>
-              <Zap className="h-5 w-5" />
+            <Button size="lg" className="musaix-gradient-button gap-3 text-white font-semibold py-4 px-8 text-lg" asChild>
+              <Link href="/songwriter">
+                Start Creating
+                <Zap className="h-5 w-5" />
+              </Link>
             </Button>
-            <Button size="lg" variant="outline" className="gap-3 border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10 hover:border-[#FF4081] py-4 px-8 text-lg">
-              <Link href="/openai">Try Demo</Link>
-              <ArrowRight className="h-5 w-5" />
+            <Button size="lg" variant="outline" className="gap-3 border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10 hover:border-[#FF4081] py-4 px-8 text-lg" asChild>
+              <Link href="/complexity-scoring">
+                Try AI Analysis
+                <ArrowRight className="h-5 w-5" />
+              </Link>
             </Button>
           </div>
           <p className="text-sm text-gray-400">No credit card required • Free forever plan available</p>
