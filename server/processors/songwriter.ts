@@ -45,97 +45,15 @@ export async function generateSongLyrics(
   personaId: string | null
 ): Promise<string> {
   try {
-    // If we have OpenAI API key, use that for generating lyrics
-    if (process.env.OPENAI_API_KEY) {
-      log("Using OpenAI to generate song lyrics");
-      return await generateWithOpenAI(topic, mood, genre, structure, linesPerVerse, personaId);
-    } else {
-      // Otherwise use our built-in generator
-      log("Using built-in song lyrics generator");
-      return generateWithBuiltIn(topic, mood, genre, structure, linesPerVerse, personaId);
-    }
+    log("Using built-in song lyrics generator");
+    return generateWithBuiltIn(topic, mood, genre, structure, linesPerVerse, personaId);
   } catch (error) {
     log(`Error generating song lyrics: ${error}`);
-    // Fall back to built-in method if OpenAI fails
-    return generateWithBuiltIn(topic, mood, genre, structure, linesPerVerse, personaId);
-  }
-}
-
-/**
- * Generate lyrics using OpenAI
- */
-async function generateWithOpenAI(
-  topic: string,
-  mood: string,
-  genre: string,
-  structure: string,
-  linesPerVerse: number,
-  personaId: string | null
-): Promise<string> {
-  // Get persona info if specified
-  const persona = personaId ? getPersonaById(personaId) : null;
-  const personaContext = persona 
-    ? `Write in the style of ${persona.name}. ${persona.description}.` 
-    : "";
-
-  // Create prompt for OpenAI
-  const prompt = `
-    Write song lyrics with the following specifications:
-    ${topic ? `Topic/theme: ${topic}` : ""}
-    Mood: ${mood}
-    Genre: ${genre || "Any"}
-    Structure: ${structure}
-    Lines per verse: ${linesPerVerse}
-    ${personaContext}
-    
-    Format the lyrics clearly with section labels (Verse 1, Chorus, etc.).
-    Make the lyrics coherent, creative, and appropriate for the specified genre and mood.
-  `.trim();
-
-  try {
-    // Call OpenAI API
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "You are a professional songwriter skilled in various genres and styles."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.8,
-        max_tokens: 1000
-      })
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      log(`OpenAI API error: ${JSON.stringify(error)}`);
-      throw new Error(`OpenAI API error: ${error.error?.message || "Unknown error"}`);
-    }
-    
-    const data = await response.json();
-    const lyrics = data.choices[0]?.message?.content?.trim();
-    
-    if (!lyrics) {
-      throw new Error("No lyrics were generated");
-    }
-    
-    return lyrics;
-  } catch (error) {
-    log(`Error calling OpenAI: ${error}`);
     throw error;
   }
 }
+
+
 
 /**
  * Generate lyrics using built-in templates and algorithms

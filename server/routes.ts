@@ -197,8 +197,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate sound design suggestions
       const suggestion = await generateSoundDesignSuggestion(
         description,
-        effects,
-        instruments
+        undefined, // genre
+        undefined, // mood
+        instruments,
+        effects
       );
       
       return res.status(200).json({ suggestion });
