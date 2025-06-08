@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import MusicPlayer from "@/components/MusicPlayer";
 import { queryClient } from "@/lib/queryClient";
@@ -19,7 +20,9 @@ import {
   Edit,
   PlayCircle,
   List,
-  Grid
+  Grid,
+  FileAudio,
+  X
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -52,12 +55,22 @@ export default function MusicPlayerPage() {
   const [isCreatingPlaylist, setIsCreatingPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState("");
   const [newPlaylistDescription, setNewPlaylistDescription] = useState("");
-
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadData, setUploadData] = useState({
+    title: "",
+    artist: "",
+    genre: "",
+    album: "",
+    createPlaylist: false,
+    playlistName: ""
+  });
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Fetch user's songs from Artist Profile
+  // Fetch user's songs
   const { data: userSongs = [], isLoading: songsLoading } = useQuery<Song[]>({
-    queryKey: ["/api/artist-profile/songs"],
+    queryKey: ["/api/songs"],
     retry: false,
   });
 
@@ -65,6 +78,51 @@ export default function MusicPlayerPage() {
   const { data: playlists = [], isLoading: playlistsLoading } = useQuery<Playlist[]>({
     queryKey: ["/api/playlists"],
     retry: false,
+  });
+
+  // Song upload mutation
+  const { mutate: uploadSong, isPending: isUploadingMutation } = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch("/api/upload/song", {
+        method: "POST",
+        body: formData,
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to upload song");
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/songs"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/playlists"] });
+      setIsUploading(false);
+      setUploadData({
+        title: "",
+        artist: "",
+        genre: "",
+        album: "",
+        createPlaylist: false,
+        playlistName: ""
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      toast({
+        title: "Song uploaded successfully!",
+        description: data.playlistCreated ? "Song uploaded and playlist created." : "Your song is now available in your library.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to upload song",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
 
   // Create playlist mutation
@@ -127,6 +185,49 @@ export default function MusicPlayerPage() {
 
   // Get unique genres
   const genres = Array.from(new Set(userSongs.map(song => song.genre).filter(Boolean))) as string[];
+
+  const handleUploadSong = () => {
+    const fileInput = fileInputRef.current;
+    if (!fileInput?.files?.[0]) {
+      toast({
+        title: "No file selected",
+        description: "Please select an audio file to upload.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!uploadData.title.trim()) {
+      toast({
+        title: "Song title required",
+        description: "Please enter a title for your song.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (uploadData.createPlaylist && !uploadData.playlistName.trim()) {
+      toast({
+        title: "Playlist name required",
+        description: "Please enter a name for the new playlist.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('songFile', fileInput.files[0]);
+    formData.append('title', uploadData.title);
+    formData.append('artist', uploadData.artist);
+    formData.append('genre', uploadData.genre);
+    formData.append('album', uploadData.album);
+    formData.append('createPlaylist', uploadData.createPlaylist.toString());
+    if (uploadData.createPlaylist && uploadData.playlistName) {
+      formData.append('playlistName', uploadData.playlistName);
+    }
+
+    uploadSong(formData);
+  };
 
   const handleCreatePlaylist = () => {
     if (!newPlaylistName.trim()) {
@@ -195,8 +296,16 @@ export default function MusicPlayerPage() {
               {viewMode === 'list' ? <Grid className="h-4 w-4" /> : <List className="h-4 w-4" />}
             </Button>
             <Button
-              onClick={() => setIsCreatingPlaylist(true)}
+              onClick={() => setIsUploading(true)}
               className="musaix-gradient-button"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Song
+            </Button>
+            <Button
+              onClick={() => setIsCreatingPlaylist(true)}
+              variant="outline"
+              className="border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10"
             >
               <Plus className="h-4 w-4 mr-2" />
               New Playlist
@@ -390,6 +499,129 @@ export default function MusicPlayerPage() {
             </Card>
           </div>
         </div>
+
+        {/* Upload Song Modal */}
+        {isUploading && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-lg mx-4 musaix-card-border bg-black">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <FileAudio className="h-5 w-5" />
+                    Upload Song
+                  </CardTitle>
+                  <Button
+                    onClick={() => setIsUploading(false)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* File Upload */}
+                <div>
+                  <Label className="text-white">Audio File</Label>
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="audio/*"
+                    className="bg-gray-800 border-gray-600 text-white file:bg-[#FF4081] file:text-white file:border-0 file:rounded-md file:px-3 file:py-1"
+                  />
+                </div>
+
+                {/* Song Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-white">Song Title *</Label>
+                    <Input
+                      value={uploadData.title}
+                      onChange={(e) => setUploadData({...uploadData, title: e.target.value})}
+                      placeholder="Enter song title..."
+                      className="bg-gray-800 border-gray-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-white">Artist</Label>
+                    <Input
+                      value={uploadData.artist}
+                      onChange={(e) => setUploadData({...uploadData, artist: e.target.value})}
+                      placeholder="Enter artist name..."
+                      className="bg-gray-800 border-gray-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-white">Genre</Label>
+                    <Input
+                      value={uploadData.genre}
+                      onChange={(e) => setUploadData({...uploadData, genre: e.target.value})}
+                      placeholder="e.g., Hip-Hop, R&B..."
+                      className="bg-gray-800 border-gray-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-white">Album</Label>
+                    <Input
+                      value={uploadData.album}
+                      onChange={(e) => setUploadData({...uploadData, album: e.target.value})}
+                      placeholder="Enter album name..."
+                      className="bg-gray-800 border-gray-600 text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Playlist Creation Option */}
+                <div className="space-y-3 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="create-playlist"
+                      checked={uploadData.createPlaylist}
+                      onCheckedChange={(checked) => 
+                        setUploadData({...uploadData, createPlaylist: !!checked})
+                      }
+                      className="border-[#FF4081] data-[state=checked]:bg-[#FF4081]"
+                    />
+                    <Label htmlFor="create-playlist" className="text-white">
+                      Create new playlist with this song
+                    </Label>
+                  </div>
+                  
+                  {uploadData.createPlaylist && (
+                    <div>
+                      <Label className="text-white">Playlist Name *</Label>
+                      <Input
+                        value={uploadData.playlistName}
+                        onChange={(e) => setUploadData({...uploadData, playlistName: e.target.value})}
+                        placeholder="Enter playlist name..."
+                        className="bg-gray-800 border-gray-600 text-white"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={handleUploadSong}
+                    disabled={isUploadingMutation}
+                    className="flex-1 musaix-gradient-button"
+                  >
+                    {isUploadingMutation ? "Uploading..." : "Upload Song"}
+                  </Button>
+                  <Button
+                    onClick={() => setIsUploading(false)}
+                    variant="outline"
+                    className="flex-1 border-gray-600 text-gray-300"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Create Playlist Modal */}
         {isCreatingPlaylist && (
