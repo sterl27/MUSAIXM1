@@ -14,6 +14,7 @@ import PageLayout from "@/components/layout/PageLayout";
 import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import LiveEnergyDashboard from "@/components/LiveEnergyDashboard";
+import ComplexityScoring from "@/components/ComplexityScoring";
 import { apiRequest } from "@/lib/queryClient";
 import { getMusicStyles, getPersonas, Persona, MusicStyle } from "@/lib/types";
 
@@ -525,7 +526,7 @@ export default function SongWriter() {
               </Card>
             </div>
             
-            {/* Energy Analysis Sidebar */}
+            {/* Analysis Sidebar */}
             <div className="space-y-6">
               {/* Live Energy Dashboard */}
               <LiveEnergyDashboard
@@ -534,6 +535,15 @@ export default function SongWriter() {
                 className="w-full"
                 compact={false}
               />
+
+              {/* AI Complexity Scoring */}
+              {generatedLyrics && (
+                <ComplexityScoring
+                  lyrics={generatedLyrics}
+                  className="w-full"
+                  autoAnalyze={false}
+                />
+              )}
 
               {/* Detailed Energy Meter */}
               {generatedLyrics && (
@@ -551,7 +561,7 @@ export default function SongWriter() {
                   <CardContent className="p-6 text-center">
                     <div className="space-y-2">
                       <div className="text-gray-400 text-2xl">🎵</div>
-                      <p className="text-sm text-gray-400">Generate lyrics to see energy analysis</p>
+                      <p className="text-sm text-gray-400">Generate lyrics to see comprehensive AI analysis</p>
                     </div>
                   </CardContent>
                 </Card>

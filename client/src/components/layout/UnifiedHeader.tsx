@@ -46,6 +46,7 @@ export default function UnifiedHeader() {
   const creativeTools = [
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
+    { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
     { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
     { href: "/lyric-animator", icon: <Video size={16} />, label: "Lyric Animator", description: "Create animated lyric videos with effects" },
     { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
