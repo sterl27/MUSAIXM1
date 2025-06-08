@@ -40,7 +40,11 @@ export default function ToolsNavigation() {
       icon: <Sparkles size={18} />,
       label: "Lyrics Enhancer"
     },
-
+    {
+      href: "/openai",
+      icon: <Bot size={18} />,
+      label: "OpenAI Enhancer"
+    },
     {
       href: "/songwriter",
       icon: <PenToolIcon size={18} />,

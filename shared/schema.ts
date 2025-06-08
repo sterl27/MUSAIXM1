@@ -85,7 +85,14 @@ export const enhanceLyricsRequestSchema = z.object({
   customDescription: z.string().optional()
 });
 
-
+// Schema for OpenAI lyrics enhancement request
+export const openAIEnhanceLyricsRequestSchema = z.object({
+  lyrics: z.string().min(1, "Lyrics cannot be empty"),
+  prompt: z.string().default("Transform these lyrics in your own style"),
+  temperature: z.number().min(0.1).max(1.0).default(0.7),
+  personaId: z.string().nullable(),
+  useAI: z.boolean().default(true)
+});
 
 // Schema for SongWriter request
 export const songwriterRequestSchema = z.object({
@@ -173,7 +180,7 @@ export type Lyrics = typeof lyrics.$inferSelect;
 export type RegisterRequest = z.infer<typeof registerSchema>;
 export type LoginRequest = z.infer<typeof loginSchema>;
 export type EnhanceLyricsRequest = z.infer<typeof enhanceLyricsRequestSchema>;
-
+export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsRequestSchema>;
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
 export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;
