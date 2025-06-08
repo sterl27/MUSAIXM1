@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Download, FileText, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { downloadAdvancedComplexityReport } from '@/lib/advancedPdfGenerator';
 
 interface ComplexityScore {
   overall: number;
@@ -46,6 +47,7 @@ export default function PDFDownloadButton({
   const [artistName, setArtistName] = useState('');
   const [includeImproved, setIncludeImproved] = useState(!!improvedLyrics);
   const [includeInsights, setIncludeInsights] = useState(true);
+  const [reportFormat, setReportFormat] = useState<'text' | 'pdf'>('pdf');
 
   const { toast } = useToast();
 
@@ -121,31 +123,44 @@ AI-Powered Lyric Enhancement Platform
     setIsGenerating(true);
     
     try {
-      const content = generatePDFContent();
-      
-      // Create a blob with the content
-      const blob = new Blob([content], { type: 'text/plain' });
-      
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      
-      const timestamp = new Date().toISOString().split('T')[0];
-      const filename = songTitle 
-        ? `musaix-${songTitle.toLowerCase().replace(/\s+/g, '-')}-complexity-report-${timestamp}.txt`
-        : `musaix-complexity-report-${timestamp}.txt`;
-      
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Report Downloaded",
-        description: "Your complexity analysis report has been downloaded successfully.",
-      });
+      if (reportFormat === 'pdf') {
+        // Generate professional PDF with visual charts
+        await downloadAdvancedComplexityReport({
+          lyrics: originalLyrics,
+          complexityScore: complexityScore,
+          improvedLyrics: includeImproved ? improvedLyrics : undefined,
+          artistName: artistName || undefined,
+          songTitle: songTitle || undefined
+        });
+        
+        toast({
+          title: "PDF Report Downloaded",
+          description: "Your professional complexity analysis report has been downloaded successfully.",
+        });
+      } else {
+        // Generate text format
+        const content = generatePDFContent();
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = songTitle 
+          ? `musaix-${songTitle.toLowerCase().replace(/\s+/g, '-')}-complexity-report-${timestamp}.txt`
+          : `musaix-complexity-report-${timestamp}.txt`;
+        
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: "Text Report Downloaded",
+          description: "Your complexity analysis report has been downloaded successfully.",
+        });
+      }
       
       setIsOpen(false);
     } catch (error) {
@@ -195,6 +210,31 @@ AI-Powered Lyric Enhancement Platform
                 onChange={(e) => setArtistName(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
               />
+            </div>
+          </div>
+
+          {/* Report Format */}
+          <div className="space-y-3">
+            <Label className="text-white font-medium">Report Format</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={reportFormat === 'pdf' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setReportFormat('pdf')}
+                className="flex-1"
+              >
+                Professional PDF
+              </Button>
+              <Button
+                type="button"
+                variant={reportFormat === 'text' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setReportFormat('text')}
+                className="flex-1"
+              >
+                Text Format
+              </Button>
             </div>
           </div>
 
