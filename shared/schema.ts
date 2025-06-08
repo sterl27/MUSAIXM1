@@ -85,14 +85,7 @@ export const enhanceLyricsRequestSchema = z.object({
   customDescription: z.string().optional()
 });
 
-// Schema for OpenAI lyrics enhancement request
-export const openAIEnhanceLyricsRequestSchema = z.object({
-  lyrics: z.string().min(1, "Lyrics cannot be empty"),
-  prompt: z.string().default("Transform these lyrics in your own style"),
-  temperature: z.number().min(0.1).max(1.0).default(0.7),
-  personaId: z.string().nullable(),
-  useAI: z.boolean().default(true)
-});
+
 
 // Schema for SongWriter request
 export const songwriterRequestSchema = z.object({

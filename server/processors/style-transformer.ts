@@ -1,9 +1,4 @@
-// Style Transformer Service with OpenAI integration
-import OpenAI from "openai";
-
-// Initialize OpenAI client
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Style Transformer Service
 
 // Interface for transformation options
 interface TransformationOptions {
@@ -18,7 +13,7 @@ interface TransformationOptions {
 }
 
 /**
- * Transform lyrics using OpenAI API
+ * Transform lyrics using built-in style transformation
  */
 export async function transformLyrics(
   originalLyrics: string,
@@ -29,32 +24,33 @@ export async function transformLyrics(
     throw new Error("No lyrics provided");
   }
   
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OpenAI API key is not configured");
-  }
-  
   try {
-    // Construct the system prompt with detailed instructions
-    const systemPrompt = constructSystemPrompt(options);
+    // Split lyrics into lines for processing
+    const lines = originalLyrics.split('\n').filter(line => line.trim());
     
-    // Create the user prompt with the lyrics
-    const userPrompt = `Here are the original lyrics to transform:\n\n${originalLyrics}`;
-    
-    // Call OpenAI API
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.7, // Adjust creativity level based on the task
-      max_tokens: 2000, // Adjust based on expected length of lyrics
+    // Transform each line based on the target style
+    const transformedLines = lines.map(line => {
+      let transformedLine = line;
+      
+      // Apply style-specific transformations
+      transformedLine = applyStyleTransformation(transformedLine, options.targetStyle, options.strength);
+      
+      // Apply mood transformations if specified
+      if (options.mood) {
+        transformedLine = applyMoodTransformation(transformedLine, options.mood);
+      }
+      
+      // Enhance imagery if requested
+      if (options.enhanceImagery) {
+        transformedLine = enhanceImagery(transformedLine);
+      }
+      
+      return transformedLine;
     });
     
-    // Return the transformed lyrics
-    return response.choices[0].message.content || "Error: No content received from API";
+    return transformedLines.join('\n');
   } catch (error) {
-    console.error("Error transforming lyrics with OpenAI:", error);
+    console.error("Error transforming lyrics:", error);
     throw error;
   }
 }
