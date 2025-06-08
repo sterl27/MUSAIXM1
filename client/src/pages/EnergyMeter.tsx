@@ -279,17 +279,21 @@ To a place where I can simply stay`
               </CardHeader>
               <CardContent>
                 <Select 
-                  value={selectedPersona?.id || ""} 
+                  value={selectedPersona?.id || "none"} 
                   onValueChange={(value) => {
-                    const persona = personas.find(p => p.id === value);
-                    setSelectedPersona(persona || null);
+                    if (value === "none") {
+                      setSelectedPersona(null);
+                    } else {
+                      const persona = personas.find(p => p.id === value);
+                      setSelectedPersona(persona || null);
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a persona (optional)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No Persona</SelectItem>
+                    <SelectItem value="none">No Persona</SelectItem>
                     {personas.map((persona) => (
                       <SelectItem key={persona.id} value={persona.id}>
                         {persona.icon} {persona.name}
