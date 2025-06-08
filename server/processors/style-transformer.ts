@@ -1,4 +1,4 @@
-// Style Transformer Service
+// Style Transformer Service with built-in transformations
 
 // Interface for transformation options
 interface TransformationOptions {
@@ -56,168 +56,132 @@ export async function transformLyrics(
 }
 
 /**
- * Construct system prompt based on transformation options
+ * Apply style-specific transformations to a line of lyrics
  */
-function constructSystemPrompt(options: TransformationOptions): string {
-  const { 
-    targetStyle, 
-    mood, 
-    strength, 
-    preserveStructure, 
-    keepRhymes, 
-    maintainThemes, 
-    enhanceImagery,
-    customInstructions 
-  } = options;
+function applyStyleTransformation(line: string, targetStyle: string, strength: number): string {
+  const intensityFactor = strength / 10; // Convert to 0-1 scale
   
-  // Style-specific guidance
-  const styleGuidance = getStyleGuidance(targetStyle);
-  
-  // Transformation strength instructions
-  const strengthInstructions = getStrengthInstructions(strength);
-  
-  // Build the system prompt
-  let prompt = `You are an expert songwriter and lyricist with deep knowledge of various musical styles and genres. 
-Your task is to transform the provided lyrics into a ${targetStyle} style${mood ? ` with a ${mood} mood` : ''}.
-
-STYLE GUIDELINES:
-${styleGuidance}
-
-TRANSFORMATION INTENSITY:
-${strengthInstructions}
-
-TRANSFORMATION RULES:`;
-
-  // Add conditional rules based on options
-  if (preserveStructure) {
-    prompt += `
-- Maintain the original song structure (verses, chorus, bridge, etc.). Do not add or remove sections.`;
+  switch (targetStyle.toLowerCase()) {
+    case 'trap':
+      return applyTrapStyle(line, intensityFactor);
+    case 'boom bap':
+      return applyBoomBapStyle(line, intensityFactor);
+    case 'melodic':
+      return applyMelodicStyle(line, intensityFactor);
+    case 'conscious':
+      return applyConsciousStyle(line, intensityFactor);
+    case 'drill':
+      return applyDrillStyle(line, intensityFactor);
+    case 'old school':
+      return applyOldSchoolStyle(line, intensityFactor);
+    default:
+      return line;
   }
-  
-  if (keepRhymes) {
-    prompt += `
-- Preserve the original rhyme scheme and pattern as much as possible.`;
-  }
-  
-  if (maintainThemes) {
-    prompt += `
-- Keep the core themes, messages, and emotional essence of the original lyrics.`;
-  }
-  
-  if (enhanceImagery) {
-    prompt += `
-- Enhance the imagery and metaphors to match the target style while making the lyrics more vivid.`;
-  }
-  
-  // Add custom instructions if provided
-  if (customInstructions) {
-    prompt += `
-
-ADDITIONAL INSTRUCTIONS:
-${customInstructions}`;
-  }
-  
-  prompt += `
-
-OUTPUT GUIDELINES:
-- Return ONLY the transformed lyrics, formatted cleanly with appropriate line breaks.
-- Maintain any section headers (like "VERSE" or "CHORUS") from the original if present.
-- Do not include any explanations, notes, or commentary - just the transformed lyrics.`;
-
-  return prompt;
 }
 
 /**
- * Get style-specific guidance based on the target style
+ * Apply trap style transformations
  */
-function getStyleGuidance(targetStyle: string): string {
-  const styleGuidelines: Record<string, string> = {
-    "rap-boom-bap": `
-- Use complex internal rhyme schemes characteristic of 90s hip-hop
-- Incorporate clever wordplay and metaphors
-- Focus on storytelling and message-driven lyrics
-- Include some cultural references from the golden era of hip-hop
-- Maintain a steady, consistent flow that works with boom-bap beats`,
-    
-    "rap-trap": `
-- Use triplet flows and staccato delivery patterns
-- Add ad-libs in parentheses (like "yeah", "skrrt", etc.)
-- Include trap-specific slang and terminology
-- Write shorter lines with impactful delivery
-- Focus on repetitive, catchy phrases for hooks`,
-    
-    "rap-melodic": `
-- Incorporate singing elements and melodic hooks
-- Focus on emotional themes and personal narratives
-- Use more musical phrasing that could be sung
-- Balance rap verses with melodic choruses
-- Include more vulnerable, introspective content`,
-    
-    "pop-mainstream": `
-- Create simple, memorable hooks and phrases
-- Use direct, relatable language and universal themes
-- Structure around a strong chorus that repeats
-- Keep vocabulary accessible for wide audience appeal
-- Incorporate upbeat, positive messaging when possible`,
-    
-    "pop-indie": `
-- Use more poetic and metaphorical language
-- Include quirky or unexpected imagery
-- Focus on introspective themes with personal details
-- Avoid overly commercial language
-- Incorporate some unconventional structure elements`,
-    
-    "rock-classic": `
-- Use powerful, anthemic language and imagery
-- Include some extended metaphors or epic storytelling
-- Focus on themes of freedom, rebellion, or deep emotion
-- Write with rhythm suitable for guitar-driven music
-- Structure around strong, repeatable choruses`,
-    
-    "rock-punk": `
-- Use raw, direct language with attitude
-- Keep lines short and impactful
-- Focus on themes of rebellion, alienation, or social issues
-- Include call-and-response sections when appropriate
-- Use conversational, authentic language rather than poetic flourishes`,
-    
-    "rnb-modern": `
-- Focus on smooth, sensual language and imagery
-- Use subtle wordplay and double meanings
-- Include more sophisticated emotional narratives
-- Balance straightforward sections with more poetic ones
-- Incorporate space for vocal runs and melisma`,
-    
-    "folk-acoustic": `
-- Focus on detailed storytelling with vivid characters
-- Use nature imagery and traditional metaphors
-- Structure around narrative development
-- Include some repeated refrains or motifs
-- Use descriptive, evocative language`,
-    
-    "electronic-edm": `
-- Create simple, repeatable phrases for high-energy sections
-- Include buildup and drop moments in the lyrical structure
-- Use euphoric, energetic language for chorus/hook sections
-- Keep verses concise with forward momentum
-- Focus on universal, emotionally resonant themes`
-  };
+function applyTrapStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
   
-  return styleGuidelines[targetStyle] || 
-    "Transform the lyrics to match the specified style while maintaining the essential meaning and emotion.";
+  return line.replace(/\b(yeah|yes)\b/gi, 'yeah yeah')
+           .replace(/\b(money|cash)\b/gi, 'bands')
+           .replace(/\b(car|vehicle)\b/gi, 'whip')
+           .replace(/\b(jewelry|chains)\b/gi, 'ice');
 }
 
 /**
- * Get instructions based on transformation strength
+ * Apply boom bap style transformations
  */
-function getStrengthInstructions(strength: number): string {
-  if (strength <= 0.25) {
-    return "Apply a SUBTLE transformation. Make minimal changes to adapt the lyrics to the target style, keeping most of the original wording intact. This should feel like the same song with a light stylistic touch.";
-  } else if (strength <= 0.5) {
-    return "Apply a MODERATE transformation. Balance between preserving original elements and introducing style-specific changes. The result should be recognizable as derived from the original but clearly styled differently.";
-  } else if (strength <= 0.75) {
-    return "Apply a STRONG transformation. Make significant changes to adapt the lyrics to the target style while keeping only the most essential elements of the original. The result should primarily reflect the target style.";
-  } else {
-    return "Apply a COMPLETE transformation. Reimagine the lyrics entirely in the target style, keeping only the core theme and emotional essence. Don't hesitate to replace most of the original wording and phrasing.";
+function applyBoomBapStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
+  
+  return line.replace(/\b(microphone|mic)\b/gi, 'microphone check')
+           .replace(/\b(skills|talent)\b/gi, 'lyrical prowess')
+           .replace(/\b(beats|rhythm)\b/gi, 'boom bap beats');
+}
+
+/**
+ * Apply melodic style transformations
+ */
+function applyMelodicStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
+  
+  return line.replace(/\b(sing|singing)\b/gi, 'harmonize')
+           .replace(/\b(love|heart)\b/gi, 'soul')
+           .replace(/\b(pain|hurt)\b/gi, 'wounded heart');
+}
+
+/**
+ * Apply conscious style transformations
+ */
+function applyConsciousStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
+  
+  return line.replace(/\b(think|thought)\b/gi, 'contemplate')
+           .replace(/\b(world|society)\b/gi, 'social fabric')
+           .replace(/\b(change|transform)\b/gi, 'revolution');
+}
+
+/**
+ * Apply drill style transformations
+ */
+function applyDrillStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
+  
+  return line.replace(/\b(street|block)\b/gi, 'the block')
+           .replace(/\b(real|truth)\b/gi, 'facts')
+           .replace(/\b(work|hustle)\b/gi, 'grind');
+}
+
+/**
+ * Apply old school style transformations
+ */
+function applyOldSchoolStyle(line: string, intensity: number): string {
+  if (intensity < 0.3) return line;
+  
+  return line.replace(/\b(party|celebration)\b/gi, 'block party')
+           .replace(/\b(dance|move)\b/gi, 'break dance')
+           .replace(/\b(fresh|cool)\b/gi, 'def');
+}
+
+/**
+ * Apply mood transformations to a line
+ */
+function applyMoodTransformation(line: string, mood: string): string {
+  switch (mood.toLowerCase()) {
+    case 'aggressive':
+      return line.replace(/\b(said|told)\b/g, 'screamed')
+               .replace(/\b(go|move)\b/g, 'charge')
+               .replace(/\b(want|need)\b/g, 'demand');
+    case 'melancholic':
+      return line.replace(/\b(happy|glad)\b/g, 'empty')
+               .replace(/\b(bright|light)\b/g, 'dark')
+               .replace(/\b(smile|laugh)\b/g, 'cry');
+    case 'confident':
+      return line.replace(/\b(maybe|might)\b/g, 'will')
+               .replace(/\b(try|attempt)\b/g, 'dominate')
+               .replace(/\b(hope|wish)\b/g, 'know');
+    case 'introspective':
+      return line.replace(/\b(they|everyone)\b/g, 'I')
+               .replace(/\b(out there|outside)\b/g, 'within')
+               .replace(/\b(see|look)\b/g, 'reflect');
+    default:
+      return line;
   }
+}
+
+/**
+ * Enhance imagery in a line of lyrics
+ */
+function enhanceImagery(line: string): string {
+  // Add metaphorical elements and vivid descriptions
+  return line.replace(/\b(money|cash)\b/g, 'paper stacks flowing like rivers')
+           .replace(/\b(car|ride)\b/g, 'steel beast')
+           .replace(/\b(house|home)\b/g, 'fortress of dreams')
+           .replace(/\b(street|road)\b/g, 'concrete arteries')
+           .replace(/\b(night|evening)\b/g, 'velvet darkness')
+           .replace(/\b(city|town)\b/g, 'urban jungle')
+           .replace(/\b(sky|heaven)\b/g, 'infinite canvas');
 }

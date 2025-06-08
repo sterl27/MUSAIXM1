@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
   enhanceLyricsRequestSchema, 
-  openAIEnhanceLyricsRequestSchema,
+
   songwriterRequestSchema,
   soundDesignRequestSchema,
   styleTransformerRequestSchema,

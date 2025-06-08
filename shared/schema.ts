@@ -173,7 +173,7 @@ export type Lyrics = typeof lyrics.$inferSelect;
 export type RegisterRequest = z.infer<typeof registerSchema>;
 export type LoginRequest = z.infer<typeof loginSchema>;
 export type EnhanceLyricsRequest = z.infer<typeof enhanceLyricsRequestSchema>;
-export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsRequestSchema>;
+
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
 export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;
