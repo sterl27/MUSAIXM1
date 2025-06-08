@@ -19,6 +19,7 @@ import MusicPlayerPage from "@/pages/MusicPlayerPage";
 import SoundSignaturePage from "@/pages/SoundSignaturePage";
 import LyricAnimator from "@/pages/LyricAnimator";
 import EnergyMeter from "@/pages/EnergyMeter";
+import ComplexityScoringPage from "@/pages/ComplexityScoring";
 
 function Router() {
   return (
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/sound-signature" component={SoundSignaturePage} />
       <Route path="/lyric-animator" component={LyricAnimator} />
       <Route path="/energy-meter" component={EnergyMeter} />
+      <Route path="/complexity-scoring" component={ComplexityScoringPage} />
       <Route component={NotFound} />
     </Switch>
   );

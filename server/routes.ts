@@ -16,6 +16,7 @@ import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
 import passport from "passport";
 import { enhanceLyrics } from "./processors/enhancer";
 import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
+import { analyzeLyricComplexity } from "./processors/complexity-analyzer";
 import { generateSongLyrics } from "./processors/songwriter";
 import { generateSoundDesignSuggestion } from "./processors/sounddesign";
 import { transformLyrics } from "./processors/style-transformer";
@@ -479,6 +480,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error creating playlist:", error);
       return res.status(500).json({ 
         message: "Failed to create playlist",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // API route for complexity analysis
+  app.post("/api/complexity/analyze", async (req, res) => {
+    try {
+      const { lyrics } = req.body;
+      
+      if (!lyrics || typeof lyrics !== 'string') {
+        return res.status(400).json({ 
+          message: "Invalid request: lyrics must be provided as a string" 
+        });
+      }
+      
+      if (lyrics.trim().length === 0) {
+        return res.status(400).json({ 
+          message: "Invalid request: lyrics cannot be empty" 
+        });
+      }
+      
+      console.log("Analyzing lyric complexity with AI");
+      const score = await analyzeLyricComplexity(lyrics);
+      
+      return res.status(200).json({ score });
+    } catch (error) {
+      console.error("Error analyzing lyric complexity:", error);
+      return res.status(500).json({ 
+        message: "Failed to analyze lyric complexity",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
