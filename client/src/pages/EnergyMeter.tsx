@@ -8,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
+import EnergyVisualization from "@/components/EnergyVisualization";
 import { getPersonas, Persona } from "@/lib/types";
 import { Activity, BarChart3, Zap, TrendingUp, Flame, Brain, Target, Waves } from "lucide-react";
 
@@ -303,6 +304,17 @@ To a place where I can simply stay`
                 </Select>
               </CardContent>
             </Card>
+
+            {/* Advanced Energy Visualization */}
+            {lyrics && (
+              <EnergyVisualization
+                energy={energyAnalysis.level}
+                intensity={energyAnalysis.intensity}
+                breakdown={energyAnalysis.breakdown}
+                className="w-full"
+                animated={true}
+              />
+            )}
 
             {/* Energy Meter */}
             <PersonaEnergyMeter 

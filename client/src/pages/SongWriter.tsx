@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PageLayout from "@/components/layout/PageLayout";
 import ToolsNavigation from "@/components/layout/ToolsNavigation";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
+import LiveEnergyDashboard from "@/components/LiveEnergyDashboard";
 import { apiRequest } from "@/lib/queryClient";
 import { getMusicStyles, getPersonas, Persona, MusicStyle } from "@/lib/types";
 
@@ -524,8 +525,17 @@ export default function SongWriter() {
               </Card>
             </div>
             
-            {/* Energy Meter Sidebar */}
+            {/* Energy Analysis Sidebar */}
             <div className="space-y-6">
+              {/* Live Energy Dashboard */}
+              <LiveEnergyDashboard
+                lyrics={generatedLyrics || ""}
+                persona={selectedPersona}
+                className="w-full"
+                compact={false}
+              />
+
+              {/* Detailed Energy Meter */}
               {generatedLyrics && (
                 <PersonaEnergyMeter 
                   persona={selectedPersona}
