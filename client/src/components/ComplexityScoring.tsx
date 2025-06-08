@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ComplexityImprovementTools from '@/components/ComplexityImprovementTools';
+import { downloadComplexityReport } from '@/lib/pdfGenerator';
 
 interface ComplexityScore {
   overall: number;
