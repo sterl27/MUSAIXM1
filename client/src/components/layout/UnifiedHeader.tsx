@@ -43,10 +43,8 @@ export default function UnifiedHeader() {
   };
 
   const creativeTools = [
-    { href: "/openai", icon: <Bot size={16} />, label: "AI Enhancer", description: "OpenAI-powered lyric enhancement" },
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
-    { href: "/rhyme-generator", icon: <Sparkles size={16} />, label: "Rhyme Generator", description: "Find perfect rhymes for your lyrics" },
     { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
     { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
@@ -54,10 +52,9 @@ export default function UnifiedHeader() {
   ];
 
   const explorePages = [
-    { href: "/personas", icon: <Users size={16} />, label: "Artist Personas", description: "Explore different artist styles" },
-    { href: "/tools", icon: <Sparkles size={16} />, label: "Creative Tools", description: "Additional creative utilities" },
     { href: "/music-player", icon: <Music size={16} />, label: "Music Player", description: "Play and manage your music collection" },
     { href: "/sound-signature", icon: <Waves size={16} />, label: "Sound Signature", description: "Visualize vocal characteristics" },
+    { href: "/artist-profile", icon: <User size={16} />, label: "Artist Profile", description: "Manage your artistic identity" },
   ];
 
   const NavLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => (
@@ -164,11 +161,13 @@ export default function UnifiedHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Admin */}
-            <NavLink href="/admin">
-              <Settings size={16} className="mr-2" />
-              Admin
-            </NavLink>
+            {/* Admin - Only show for admin users */}
+            {isAuthenticated && user && (user.role === 'admin' || user.role === 'super_admin') && (
+              <NavLink href="/admin">
+                <Settings size={16} className="mr-2" />
+                Admin
+              </NavLink>
+            )}
           </nav>
 
           {/* Desktop Auth Section */}
@@ -292,31 +291,62 @@ export default function UnifiedHeader() {
                       </div>
                     </div>
 
-                    {/* Admin */}
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 px-4">
-                        Settings
-                      </h3>
-                      <MobileNavItem 
-                        href="/admin" 
-                        icon={<Settings size={18} />} 
-                        label="Admin Panel" 
-                        onClick={() => setIsOpen(false)}
-                      />
-                    </div>
+                    {/* Admin - Only show for admin users */}
+                    {isAuthenticated && user && (user.role === 'admin' || user.role === 'super_admin') && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 px-4">
+                          Settings
+                        </h3>
+                        <MobileNavItem 
+                          href="/admin" 
+                          icon={<Settings size={18} />} 
+                          label="Admin Panel" 
+                          onClick={() => setIsOpen(false)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Mobile Auth */}
                 <div className="p-4 border-t border-gray-700">
-                  <div className="flex flex-col gap-3">
-                    <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800">
-                      Sign In
-                    </Button>
-                    <Button className="w-full musaix-gradient-button">
-                      Sign Up
-                    </Button>
-                  </div>
+                  {isAuthenticated && user ? (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center gap-3 p-3 bg-white/5 rounded-md">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={user.profileImageUrl || undefined} />
+                          <AvatarFallback className="bg-[#FF4081] text-white text-sm">
+                            {user.firstName?.[0]}{user.lastName?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-white">{user.firstName} {user.lastName}</p>
+                          <p className="text-xs text-gray-400">{user.email}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                        variant="outline" 
+                        className="w-full border-gray-600 text-white hover:bg-gray-800"
+                      >
+                        {logoutMutation.isPending ? "Signing out..." : "Sign Out"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <Link href="/login">
+                        <Button variant="outline" className="w-full border-gray-600 text-white hover:bg-gray-800">
+                          Sign In
+                        </Button>
+                      </Link>
+                      <Link href="/register">
+                        <Button className="w-full musaix-gradient-button">
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </SheetContent>
