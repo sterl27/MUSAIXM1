@@ -11,6 +11,22 @@ import type { User } from "@shared/schema";
 // Session configuration
 export function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  
+  // Use memory store in development to avoid database connection issues during startup
+  if (process.env.NODE_ENV === "development") {
+    return session({
+      secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: false,
+        maxAge: sessionTtl,
+      },
+    });
+  }
+  
+  // Use PostgreSQL store in production
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
