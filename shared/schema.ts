@@ -184,6 +184,23 @@ export type OpenAIEnhanceLyricsRequest = z.infer<typeof openAIEnhanceLyricsReque
 export type SongwriterRequest = z.infer<typeof songwriterRequestSchema>;
 export type SoundDesignRequest = z.infer<typeof soundDesignRequestSchema>;
 export type StyleTransformerRequest = z.infer<typeof styleTransformerRequestSchema>;
+// Songs table
+export const songs = pgTable("songs", {
+  id: varchar("id").primaryKey().notNull(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: varchar("title").notNull(),
+  artist: varchar("artist").default(""),
+  genre: varchar("genre").default(""),
+  album: varchar("album").default(""),
+  fileUrl: text("file_url").notNull(),
+  fileName: varchar("file_name").notNull(),
+  fileSize: integer("file_size").default(0),
+  duration: integer("duration").default(0), // in seconds
+  uploadDate: timestamp("upload_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Playlists table
 export const playlists = pgTable("playlists", {
   id: varchar("id").primaryKey().notNull(),
@@ -193,6 +210,26 @@ export const playlists = pgTable("playlists", {
   songIds: text("song_ids").array().default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSongSchema = createInsertSchema(songs).pick({
+  title: true,
+  artist: true,
+  genre: true,
+  album: true,
+  fileUrl: true,
+  fileName: true,
+  fileSize: true,
+  duration: true,
+});
+
+export const songUploadSchema = z.object({
+  title: z.string().min(1, "Song title is required"),
+  artist: z.string().default(""),
+  genre: z.string().default(""),
+  album: z.string().default(""),
+  createPlaylist: z.boolean().default(false),
+  playlistName: z.string().optional(),
 });
 
 export const insertPlaylistSchema = createInsertSchema(playlists).pick({
@@ -207,6 +244,9 @@ export const playlistRequestSchema = z.object({
   songs: z.array(z.string()).default([]),
 });
 
+export type InsertSong = z.infer<typeof insertSongSchema>;
+export type Song = typeof songs.$inferSelect;
+export type SongUploadRequest = z.infer<typeof songUploadSchema>;
 export type InsertArtistProfile = z.infer<typeof insertArtistProfileSchema>;
 export type ArtistProfile = typeof artistProfiles.$inferSelect;
 export type ArtistProfileRequest = z.infer<typeof artistProfileRequestSchema>;

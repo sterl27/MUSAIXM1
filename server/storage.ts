@@ -2,12 +2,15 @@ import {
   users, 
   artistProfiles,
   playlists,
+  songs,
   type User, 
   type RegisterRequest,
   type ArtistProfile,
   type ArtistProfileRequest,
   type Playlist,
-  type PlaylistRequest
+  type PlaylistRequest,
+  type Song,
+  type InsertSong
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
