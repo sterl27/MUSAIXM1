@@ -18,6 +18,7 @@ import ArtistProfile from "@/pages/ArtistProfile";
 import MusicPlayerPage from "@/pages/MusicPlayerPage";
 import SoundSignaturePage from "@/pages/SoundSignaturePage";
 import LyricAnimator from "@/pages/LyricAnimator";
+import EnergyMeter from "@/pages/EnergyMeter";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/music-player" component={MusicPlayerPage} />
       <Route path="/sound-signature" component={SoundSignaturePage} />
       <Route path="/lyric-animator" component={LyricAnimator} />
+      <Route path="/energy-meter" component={EnergyMeter} />
       <Route component={NotFound} />
     </Switch>
   );
