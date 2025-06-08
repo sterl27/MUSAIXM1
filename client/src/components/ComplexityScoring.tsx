@@ -169,10 +169,19 @@ In bodies that are temporary vessels, perfectly designed`;
     <div className={cn("space-y-6", className)}>
       <Card className="musaix-card-border bg-black/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white">
-            <Brain className="h-5 w-5 text-[#FF4081]" />
-            AI-Powered Lyric Complexity Scoring
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Brain className="h-5 w-5 text-[#FF4081]" />
+              AI-Powered Lyric Complexity Scoring
+            </CardTitle>
+            {score && (
+              <PDFDownloadButton
+                complexityScore={score}
+                originalLyrics={lyrics}
+                improvedLyrics={improvedLyrics}
+              />
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Lyrics Input */}

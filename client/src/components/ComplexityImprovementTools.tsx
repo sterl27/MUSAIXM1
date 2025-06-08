@@ -22,6 +22,7 @@ import {
   Brain
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import PDFDownloadButton from '@/components/PDFDownloadButton';
 
 interface ImprovementSuggestion {
   category: 'linguistic' | 'structural' | 'semantic' | 'creative';
@@ -408,6 +409,13 @@ export default function ComplexityImprovementTools({
                       Enhanced Lyrics
                     </h4>
                     <div className="flex gap-2">
+                      {complexityScore && (
+                        <PDFDownloadButton
+                          complexityScore={complexityScore}
+                          originalLyrics={originalLyrics}
+                          improvedLyrics={improvedLyrics}
+                        />
+                      )}
                       <Button size="sm" variant="outline" onClick={copyImprovedLyrics}>
                         <Copy className="h-4 w-4 mr-1" />
                         Copy
