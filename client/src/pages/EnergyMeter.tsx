@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UnifiedPageLayout from "@/components/layout/UnifiedPageLayout";
 import PersonaEnergyMeter from "@/components/PersonaEnergyMeter";
 import EnergyVisualization from "@/components/EnergyVisualization";
+import CreativeAnalyticsDashboard from "@/components/CreativeAnalyticsDashboard";
 import { getPersonas, Persona } from "@/lib/types";
 import { Activity, BarChart3, Zap, TrendingUp, Flame, Brain, Target, Waves } from "lucide-react";
 
@@ -356,6 +357,13 @@ To a place where I can simply stay`
           </div>
         </div>
         
+        {/* Creative Analytics Dashboard */}
+        <CreativeAnalyticsDashboard
+          currentLyrics={lyrics}
+          currentPersona={selectedPersona}
+          className="w-full"
+        />
+
         {/* Tips and Information */}
         <Card className="musaix-card-border bg-black/50">
           <CardHeader>
