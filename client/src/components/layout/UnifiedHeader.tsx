@@ -27,7 +27,8 @@ import {
   Activity,
   FileText,
   User,
-  Waves
+  Waves,
+  Video
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -45,6 +46,7 @@ export default function UnifiedHeader() {
   const creativeTools = [
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
+    { href: "/lyric-animator", icon: <Video size={16} />, label: "Lyric Animator", description: "Create animated lyric videos with effects" },
     { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
     { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },

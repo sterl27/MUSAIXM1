@@ -2,6 +2,123 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lyric Animation Styles */
+.lyric-line {
+  transition: all 0.5s ease-in-out;
+}
+
+.lyric-hidden {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+}
+
+.lyric-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.lyric-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.lyric-bounce {
+  animation: bounce 1s ease-out forwards;
+}
+
+.lyric-typewriter {
+  overflow: hidden;
+  border-right: 2px solid;
+  animation: typewriter 2s steps(40) forwards, blink 1s infinite;
+}
+
+.lyric-wave {
+  animation: wave 1s ease-in-out forwards;
+}
+
+.lyric-glow-pulse {
+  animation: glowPulse 1.5s ease-in-out infinite alternate;
+}
+
+.lyric-split-reveal {
+  animation: splitReveal 1s ease-out forwards;
+}
+
+.lyric-particle-burst {
+  animation: particleBurst 1.2s ease-out forwards;
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+  0% { opacity: 0; transform: scale(0.3) translateY(100px); }
+  50% { opacity: 1; transform: scale(1.1) translateY(-10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+@keyframes wave {
+  0% { opacity: 0; transform: translateY(30px) rotateX(90deg); }
+  100% { opacity: 1; transform: translateY(0) rotateX(0deg); }
+}
+
+@keyframes glowPulse {
+  from { 
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor; 
+    transform: scale(1);
+  }
+  to { 
+    text-shadow: 0 0 20px currentColor, 0 0 40px currentColor; 
+    transform: scale(1.05);
+  }
+}
+
+@keyframes splitReveal {
+  from { 
+    opacity: 0; 
+    clip-path: inset(0 50% 0 50%); 
+    transform: scale(1.2);
+  }
+  to { 
+    opacity: 1; 
+    clip-path: inset(0 0% 0 0%); 
+    transform: scale(1);
+  }
+}
+
+@keyframes particleBurst {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.5) rotate(0deg); 
+    filter: blur(4px);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.3) rotate(180deg); 
+    filter: blur(0px);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(360deg); 
+    filter: blur(0px);
+  }
+}
+
 :root {
   /* Musaix Dark Theme - Black background with vibrant gradients */
   --background: 0 0% 0%; /* Pure black background */
