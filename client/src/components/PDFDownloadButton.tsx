@@ -207,7 +207,7 @@ AI-Powered Lyric Enhancement Platform
                   <Checkbox
                     id="include-improved"
                     checked={includeImproved}
-                    onCheckedChange={setIncludeImproved}
+                    onCheckedChange={(checked) => setIncludeImproved(checked === true)}
                   />
                   <Label htmlFor="include-improved" className="text-sm text-gray-300">
                     Include AI-enhanced lyrics
@@ -219,7 +219,7 @@ AI-Powered Lyric Enhancement Platform
                 <Checkbox
                   id="include-insights"
                   checked={includeInsights}
-                  onCheckedChange={setIncludeInsights}
+                  onCheckedChange={(checked) => setIncludeInsights(checked === true)}
                 />
                 <Label htmlFor="include-insights" className="text-sm text-gray-300">
                   Include AI insights and suggestions

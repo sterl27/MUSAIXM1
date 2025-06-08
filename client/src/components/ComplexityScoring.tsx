@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ComplexityImprovementTools from '@/components/ComplexityImprovementTools';
-import { downloadComplexityReport } from '@/lib/pdfGenerator';
+import PDFDownloadButton from '@/components/PDFDownloadButton';
 
 interface ComplexityScore {
   overall: number;
@@ -41,12 +41,14 @@ interface ComplexityScoringProps {
   lyrics?: string;
   className?: string;
   autoAnalyze?: boolean;
+  improvedLyrics?: string;
 }
 
 export default function ComplexityScoring({ 
   lyrics: externalLyrics, 
   className,
-  autoAnalyze = false 
+  autoAnalyze = false,
+  improvedLyrics
 }: ComplexityScoringProps) {
   const [lyrics, setLyrics] = useState(externalLyrics || "");
   const [score, setScore] = useState<ComplexityScore | null>(null);
