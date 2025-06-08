@@ -13,7 +13,8 @@ import {
   registerSchema,
   loginSchema,
   artistProfileRequestSchema,
-  playlistRequestSchema
+  playlistRequestSchema,
+  songUploadSchema
 } from "@shared/schema";
 import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
 import passport from "passport";
@@ -468,16 +469,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/upload/song", requireAuth, async (req: any, res) => {
+  app.post("/api/upload/song", requireAuth, upload.single('songFile'), async (req: any, res) => {
     try {
-      // This would need multer middleware for actual file handling
-      return res.status(501).json({ 
-        message: "Song upload not yet implemented - requires file storage setup" 
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Validate the form data
+      const validationResult = songUploadSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        // Clean up uploaded file if validation fails
+        fs.unlinkSync(file.path);
+        return res.status(400).json({ 
+          message: "Validation failed",
+          errors: validationResult.error.errors 
+        });
+      }
+
+      const { title, artist, genre, album, createPlaylist, playlistName } = validationResult.data;
+      const userId = req.user.id;
+
+      // Create the song record
+      const fileUrl = `/uploads/${file.filename}`;
+      const song = await storage.createSong(userId, {
+        title,
+        artist,
+        genre,
+        album,
+        fileUrl,
+        fileName: file.filename,
+        fileSize: file.size,
+        duration: 0, // Could be extracted from audio metadata if needed
+      });
+
+      // If user wants to create a new playlist with this song
+      if (createPlaylist && playlistName) {
+        await storage.createPlaylist(userId, {
+          name: playlistName,
+          description: `Playlist created for ${title}`,
+          songs: [song.id],
+        });
+      }
+
+      return res.status(201).json({ 
+        message: "Song uploaded successfully",
+        song,
+        playlistCreated: createPlaylist && playlistName
       });
     } catch (error) {
       console.error("Error uploading song:", error);
+      
+      // Clean up uploaded file on error
+      if (req.file) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (cleanupError) {
+          console.error("Error cleaning up file:", cleanupError);
+        }
+      }
+      
       return res.status(500).json({ 
         message: "Failed to upload song",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get user's songs
+  app.get("/api/songs", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const songs = await storage.getUserSongs(userId);
+      
+      return res.status(200).json(songs);
+    } catch (error) {
+      console.error("Error fetching songs:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch songs",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Delete a song
+  app.delete("/api/songs/:id", requireAuth, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const userId = req.user.id;
+      
+      const song = await storage.getSong(id);
+      if (!song || song.userId !== userId) {
+        return res.status(404).json({ message: "Song not found" });
+      }
+
+      // Delete the file from disk
+      const filePath = path.join(process.cwd(), 'uploads', song.fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      // Delete the song record
+      const deleted = await storage.deleteSong(id, userId);
+      
+      if (deleted) {
+        return res.status(200).json({ message: "Song deleted successfully" });
+      } else {
+        return res.status(500).json({ message: "Failed to delete song" });
+      }
+    } catch (error) {
+      console.error("Error deleting song:", error);
+      return res.status(500).json({ 
+        message: "Failed to delete song",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

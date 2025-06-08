@@ -37,9 +37,16 @@ export interface IStorage {
   getArtistProfile(userId: number): Promise<ArtistProfile | undefined>;
   upsertArtistProfile(userId: number, profileData: ArtistProfileRequest): Promise<ArtistProfile>;
 
+  // Song operations
+  getUserSongs(userId: number): Promise<Song[]>;
+  createSong(userId: number, songData: InsertSong): Promise<Song>;
+  getSong(id: string): Promise<Song | undefined>;
+  deleteSong(id: string, userId: number): Promise<boolean>;
+
   // Playlist operations
   getUserPlaylists(userId: number): Promise<Playlist[]>;
   createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist>;
+  addSongToPlaylist(playlistId: string, songId: string): Promise<boolean>;
 
   // Admin operations
   getUserStats(): Promise<any>;
@@ -211,6 +218,37 @@ export class DatabaseStorage implements IStorage {
     return userPlaylists;
   }
 
+  async getUserSongs(userId: number): Promise<Song[]> {
+    const userSongs = await db.select().from(songs).where(eq(songs.userId, userId));
+    return userSongs;
+  }
+
+  async createSong(userId: number, songData: InsertSong): Promise<Song> {
+    const songId = `song_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const [song] = await db
+      .insert(songs)
+      .values({
+        id: songId,
+        userId,
+        ...songData,
+      })
+      .returning();
+    return song;
+  }
+
+  async getSong(id: string): Promise<Song | undefined> {
+    const [song] = await db.select().from(songs).where(eq(songs.id, id));
+    return song || undefined;
+  }
+
+  async deleteSong(id: string, userId: number): Promise<boolean> {
+    const result = await db
+      .delete(songs)
+      .where(eq(songs.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
   async createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist> {
     const playlistId = `playlist_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
@@ -226,6 +264,19 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     return playlist;
+  }
+
+  async addSongToPlaylist(playlistId: string, songId: string): Promise<boolean> {
+    const [playlist] = await db.select().from(playlists).where(eq(playlists.id, playlistId));
+    if (!playlist) return false;
+
+    const updatedSongIds = [...(playlist.songIds || []), songId];
+    await db
+      .update(playlists)
+      .set({ songIds: updatedSongIds, updatedAt: new Date() })
+      .where(eq(playlists.id, playlistId));
+    
+    return true;
   }
 
   // Admin operations
@@ -277,8 +328,10 @@ export class DatabaseStorage implements IStorage {
       .insert(users)
       .values({
         email: userData.email,
+        username: userData.username || userData.email,
         password: hashedPassword,
-        role: userData.role || 'user',
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
       })
       .returning();
     
