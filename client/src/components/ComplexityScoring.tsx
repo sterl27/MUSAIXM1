@@ -22,6 +22,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ComplexityImprovementTools from '@/components/ComplexityImprovementTools';
 
 interface ComplexityScore {
   overall: number;
@@ -226,10 +227,11 @@ In bodies that are temporary vessels, perfectly designed`;
           {/* Results */}
           {score && (
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="breakdown">Detailed Analysis</TabsTrigger>
+                <TabsTrigger value="breakdown">Analysis</TabsTrigger>
                 <TabsTrigger value="insights">AI Insights</TabsTrigger>
+                <TabsTrigger value="tools">Improve</TabsTrigger>
               </TabsList>
 
               {/* Overview Tab */}
@@ -435,6 +437,20 @@ In bodies that are temporary vessels, perfectly designed`;
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Enhancement Tools Tab */}
+              <TabsContent value="tools" className="space-y-4">
+                <ComplexityImprovementTools
+                  originalLyrics={lyrics}
+                  complexityScore={score}
+                  onLyricsImproved={(improvedLyrics) => {
+                    setLyrics(improvedLyrics);
+                    // Re-analyze the improved lyrics
+                    analyzeComplexity(improvedLyrics);
+                  }}
+                  className="w-full"
+                />
               </TabsContent>
             </Tabs>
           )}

@@ -17,6 +17,7 @@ import passport from "passport";
 import { enhanceLyrics } from "./processors/enhancer";
 import { enhanceLyricsWithOpenAI } from "./processors/openai-enhancer";
 import { analyzeLyricComplexity } from "./processors/complexity-analyzer";
+import { improveLyrics } from "./processors/lyric-improver";
 import { generateSongLyrics } from "./processors/songwriter";
 import { generateSoundDesignSuggestion } from "./processors/sounddesign";
 import { transformLyrics } from "./processors/style-transformer";
@@ -510,6 +511,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error analyzing lyric complexity:", error);
       return res.status(500).json({ 
         message: "Failed to analyze lyric complexity",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // API route for lyric improvement
+  app.post("/api/complexity/improve", async (req, res) => {
+    try {
+      const { lyrics, focusAreas, currentScore, improvementLevel } = req.body;
+      
+      if (!lyrics || typeof lyrics !== 'string') {
+        return res.status(400).json({ 
+          message: "Invalid request: lyrics must be provided as a string" 
+        });
+      }
+      
+      if (lyrics.trim().length === 0) {
+        return res.status(400).json({ 
+          message: "Invalid request: lyrics cannot be empty" 
+        });
+      }
+      
+      console.log("Improving lyrics with AI enhancement tools");
+      const improvedLyrics = await improveLyrics({
+        lyrics,
+        focusAreas: focusAreas || ['balanced'],
+        currentScore,
+        improvementLevel: improvementLevel || 'moderate'
+      });
+      
+      return res.status(200).json({ improvedLyrics });
+    } catch (error) {
+      console.error("Error improving lyrics:", error);
+      return res.status(500).json({ 
+        message: "Failed to improve lyrics",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }
