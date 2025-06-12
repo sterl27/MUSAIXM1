@@ -369,7 +369,7 @@ export class DatabaseStorage implements IStorage {
   async getSystemSettings(): Promise<any> {
     // For now, return default settings since we don't have a settings table
     return {
-      siteName: "Musaix Rap Pro",
+      siteName: "Musaix Pro",
       siteDescription: "AI-powered lyrical enhancement platform",
       allowRegistration: true,
       requireEmailVerification: false,

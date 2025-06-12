@@ -93,7 +93,7 @@ export default function UnifiedHeader() {
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">
               <Music className="h-8 w-8 text-[#FF4081]" />
-              <h1 className="text-xl font-bold musaix-gradient-text">Musaix Rap Pro</h1>
+              <h1 className="text-xl font-bold musaix-gradient-text">Musaix Pro</h1>
             </div>
           </Link>
 

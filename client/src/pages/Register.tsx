@@ -32,7 +32,7 @@ export default function Register() {
     try {
       await registerMutation.mutateAsync(data);
       toast({
-        title: "Welcome to Musaix Rap Pro!",
+        title: "Welcome to Musaix Pro!",
         description: "Your account has been created successfully. Please sign in.",
       });
       setLocation("/login");
@@ -59,7 +59,7 @@ export default function Register() {
               <Music className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white">Join Musaix Rap Pro</h1>
+          <h1 className="text-3xl font-bold text-white">Join Musaix Pro</h1>
           <p className="text-gray-400 mt-2">Create your account to start enhancing your lyrics</p>
         </div>
 
