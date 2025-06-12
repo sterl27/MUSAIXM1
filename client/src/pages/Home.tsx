@@ -73,16 +73,16 @@ export default function Home() {
 
         {/* Right Side - Tools Grid */}
         <div className="flex-1 p-8 bg-gradient-to-br from-gray-900 to-black">
-          <div className="grid grid-cols-4 gap-6 h-full">
+          <div className="grid grid-cols-4 gap-8 h-full">
             {tools.map((tool, index) => (
               <Link key={index} href={tool.href}>
-                <Card className="h-40 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-600 hover:border-gray-500 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-xl musaix-card-border hover:musaix-glow">
-                  <CardContent className="p-6 h-full flex flex-col justify-between">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                      <tool.icon className="h-6 w-6 text-white" />
+                <Card className="h-56 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-3xl">
+                  <CardContent className="p-8 h-full flex flex-col justify-between items-center text-center">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
+                      <tool.icon className="h-8 w-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-white font-semibold text-sm group-hover:text-[#FF4081] transition-colors duration-300">
+                      <h3 className="text-white font-bold text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
                         {tool.title}
                       </h3>
                     </div>
