@@ -66,11 +66,7 @@ export default function ToolsNavigation() {
       icon: <Wand2Icon size={18} />,
       label: "Style Transformer"
     },
-    {
-      href: "/tools",
-      icon: <Wand2Icon size={18} />,
-      label: "Creative Tools"
-    }
+
   ];
 
   return (
