@@ -67,25 +67,7 @@ export default function Home() {
               </Button>
             </div>
 
-            {/* Preview Section */}
-            <div className="mt-12 p-6 bg-gray-900/50 rounded-xl border border-gray-700 backdrop-blur-sm musaix-card-border">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-[#FF4081] text-sm font-semibold">
-                  <Sparkles className="h-4 w-4" />
-                  Live Preview
-                </div>
-                <div className="bg-black/50 rounded-lg p-4 font-mono text-xs">
-                  <div className="text-gray-400 mb-2">Input:</div>
-                  <div className="text-gray-300 mb-3 leading-relaxed">
-                    "Walking through the city at night"
-                  </div>
-                  <div className="text-[#FF4081] mb-2">Enhanced:</div>
-                  <div className="text-[#FFC107] leading-relaxed musaix-text-glow">
-                    "Cruisin' through the concrete jungle when the neon lights glow"
-                  </div>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
 
