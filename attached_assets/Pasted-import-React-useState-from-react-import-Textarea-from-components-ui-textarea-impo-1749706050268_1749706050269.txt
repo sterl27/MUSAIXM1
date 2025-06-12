@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectItem } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
+
+const genres = ['trap', 'boom bap', 'drill', 'dirty south', 'lo-fi', 'cloud rap'];
+const moods = ['aggressive', 'sad', 'epic', 'laid-back', 'dark', 'hype'];
+const tempos = ['slow', 'midtempo', 'fast'];
+
+export default function BeatPromptGenerator() {
+  const [genre, setGenre] = useState('trap');
+  const [mood, setMood] = useState('aggressive');
+  const [tempo, setTempo] = useState('midtempo');
+  const [extras, setExtras] = useState('');
+  const [prompt, setPrompt] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const generatePrompt = async () => {
+    setLoading(true);
+    const systemPrompt = `You are a rap beat instrumental prompt generator. Describe vivid, cinematic 1–2 sentence instrumental hip-hop/rap beats with genre, mood, tempo, sonic texture, and key instruments. No vocals. No lists. lowercase only.`;
+
+    const userInput = `Generate a ${tempo} ${genre} beat that is ${mood}, with details like: ${extras}`;
+
+    try {
+      const res = await fetch('/api/xai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'xai-3-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userInput }
+          ]
+        })
+      });
+      const data = await res.json();
+      setPrompt(data.result.trim());
+    } catch (err) {
+      setPrompt('Failed to generate prompt.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Card className="max-w-xl mx-auto p-4 mt-10 shadow-lg">
+      <CardContent className="space-y-4">
+        <h2 className="text-xl font-bold">Rap Beat Prompt Generator</h2>
+
+        <Select value={genre} onValueChange={setGenre}>
+          {genres.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+        </Select>
+
+        <Select value={mood} onValueChange={setMood}>
+          {moods.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+        </Select>
+
+        <Select value={tempo} onValueChange={setTempo}>
+          {tempos.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+        </Select>
+
+        <Input
+          placeholder="Extra details: 808s, cinematic, grime, etc."
+          value={extras}
+          onChange={e => setExtras(e.target.value)}
+        />
+
+        <Button onClick={generatePrompt} disabled={loading} className="w-full">
+          {loading ? <><Loader2 className="animate-spin mr-2" /> Generating...</> : 'Generate Prompt'}
+        </Button>
+
+        {prompt && (
+          <Textarea readOnly value={prompt} className="bg-gray-100" rows={4} />
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -120,6 +120,18 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link href="/beat-generator">
+              <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow cursor-pointer">
+                <CardContent className="p-8">
+                  <div className="h-16 w-16 rounded-xl bg-gradient-to-r from-[#FF4081] to-[#AB47BC] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Music className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4 text-white">Beat Prompt Generator</h3>
+                  <p className="text-gray-300 leading-relaxed">Create cinematic, AI-powered descriptions for rap beat production with genre-specific styling and mood control.</p>
+                </CardContent>
+              </Card>
+            </Link>
+            
             <Link href="/songwriter">
               <Card className="musaix-card-border bg-black/50 hover:bg-black/70 transition-all duration-300 group hover:musaix-glow cursor-pointer">
                 <CardContent className="p-8">
