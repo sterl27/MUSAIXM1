@@ -62,6 +62,11 @@ export default function ToolsNavigation() {
       icon: <Wand2Icon size={18} />,
       label: "Style Transformer"
     },
+    {
+      href: "/genre-recommendation",
+      icon: <MusicIcon size={18} />,
+      label: "Genre Engine"
+    },
 
   ];
 

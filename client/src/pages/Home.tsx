@@ -24,7 +24,7 @@ export default function Home() {
     { title: "Lyrics Score", href: "/complexity-scoring", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
     { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "from-[#AB47BC] to-[#3F51B5]" },
     { title: "Flow Analysis", href: "/flow-analyzer", icon: Brain, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Structure Design", href: "/structure-formatter", icon: FileText, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#FF4081] to-[#AB47BC]" },
   ];
 
   return (

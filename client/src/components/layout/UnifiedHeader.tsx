@@ -28,7 +28,8 @@ import {
   FileText,
   User,
   Waves,
-  Video
+  Video,
+  Target
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -54,6 +55,7 @@ export default function UnifiedHeader() {
     { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
     { href: "/style-transformer", icon: <Wand2 size={16} />, label: "Style Transformer", description: "Transform lyrics between styles" },
+    { href: "/genre-recommendation", icon: <Target size={16} />, label: "Genre Engine", description: "AI-powered music genre recommendations" },
   ];
 
   const explorePages = [
