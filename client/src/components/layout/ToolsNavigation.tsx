@@ -56,11 +56,7 @@ export default function ToolsNavigation() {
       icon: <SlidersHorizontal size={18} />,
       label: "Sound Design"
     },
-    {
-      href: "/personas",
-      icon: <MusicIcon size={18} />,
-      label: "Personas"
-    },
+
     {
       href: "/style-transformer",
       icon: <Wand2Icon size={18} />,
