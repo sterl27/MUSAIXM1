@@ -14,7 +14,8 @@ import {
   loginSchema,
   artistProfileRequestSchema,
   playlistRequestSchema,
-  songUploadSchema
+  songUploadSchema,
+  genreRecommendationRequestSchema
 } from "@shared/schema";
 import { setupAuth, requireAuth, optionalAuth, hashPassword } from "./auth";
 import passport from "passport";
@@ -26,6 +27,7 @@ import { generateSongLyrics } from "./processors/songwriter";
 import { generateSoundDesignSuggestion } from "./processors/sounddesign";
 import { transformLyrics } from "./processors/style-transformer";
 import { getAvailableVoices, generateSpeech, defaultVoiceMappings } from "./processors/elevenlabs";
+import { recommendGenres } from "./processors/genre-recommender";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -688,6 +690,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error improving lyrics:", error);
       return res.status(500).json({ 
         message: "Failed to improve lyrics",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // API route for AI-powered genre recommendations
+  app.post("/api/genre/recommend", optionalAuth, async (req: any, res) => {
+    try {
+      // Validate request body
+      const validationResult = genreRecommendationRequestSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid request body",
+          errors: validationResult.error.errors
+        });
+      }
+      
+      const requestData = validationResult.data;
+      
+      // Ensure at least one input is provided
+      if (!requestData.lyrics && !requestData.musicDescription && !requestData.currentGenre) {
+        return res.status(400).json({ 
+          message: "At least one of lyrics, music description, or current genre must be provided" 
+        });
+      }
+      
+      console.log("Analyzing music characteristics for genre recommendation");
+      const recommendation = await recommendGenres(requestData);
+      
+      // Save recommendation to database if user is authenticated
+      if (req.user) {
+        try {
+          await storage.saveGenreRecommendation(req.user.id, {
+            inputText: JSON.stringify(requestData),
+            recommendedGenres: recommendation,
+            confidence: recommendation.confidence,
+            aiAnalysis: recommendation.reasoning
+          });
+        } catch (saveError) {
+          console.warn("Failed to save genre recommendation:", saveError);
+          // Continue with response even if save fails
+        }
+      }
+      
+      return res.status(200).json(recommendation);
+    } catch (error) {
+      console.error("Error generating genre recommendations:", error);
+      return res.status(500).json({ 
+        message: "Failed to generate genre recommendations",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get user's genre recommendation history
+  app.get("/api/genre/history", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const history = await storage.getGenreRecommendationHistory(userId);
+      
+      return res.status(200).json(history);
+    } catch (error) {
+      console.error("Error fetching genre recommendation history:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch recommendation history",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

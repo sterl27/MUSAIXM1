@@ -253,3 +253,39 @@ export type ArtistProfileRequest = z.infer<typeof artistProfileRequestSchema>;
 export type InsertPlaylist = z.infer<typeof insertPlaylistSchema>;
 export type Playlist = typeof playlists.$inferSelect;
 export type PlaylistRequest = z.infer<typeof playlistRequestSchema>;
+
+// Genre Recommendations table
+export const genreRecommendations = pgTable("genre_recommendations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  inputText: text("input_text").notNull(),
+  recommendedGenres: jsonb("recommended_genres").notNull(),
+  confidence: integer("confidence").default(0),
+  aiAnalysis: text("ai_analysis"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Genre recommendation request schema
+export const genreRecommendationRequestSchema = z.object({
+  lyrics: z.string().optional(),
+  musicDescription: z.string().optional(),
+  currentGenre: z.string().optional(),
+  mood: z.string().optional(),
+  influences: z.array(z.string()).default([]),
+  targetAudience: z.string().optional(),
+});
+
+// Genre recommendation response schema
+export const genreRecommendationResponseSchema = z.object({
+  primaryGenre: z.string(),
+  secondaryGenres: z.array(z.string()),
+  confidence: z.number().min(0).max(100),
+  reasoning: z.string(),
+  suggestions: z.array(z.string()),
+  relatedArtists: z.array(z.string()),
+});
+
+export type GenreRecommendationRequest = z.infer<typeof genreRecommendationRequestSchema>;
+export type GenreRecommendationResponse = z.infer<typeof genreRecommendationResponseSchema>;
+export type GenreRecommendation = typeof genreRecommendations.$inferSelect;
+export type InsertGenreRecommendation = typeof genreRecommendations.$inferInsert;

@@ -3,6 +3,7 @@ import {
   artistProfiles,
   playlists,
   songs,
+  genreRecommendations,
   type User, 
   type RegisterRequest,
   type ArtistProfile,
@@ -10,7 +11,10 @@ import {
   type Playlist,
   type PlaylistRequest,
   type Song,
-  type InsertSong
+  type InsertSong,
+  type GenreRecommendation,
+  type InsertGenreRecommendation,
+  type GenreRecommendationResponse
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -47,6 +51,15 @@ export interface IStorage {
   getUserPlaylists(userId: number): Promise<Playlist[]>;
   createPlaylist(userId: number, playlistData: PlaylistRequest): Promise<Playlist>;
   addSongToPlaylist(playlistId: string, songId: string): Promise<boolean>;
+
+  // Genre Recommendation operations
+  saveGenreRecommendation(userId: number, recommendation: {
+    inputText: string;
+    recommendedGenres: GenreRecommendationResponse;
+    confidence: number;
+    aiAnalysis: string;
+  }): Promise<GenreRecommendation>;
+  getGenreRecommendationHistory(userId: number): Promise<GenreRecommendation[]>;
 
   // Admin operations
   getUserStats(): Promise<any>;
