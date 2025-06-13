@@ -21,6 +21,7 @@ import LyricAnimator from "@/pages/LyricAnimator";
 import EnergyMeter from "@/pages/EnergyMeter";
 import ComplexityScoringPage from "@/pages/ComplexityScoring";
 import BeatGenerator from "@/pages/BeatGenerator";
+import GenreRecommendation from "@/pages/GenreRecommendation";
 
 function Router() {
   return (
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/energy-meter" component={EnergyMeter} />
       <Route path="/complexity-scoring" component={ComplexityScoringPage} />
       <Route path="/beat-generator" component={BeatGenerator} />
+      <Route path="/genre-recommendation" component={GenreRecommendation} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -17,7 +17,7 @@ import {
   type GenreRecommendationResponse
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -396,6 +396,32 @@ export class DatabaseStorage implements IStorage {
     // For now, just return the settings as we don't have persistent storage
     // In a real implementation, this would save to a settings table
     return settingsData;
+  }
+
+  async saveGenreRecommendation(userId: number, recommendation: {
+    inputText: string;
+    recommendedGenres: GenreRecommendationResponse;
+    confidence: number;
+    aiAnalysis: string;
+  }): Promise<GenreRecommendation> {
+    const [saved] = await db.insert(genreRecommendations).values({
+      userId,
+      inputText: recommendation.inputText,
+      recommendedGenres: recommendation.recommendedGenres,
+      confidence: recommendation.confidence,
+      aiAnalysis: recommendation.aiAnalysis,
+    }).returning();
+    
+    return saved;
+  }
+
+  async getGenreRecommendationHistory(userId: number): Promise<GenreRecommendation[]> {
+    const history = await db.select()
+      .from(genreRecommendations)
+      .where(eq(genreRecommendations.userId, userId))
+      .orderBy(desc(genreRecommendations.createdAt));
+    
+    return history;
   }
 }
 
