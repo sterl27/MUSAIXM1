@@ -30,7 +30,8 @@ import {
   Waves,
   Video,
   Target,
-  BarChart3
+  BarChart3,
+  TrendingUp
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -51,6 +52,7 @@ export default function UnifiedHeader() {
     { href: "/beat-generator", icon: <Music size={16} />, label: "Beat Generator", description: "Create cinematic beat prompts for production" },
     { href: "/beat-analyzer", icon: <BarChart3 size={16} />, label: "Beat Analyzer", description: "AI-powered beat analysis and production insights" },
     { href: "/beat-studio", icon: <Settings size={16} />, label: "Beat Studio", description: "Professional beat creation and production workspace" },
+    { href: "/trends-dashboard", icon: <TrendingUp size={16} />, label: "Trends Dashboard", description: "Real-time music industry trends and insights" },
     { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
     { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
     { href: "/lyric-animator", icon: <Video size={16} />, label: "Lyric Animator", description: "Create animated lyric videos with effects" },

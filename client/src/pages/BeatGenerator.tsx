@@ -304,13 +304,23 @@ export default function BeatGenerator() {
                   <Music className="h-5 w-5 text-[#FF4081]" />
                   Beat Configuration
                 </CardTitle>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="advanced-mode" className="text-gray-300">Advanced Mode</Label>
-                  <Switch
-                    id="advanced-mode"
-                    checked={advancedMode}
-                    onCheckedChange={setAdvancedMode}
-                  />
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="advanced-mode" className="text-gray-300">Advanced Mode</Label>
+                    <Switch
+                      id="advanced-mode"
+                      checked={advancedMode}
+                      onCheckedChange={setAdvancedMode}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="trend-search" className="text-gray-300">Real-time Trends</Label>
+                    <Switch
+                      id="trend-search"
+                      checked={enableTrendSearch}
+                      onCheckedChange={setEnableTrendSearch}
+                    />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -545,8 +555,60 @@ export default function BeatGenerator() {
                             </Badge>
                           </>
                         )}
+                        {enableTrendSearch && (
+                          <Badge variant="outline" className="border-green-500 text-green-400">
+                            Trends: {loadingTrends ? 'Loading...' : 'Active'}
+                          </Badge>
+                        )}
                       </div>
                     </div>
+
+                    {/* Trend Data Display */}
+                    {trendData && enableTrendSearch && (
+                      <div className="pt-4 border-t border-gray-700">
+                        <h4 className="text-white font-medium mb-3">Current Industry Trends</h4>
+                        <div className="space-y-3 text-sm">
+                          {trendData.currentGenres && trendData.currentGenres.length > 0 && (
+                            <div>
+                              <span className="text-gray-400">Trending Genres:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {trendData.currentGenres.slice(0, 4).map((genre: string, index: number) => (
+                                  <Badge key={index} variant="outline" className="border-blue-500 text-blue-400 text-xs">
+                                    {genre}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {trendData.trendingArtists && trendData.trendingArtists.length > 0 && (
+                            <div>
+                              <span className="text-gray-400">Popular Producers:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {trendData.trendingArtists.slice(0, 3).map((artist: string, index: number) => (
+                                  <Badge key={index} variant="outline" className="border-purple-500 text-purple-400 text-xs">
+                                    {artist}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
+                          {trendData.productionTechniques && trendData.productionTechniques.length > 0 && (
+                            <div>
+                              <span className="text-gray-400">Hot Techniques:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {trendData.productionTechniques.slice(0, 3).map((technique: string, index: number) => (
+                                  <Badge key={index} variant="outline" className="border-orange-500 text-orange-400 text-xs">
+                                    {technique}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-12 text-gray-400">
