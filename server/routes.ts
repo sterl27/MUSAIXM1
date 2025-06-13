@@ -28,6 +28,7 @@ import { generateSoundDesignSuggestion } from "./processors/sounddesign";
 import { transformLyrics } from "./processors/style-transformer";
 import { getAvailableVoices, generateSpeech, defaultVoiceMappings } from "./processors/elevenlabs";
 import { recommendGenres } from "./processors/genre-recommender";
+import { searchBeatTrends, searchBeatTutorials, getCurrentSampleTrends } from "./processors/web-search";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -936,6 +937,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error updating settings:", error);
       return res.status(500).json({ 
         message: "Failed to update settings",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Web Search API Routes for Beat Generation
+  
+  // Search for current beat trends
+  app.post("/api/beats/search-trends", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ 
+          message: "Query parameter is required" 
+        });
+      }
+      
+      console.log(`Searching beat trends for: ${query}`);
+      const trends = await searchBeatTrends(query);
+      
+      return res.status(200).json(trends);
+    } catch (error) {
+      console.error("Error searching beat trends:", error);
+      return res.status(500).json({ 
+        message: "Failed to search beat trends",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Search for beat making tutorials
+  app.post("/api/beats/search-tutorials", async (req, res) => {
+    try {
+      const { genre, technique } = req.body;
+      
+      if (!genre || typeof genre !== 'string') {
+        return res.status(400).json({ 
+          message: "Genre parameter is required" 
+        });
+      }
+      
+      console.log(`Searching tutorials for: ${genre} - ${technique || 'general'}`);
+      const tutorials = await searchBeatTutorials(genre, technique || 'production');
+      
+      return res.status(200).json(tutorials);
+    } catch (error) {
+      console.error("Error searching beat tutorials:", error);
+      return res.status(500).json({ 
+        message: "Failed to search beat tutorials",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Get current sample trends
+  app.get("/api/beats/sample-trends", async (req, res) => {
+    try {
+      console.log("Fetching current sample trends");
+      const sampleTrends = await getCurrentSampleTrends();
+      
+      return res.status(200).json(sampleTrends);
+    } catch (error) {
+      console.error("Error fetching sample trends:", error);
+      return res.status(500).json({ 
+        message: "Failed to fetch sample trends",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
+  // Enhanced beat generation with web search integration
+  app.post("/api/beats/generate-enhanced", async (req, res) => {
+    try {
+      const { genre, mood, tempo, searchTrends = true, artistInfluences } = req.body;
+      
+      if (!genre || typeof genre !== 'string') {
+        return res.status(400).json({ 
+          message: "Genre parameter is required" 
+        });
+      }
+      
+      let trendData = null;
+      if (searchTrends) {
+        console.log(`Searching trends for ${genre} beat generation`);
+        trendData = await searchBeatTrends(`${genre} ${mood || ''} ${tempo || ''}`);
+      }
+      
+      // Generate enhanced beat prompt with trend data
+      const systemPrompt = `You are an advanced rap beat instrumental prompt generator with access to current music industry trends. Create vivid, cinematic descriptions incorporating the latest production techniques and trending sounds. Use lowercase and be highly descriptive with technical details.`;
+      
+      let userInput = `Generate a ${tempo || 'midtempo'} ${genre} beat that is ${mood || 'energetic'}.`;
+      
+      if (trendData) {
+        userInput += `\n\nCurrent industry trends to incorporate:
+        - Trending genres: ${trendData.currentGenres.join(', ')}
+        - Popular producers: ${trendData.trendingArtists.join(', ')}
+        - Production techniques: ${trendData.productionTechniques.join(', ')}
+        - Popular sounds: ${trendData.popularSounds.join(', ')}
+        - Key insights: ${trendData.insights.join('. ')}`;
+      }
+      
+      if (artistInfluences) {
+        userInput += `\n\nArtist influences to consider: ${artistInfluences}`;
+      }
+      
+      userInput += '\n\nCreate a detailed beat description that reflects current industry trends and modern production standards.';
+      
+      return res.status(200).json({
+        enhancedPrompt: userInput,
+        trendData: trendData,
+        generatedAt: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error("Error generating enhanced beat:", error);
+      return res.status(500).json({ 
+        message: "Failed to generate enhanced beat",
         error: error instanceof Error ? error.message : "Unknown error"
       });
     }

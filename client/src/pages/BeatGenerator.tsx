@@ -108,6 +108,11 @@ export default function BeatGenerator() {
   // UI controls
   const [autoSave, setAutoSave] = useState(true);
   const [advancedMode, setAdvancedMode] = useState(false);
+  
+  // Web search integration
+  const [enableTrendSearch, setEnableTrendSearch] = useState(true);
+  const [trendData, setTrendData] = useState<any>(null);
+  const [loadingTrends, setLoadingTrends] = useState(false);
 
   const { toast } = useToast();
 
@@ -121,6 +126,37 @@ export default function BeatGenerator() {
     setSelectedInstruments(selectedInstruments.filter(i => i !== instrument));
   };
 
+  const fetchCurrentTrends = async () => {
+    if (!enableTrendSearch) return null;
+    
+    setLoadingTrends(true);
+    try {
+      const genreInfo = genres.find(g => g.id === selectedGenre);
+      const moodInfo = moods.find(m => m.id === selectedMood);
+      
+      const searchQuery = `${genreInfo?.name} ${moodInfo?.name} beat production`;
+      
+      const res = await fetch('/api/beats/search-trends', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ query: searchQuery })
+      });
+
+      if (res.ok) {
+        const trends = await res.json();
+        setTrendData(trends);
+        return trends;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error fetching trends:', error);
+      return null;
+    } finally {
+      setLoadingTrends(false);
+    }
+  };
+
   const generatePrompt = async () => {
     setLoading(true);
     
@@ -129,9 +165,15 @@ export default function BeatGenerator() {
     const tempoInfo = tempos.find(t => t.id === selectedTempo);
     const structureInfo = beatStructures.find(s => s.id === selectedStructure);
     
-    const systemPrompt = `You are an advanced rap beat instrumental prompt generator. Create vivid, cinematic descriptions of hip-hop/rap beats with precise details about sonic texture, instruments, and production techniques. Focus on creating atmospheric and professional beat descriptions. Use lowercase and be highly descriptive with technical details.`;
+    // Fetch current trends if enabled
+    let currentTrends = null;
+    if (enableTrendSearch) {
+      currentTrends = await fetchCurrentTrends();
+    }
+    
+    const systemPrompt = `You are an advanced rap beat instrumental prompt generator with access to current music industry trends. Create vivid, cinematic descriptions of hip-hop/rap beats with precise details about sonic texture, instruments, and production techniques. Focus on creating atmospheric and professional beat descriptions that reflect current industry standards. Use lowercase and be highly descriptive with technical details.`;
 
-    const userInput = `Generate a ${tempoInfo?.name} ${genreInfo?.name} beat that is ${moodInfo?.name}.
+    let userInput = `Generate a ${tempoInfo?.name} ${genreInfo?.name} beat that is ${moodInfo?.name}.
     
     Structure: ${structureInfo?.description}
     Complexity Level: ${complexity[0]}%
@@ -141,9 +183,19 @@ export default function BeatGenerator() {
     
     ${selectedInstruments.length > 0 ? `Key Instruments: ${selectedInstruments.join(', ')}` : ''}
     ${artistInfluences ? `Artist Influences: ${artistInfluences}` : ''}
-    ${customElements ? `Custom Elements: ${customElements}` : ''}
+    ${customElements ? `Custom Elements: ${customElements}` : ''}`;
+
+    // Incorporate trend data if available
+    if (currentTrends) {
+      userInput += `\n\nCurrent Industry Trends to Incorporate:
+      - Trending Genres: ${currentTrends.currentGenres?.join(', ') || 'N/A'}
+      - Popular Producers: ${currentTrends.trendingArtists?.join(', ') || 'N/A'}
+      - Production Techniques: ${currentTrends.productionTechniques?.join(', ') || 'N/A'}
+      - Popular Sounds: ${currentTrends.popularSounds?.join(', ') || 'N/A'}
+      - Industry Insights: ${currentTrends.insights?.join('. ') || 'N/A'}`;
+    }
     
-    Create a detailed beat description focusing on sonic texture, instrumentation, and mood.`;
+    userInput += '\n\nCreate a detailed beat description focusing on sonic texture, instrumentation, mood, and current production trends.';
 
     try {
       const endpoint = '/api/openai/enhance';
@@ -176,7 +228,7 @@ export default function BeatGenerator() {
 
       toast({
         title: "Beat Prompt Generated",
-        description: `Created ${genreInfo?.name} beat prompt with ${moodInfo?.name} mood`,
+        description: `Created ${genreInfo?.name} beat prompt with ${moodInfo?.name} mood${currentTrends ? ' using current trends' : ''}`,
       });
 
     } catch (error) {
