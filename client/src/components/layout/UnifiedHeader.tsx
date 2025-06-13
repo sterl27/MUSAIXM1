@@ -29,7 +29,8 @@ import {
   User,
   Waves,
   Video,
-  Target
+  Target,
+  BarChart3
 } from "lucide-react";
 
 export default function UnifiedHeader() {
@@ -48,6 +49,7 @@ export default function UnifiedHeader() {
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
     { href: "/beat-generator", icon: <Music size={16} />, label: "Beat Generator", description: "Create cinematic beat prompts for production" },
+    { href: "/beat-analyzer", icon: <BarChart3 size={16} />, label: "Beat Analyzer", description: "AI-powered beat analysis and production insights" },
     { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
     { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
     { href: "/lyric-animator", icon: <Video size={16} />, label: "Lyric Animator", description: "Create animated lyric videos with effects" },
