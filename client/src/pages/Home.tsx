@@ -6,7 +6,7 @@ import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User
 
 export default function Home() {
   const tools = [
-    { title: "Music Player", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "SoundCloud Player", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
     { title: "Beat Generator", href: "/beat-generator", icon: Music, color: "from-[#AB47BC] to-[#3F51B5]" },
     { title: "Beat Studio", href: "/beat-studio", icon: Palette, color: "from-[#FFC107] to-[#FF4081]" },
     { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },

@@ -62,7 +62,7 @@ export default function UnifiedHeader() {
   ];
 
   const explorePages = [
-    { href: "/music-player", icon: <Music size={16} />, label: "Music Player", description: "Play and manage your music collection" },
+    { href: "/music-player", icon: <Music size={16} />, label: "SoundCloud Player", description: "Stream curated playlists from SoundCloud" },
     { href: "/sound-signature", icon: <Waves size={16} />, label: "Sound Signature", description: "Visualize vocal characteristics" },
     { href: "/artist-profile", icon: <User size={16} />, label: "Artist Profile", description: "Manage your artistic identity" },
   ];
