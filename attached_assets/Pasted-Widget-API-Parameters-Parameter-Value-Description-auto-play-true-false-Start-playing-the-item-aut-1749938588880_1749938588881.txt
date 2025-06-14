@@ -1,0 +1,82 @@
+Widget API
+Parameters
+Parameter	Value	Description
+auto_play	true/false	Start playing the item automatically
+color	hex code	Color play button and other controls. e.g. “#0066CC”
+buying	true/false	Show/Hide buy buttons
+sharing	true/false	Show/Hide share buttons
+download	true/false	Show/Hide download buttons
+show_artwork	true/false	Show/Hide the item’s artwork
+show_playcount	true/false	Show/Hide number of track plays
+show_user	true/false	Show/Hide the uploader name
+start_track	number	A number from 0 to the playlist length which reselects the track in a playlist
+single_active	true/false	If set to false the multiple players on the page won’t toggle each other off when playing
+These parameters can be added to the player URL in the embed code.
+
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay
+  src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&amp;{ ADD YOUR PARAMETERS HERE }">
+</iframe>
+API
+In order to access the JavaScript object which provides the SoundCloud Widget API, add this script to your html page.
+
+This script exposes the SC.Widget(/*iframeElement|iframeElementID*/) function to the global scope. It allows you to control the widget from the parent page (the page the widget is inserted into). SC.Widget accepts the reference to the iframe element or its id.
+
+var iframeElement   = document.querySelector('iframe');
+var iframeElementID = iframeElement.id;
+var widget1         = SC.Widget(iframeElement);
+var widget2         = SC.Widget(iframeElementID);
+// widget1 === widget2
+Playground
+Widget API Playground is a special page where you can view examples and see the results live on your screen.
+
+Methods
+When you get the widget object with the help of the SC.Widget method, you'll have access to the following public methods:
+
+bind(eventName, listener) — adds a listener function for the specified eventName. See below for the list of possible event names.
+unbind(eventName) — removes all listener functions previously added for the specified eventName. See below for the list of possible event names.
+load(url, options) — reloads the iframe element with a new widget specified by the url. All previously added event listeners will continue working. options is an object which allows you to define all possible widget parameters as well as a callback function which will be executed as soon as new widget is ready. See below for detailed list of widget parameters.
+play() — plays the sound.
+pause() — pauses the sound.
+toggle() — toggles the sound.
+seekTo(milliseconds) — jumps to a certain position in a sound.
+setVolume(volume) — sets the widget volume to a certain value in the range 0-100.
+next() — skips to the next sound (only if the widget contains multiple sounds).
+prev() — skips to the previous sound (only if the widget contains multiple sounds).
+skip(soundIndex) — jumps to the soundIndex sound, starting from 0 (only if the widget contains multiple sounds).
+Getters
+The following methods are sorted out to a separate group called "getters" because they return a value and do not modify the state of the widget. Since communication between the parent page and the widget's iframe is implemented through window.postMessage, it's not possible to return the value synchronously. Because of this, every getter method accepts a callback function as a parameter which, when called, will be given the return value of the getter method.
+
+getVolume(callback) — returns the current volume, in the range of [0, 100].
+getDuration(callback) — returns current sound duration in milliseconds.
+getPosition(callback) — returns current sound position in milliseconds.
+getSounds(callback) — returns the list of sound objects.
+getCurrentSound(callback) — returns current sound object.
+getCurrentSoundIndex(callback) — returns the index of current sound.
+isPaused(callback) — whether the widget is paused.
+Event Types
+All possible event types fired by the widget are accessible by means of the SC.Widget.Events object. This object should be used when you want to add or remove a listener from an event. Event listener is executed in the context of widget object.
+
+There a two main event categories: audio and ui.
+
+Audio
+SC.Widget.Events.LOAD_PROGRESS — fired periodically while the sound is loading.
+SC.Widget.Events.PLAY_PROGRESS — fired periodically while the sound is playing.
+SC.Widget.Events.PLAY — fired when the sound begins to play.
+SC.Widget.Events.PAUSE — fired when the sound pauses.
+SC.Widget.Events.FINISH — fired when the sound finishes.
+SC.Widget.Events.SEEK — fired when the user seeks.
+Audio events return an object containing the following properties:
+
+relativePosition - relative current position of the current sound, in the range of [0,1].
+loadProgress     - the current value of the loading progress, in the range of [0,1].
+currentPosition  - the position of the current sound (in milliseconds).
+UI
+SC.Widget.Events.READY — fired when the widget has loaded its data and is ready to accept external calls.
+SC.Widget.Events.CLICK_DOWNLOAD — Fired when the user clicks the download button.
+SC.Widget.Events.CLICK_BUY — Fired when the user clicks the buy button.
+SC.Widget.Events.OPEN_SHARE_PANEL — Fired when the share panel is opened. This happens when the user clicks the "Share" button, and at the end of the last sound.
+SC.Widget.Events.ERROR — Fired when an error message is displayed.
+Resources
+Also take a look at the blog post about HTML5 Widget API for more examples.
+
+Status Privacy Cookies Imprint
