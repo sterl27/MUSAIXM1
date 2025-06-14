@@ -6,25 +6,25 @@ import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User
 
 export default function Home() {
   const tools = [
-    { title: "Musaix Explore", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Production", href: "/beat-generator", icon: Music, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Style Prompt", href: "/style-transformer", icon: Palette, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Music Player", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Beat Generator", href: "/beat-generator", icon: Music, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Beat Studio", href: "/beat-studio", icon: Palette, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
     
-    { title: "Songwriter", href: "/songwriter", icon: PenTool, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Rap Lyrics", href: "/complexity-scoring", icon: Bot, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#AB47BC] to-[#3F51B5]" },
-    
-    { title: "Lyric Animator", href: "/lyric-animator", icon: Video, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Meta Track", href: "/flow-analyzer", icon: Target, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Sound Signature", href: "/sound-signature", icon: Volume2, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Style Transform", href: "/style-transformer", icon: Wand2, color: "from-[#FFC107] to-[#FF4081]" },
-    
-    { title: "Lyrics Score", href: "/complexity-scoring", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "from-[#FF4081] to-[#AB47BC]" },
     { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Flow Analysis", href: "/flow-analyzer", icon: Brain, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#FF4081] to-[#AB47BC]" },
+    
+    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Style Transformer", href: "/style-transformer", icon: Wand2, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#FFC107] to-[#FF4081]" },
+    
+    { title: "Beat Analyzer", href: "/beat-analyzer", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Sound Signature", href: "/sound-signature", icon: Volume2, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Structure Format", href: "/structure-formatter", icon: FileText, color: "from-[#FF4081] to-[#AB47BC]" },
   ];
 
   return (

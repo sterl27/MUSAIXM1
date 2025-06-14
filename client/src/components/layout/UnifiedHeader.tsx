@@ -54,7 +54,6 @@ export default function UnifiedHeader() {
     { href: "/trends-dashboard", icon: <TrendingUp size={16} />, label: "Trends Dashboard", description: "Real-time music industry trends and insights" },
     { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
     { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
-
     { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
     { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
@@ -82,7 +81,7 @@ export default function UnifiedHeader() {
   const MobileNavItem = ({ href, icon, label, onClick }: { href: string; icon: React.ReactNode; label: string; onClick?: () => void }) => (
     <Link href={href}>
       <div 
-        className={`flex items-center gap-3 px-4 py-3 text-white hover:text-[#FF4081] hover:bg-white/5 transition-colors rounded-md ${isActive(href) ? 'text-[#FF4081] bg-white/10' : ''}`}
+        className={`flex items-center gap-2 px-3 py-2 text-white hover:text-[#FF4081] hover:bg-white/5 transition-colors rounded-md text-sm ${isActive(href) ? 'text-[#FF4081] bg-white/10' : ''}`}
         onClick={onClick}
       >
         {icon}
@@ -246,33 +245,49 @@ export default function UnifiedHeader() {
             <SheetContent side="right" className="w-80 bg-black border-gray-700 p-0">
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
-                <div className="p-6 border-b border-gray-700">
+                <div className="p-4 border-b border-gray-700">
                   <div className="flex items-center gap-2">
                     <Music className="h-6 w-6 text-[#FF4081]" />
-                    <h2 className="text-lg font-bold musaix-gradient-text">Musaix Rap Pro</h2>
+                    <h2 className="text-lg font-bold musaix-gradient-text">Musaix Pro</h2>
                   </div>
                 </div>
 
                 {/* Mobile Navigation */}
-                <div className="flex-1 overflow-y-auto p-4">
-                  <div className="space-y-6">
+                <div className="flex-1 overflow-y-auto p-3">
+                  <div className="space-y-4">
                     {/* Home */}
-                    <div>
-                      <MobileNavItem 
-                        href="/" 
-                        icon={<Home size={18} />} 
-                        label="Home" 
-                        onClick={() => setIsOpen(false)}
-                      />
-                    </div>
+                    <MobileNavItem 
+                      href="/" 
+                      icon={<Home size={16} />} 
+                      label="Home" 
+                      onClick={() => setIsOpen(false)}
+                    />
 
                     {/* Creative Tools Section */}
                     <div>
-                      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 px-4">
+                      <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-2">
                         Creative Tools
                       </h3>
-                      <div className="space-y-1">
-                        {creativeTools.map((tool) => (
+                      <div className="space-y-0.5">
+                        {creativeTools.slice(0, 8).map((tool) => (
+                          <MobileNavItem 
+                            key={tool.href}
+                            href={tool.href} 
+                            icon={tool.icon} 
+                            label={tool.label} 
+                            onClick={() => setIsOpen(false)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* More Tools Section */}
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-2">
+                        Advanced Tools
+                      </h3>
+                      <div className="space-y-0.5">
+                        {creativeTools.slice(8).map((tool) => (
                           <MobileNavItem 
                             key={tool.href}
                             href={tool.href} 
@@ -286,10 +301,10 @@ export default function UnifiedHeader() {
 
                     {/* Explore Section */}
                     <div>
-                      <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 px-4">
+                      <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-2">
                         Explore
                       </h3>
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {explorePages.map((page) => (
                           <MobileNavItem 
                             key={page.href}
@@ -305,12 +320,12 @@ export default function UnifiedHeader() {
                     {/* Admin - Only show for admin users */}
                     {isAuthenticated && user && (user.role === 'admin' || user.role === 'super_admin') && (
                       <div>
-                        <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 px-4">
+                        <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-2">
                           Settings
                         </h3>
                         <MobileNavItem 
                           href="/admin" 
-                          icon={<Settings size={18} />} 
+                          icon={<Settings size={16} />} 
                           label="Admin Panel" 
                           onClick={() => setIsOpen(false)}
                         />
