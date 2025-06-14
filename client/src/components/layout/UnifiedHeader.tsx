@@ -28,7 +28,6 @@ import {
   FileText,
   User,
   Waves,
-  Video,
   Target,
   BarChart3,
   TrendingUp
@@ -55,7 +54,7 @@ export default function UnifiedHeader() {
     { href: "/trends-dashboard", icon: <TrendingUp size={16} />, label: "Trends Dashboard", description: "Real-time music industry trends and insights" },
     { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
     { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
-    { href: "/lyric-animator", icon: <Video size={16} />, label: "Lyric Animator", description: "Create animated lyric videos with effects" },
+
     { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
     { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
