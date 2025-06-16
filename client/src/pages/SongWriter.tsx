@@ -1,4 +1,4 @@
-import { useState } from "react";
+enhance ui - simplify - ux enhance - import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,26 +26,26 @@ export default function SongWriter() {
   const [length, setLength] = useState<string>("medium");
   const [structure, setStructure] = useState<string[]>(["verse", "chorus", "verse", "chorus", "bridge", "chorus"]);
   const [useAI, setUseAI] = useState(true);
-  
+
   const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
   const [selectedMusicStyle, setSelectedMusicStyle] = useState<MusicStyle | null>(null);
-  
+
   const [generatedLyrics, setGeneratedLyrics] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const personas = getPersonas();
   const musicStyles = getMusicStyles();
-  
+
   // Song generation function
   const { mutate: generateSong } = useMutation({
     mutationFn: async () => {
       setLoading(true);
       setError(null);
-      
+
       // Get details for request
       const personaId = selectedPersona?.id || null;
-      
+
       try {
         const response = await apiRequest(
           "POST",
@@ -61,7 +61,7 @@ export default function SongWriter() {
             useAI
           }
         );
-        
+
         const data = await response.json();
         return data;
       } catch (err) {
@@ -75,26 +75,26 @@ export default function SongWriter() {
         setLoading(false);
       }
     },
-    
+
     onSuccess: (data) => {
       if (data && data.lyrics) {
         setGeneratedLyrics(data.lyrics);
       }
     },
-    
+
     onError: (err: Error) => {
       setError(err.message);
     }
   });
-  
+
   const handleAddSection = (section: string) => {
     setStructure([...structure, section]);
   };
-  
+
   const handleRemoveSection = (index: number) => {
     setStructure(structure.filter((_, i) => i !== index));
   };
-  
+
   const handleMoveSection = (index: number, direction: "up" | "down") => {
     if (direction === "up" && index > 0) {
       const newStructure = [...structure];
@@ -106,27 +106,27 @@ export default function SongWriter() {
       setStructure(newStructure);
     }
   };
-  
+
   const handleGenerate = () => {
     if (!topic.trim()) {
       setError("Please enter a topic for your song");
       return;
     }
-    
+
     generateSong();
   };
-  
+
   const handleClear = () => {
     setGeneratedLyrics(null);
     setError(null);
   };
-  
+
   const copyToClipboard = () => {
     if (generatedLyrics) {
       navigator.clipboard.writeText(generatedLyrics);
     }
   };
-  
+
   // Get section name
   const getSectionName = (section: string) => {
     switch (section) {
@@ -143,14 +143,14 @@ export default function SongWriter() {
   return (
     <PageLayout title="AI Song Writer" description="Generate song lyrics based on your ideas">
       <ToolsNavigation />
-      
+
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid grid-cols-3 mb-6 w-full md:w-[400px]">
           <TabsTrigger value="basic">Basic</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
           <TabsTrigger value="output">Generated Lyrics</TabsTrigger>
         </TabsList>
-        
+
         {/* Basic Options Tab */}
         <TabsContent value="basic" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -174,7 +174,7 @@ export default function SongWriter() {
                     Example: "Love", "Heartbreak", "Summer vibes", "Overcoming challenges"
                   </p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="mood">Mood</Label>
                   <RadioGroup
@@ -208,7 +208,7 @@ export default function SongWriter() {
                     </div>
                   </RadioGroup>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="musicStyle">Music Style Template</Label>
                   <Select 
@@ -234,7 +234,7 @@ export default function SongWriter() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 {!selectedMusicStyle && (
                   <div className="space-y-2">
                     <Label htmlFor="genre">Custom Genre</Label>
@@ -261,7 +261,7 @@ export default function SongWriter() {
                 </Button>
               </CardFooter>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Song Structure</CardTitle>
@@ -285,7 +285,7 @@ export default function SongWriter() {
                     <span>Complex</span>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="length">Song Length</Label>
                   <RadioGroup
@@ -307,7 +307,7 @@ export default function SongWriter() {
                     </div>
                   </RadioGroup>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-4">
                   <Label htmlFor="useAI" className="cursor-pointer">Use AI Generation</Label>
                   <Switch 
@@ -316,7 +316,7 @@ export default function SongWriter() {
                     onCheckedChange={setUseAI} 
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="persona">Artist Style (Optional)</Label>
                   <Select 
@@ -346,7 +346,7 @@ export default function SongWriter() {
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* Advanced Options Tab */}
         <TabsContent value="advanced" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -394,7 +394,7 @@ export default function SongWriter() {
                         </div>
                       </div>
                     ))}
-                    
+
                     {structure.length === 0 && (
                       <div className="text-center text-muted-foreground py-2">
                         No sections added yet
@@ -402,7 +402,7 @@ export default function SongWriter() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 pt-4">
                   <Label>Add Section</Label>
                   <div className="grid grid-cols-3 gap-2">
@@ -455,7 +455,7 @@ export default function SongWriter() {
                 </Button>
               </CardFooter>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>AI Settings</CardTitle>
@@ -489,7 +489,7 @@ export default function SongWriter() {
             </Card>
           </div>
         </TabsContent>
-        
+
         {/* Output Tab */}
         <TabsContent value="output" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -525,7 +525,7 @@ export default function SongWriter() {
                 </CardFooter>
               </Card>
             </div>
-            
+
             {/* Analysis Sidebar */}
             <div className="space-y-6">
               {/* Live Energy Dashboard */}
@@ -555,7 +555,7 @@ export default function SongWriter() {
                   animateOnChange={true}
                 />
               )}
-              
+
               {!generatedLyrics && (
                 <Card className="musaix-card-border bg-black/50">
                   <CardContent className="p-6 text-center">
