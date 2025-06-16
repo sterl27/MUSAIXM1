@@ -1,251 +1,416 @@
-import { Persona } from "@/lib/types";
-import { getPersonas } from "@/lib/types";
-import { Crown, Flame, Volume2, Mic, CheckCircle, Theater } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import VoicePreview from "./VoicePreview";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { 
+  User, 
+  Search, 
+  Volume2, 
+  Brain, 
+  Star,
+  TrendingUp,
+  Clock,
+  Zap
+} from "lucide-react";
+
+interface Persona {
+  id: string;
+  name: string;
+  description: string;
+  voiceId?: string;
+  category: string;
+  popularity: number;
+  complexity: number;
+  characteristics: string[];
+  matchingVoices: string[];
+}
 
 interface PersonaSelectorProps {
-  selectedPersona: Persona;
-  onSelectPersona: (persona: Persona) => void;
+  selectedPersona: string;
+  onPersonaSelect: (personaId: string) => void;
+  suggestedPersonas?: Array<{
+    id: string;
+    name: string;
+    description: string;
+    matchScore: number;
+  }>;
+  userLyrics?: string;
 }
 
-// Function to get sample text for each persona
-function getSampleTextForPersona(personaId: string): string {
-  switch(personaId) {
-    // Hip Hop & Rap
-    case "outkast":
-      return "ATL, here we go for the show. Spittin' verses while we're stackin' dough. The South got somethin' to say, every single day.";
-    case "goodiemob":
-      return "In the dirty South we rise, wisdom in our eyes. Soul food for thought while we touch the sky. Cell therapy for the mind.";
-    case "liljon":
-      return "YEAH! WHAT? OKAY! LET'S GO! TURN UP THE SPEAKERS AND FEEL THE BEAT! CRUNK AIN'T DEAD!";
-    case "ti":
-      return "Welcome to the trap, where we strategize and adapt. Hustle hard, stay sharp, that's the only way to live large.";
-    
-    // Rock & Alternative
-    case "rock-ballad":
-      return "As the night falls, I remember your face. Every moment, every heartbeat, I can't erase. The memories we made, like a flame that won't die.";
-    case "alt-indie":
-      return "Whispers in vacant rooms, echoes of forgotten dreams. We're hanging by a thread as the city sleeps, searching for meaning in the noise.";
-    
-    // Electronic & Dance
-    case "edm":
-      return "Feel the bass drop, as we reach for the sky. Hands up, lose yourself, let the rhythm take you high. The night is young, and we won't stop.";
-    case "ambient":
-      return "Floating through endless space, surrounded by stars and silence. Time stands still as waves of sound wash over consciousness.";
-    
-    // Pop & R&B
-    case "pop-vocals":
-      return "This is the moment we've been waiting for. Tonight we're letting go, dancing on the edge. Your love is like a melody I can't get out of my head.";
-    case "rnb-smooth":
-      return "Baby, when the lights are low, and it's just you and me. I feel your heart beating close to mine. Let me show you what love can be.";
-    
-    // Default
-    default:
-      return "Welcome to Musaix. Select a music persona to enhance your lyrics with unique style and sound.";
+const PERSONAS: Persona[] = [
+  {
+    id: "eminem",
+    name: "Eminem",
+    description: "Rapid-fire delivery, complex wordplay, aggressive energy",
+    voiceId: "pNInz6obpgDQGcFmaJgB",
+    category: "aggressive",
+    popularity: 95,
+    complexity: 9,
+    characteristics: ["Fast delivery", "Complex rhyme schemes", "Aggressive tone", "Technical wordplay"],
+    matchingVoices: ["Adam", "Antoni", "Arnold"]
+  },
+  {
+    id: "kendrick",
+    name: "Kendrick Lamar",
+    description: "Conscious rap, intricate storytelling, social commentary",
+    voiceId: "ErXwobaYiN019PkySvjV",
+    category: "conscious",
+    popularity: 92,
+    complexity: 8,
+    characteristics: ["Storytelling", "Social awareness", "Dynamic flow", "Jazz influences"],
+    matchingVoices: ["Josh", "Marcus", "Samuel"]
+  },
+  {
+    id: "drake",
+    name: "Drake",
+    description: "Melodic rap, emotional vulnerability, mainstream appeal",
+    voiceId: "VR6AewLTigWG4xSOukaG",
+    category: "melodic",
+    popularity: 98,
+    complexity: 6,
+    characteristics: ["Melodic hooks", "Emotional depth", "R&B influences", "Commercial appeal"],
+    matchingVoices: ["Brian", "Chris", "Eric"]
+  },
+  {
+    id: "jcole",
+    name: "J. Cole",
+    description: "Introspective lyricism, authentic storytelling, soulful production",
+    voiceId: "pqHfZKP75CvOlQylNhV4",
+    category: "conscious",
+    popularity: 88,
+    complexity: 7,
+    characteristics: ["Introspection", "Life stories", "Soulful beats", "Genuine emotion"],
+    matchingVoices: ["Daniel", "Dave", "Ethan"]
+  },
+  {
+    id: "travisscott",
+    name: "Travis Scott",
+    description: "Auto-tuned vocals, atmospheric production, energetic performances",
+    voiceId: "N2lVS1w4EtoT3dr4eOWO",
+    category: "atmospheric",
+    popularity: 89,
+    complexity: 5,
+    characteristics: ["Auto-tune effects", "Atmospheric sounds", "High energy", "Psychedelic vibes"],
+    matchingVoices: ["Clyde", "Fin", "Harry"]
+  },
+  {
+    id: "lilwayne",
+    name: "Lil Wayne",
+    description: "Clever wordplay, punchline rap, versatile flow patterns",
+    voiceId: "flq6f7yk4E4fJM5XTYuZ",
+    category: "punchline",
+    popularity: 85,
+    complexity: 8,
+    characteristics: ["Punchlines", "Metaphors", "Flow switching", "Creative wordplay"],
+    matchingVoices: ["Antoni", "Arnold", "Jeremy"]
+  },
+  {
+    id: "nas",
+    name: "Nas",
+    description: "Lyrical prowess, street poetry, timeless storytelling",
+    voiceId: "TxGEqnHWrfWFTfGW9XjX",
+    category: "lyrical",
+    popularity: 82,
+    complexity: 9,
+    characteristics: ["Lyrical density", "Street narratives", "Poetic imagery", "Classic flow"],
+    matchingVoices: ["Michael", "River", "Roger"]
+  },
+  {
+    id: "jayz",
+    name: "Jay-Z",
+    description: "Business-minded rap, confident delivery, commercial success",
+    voiceId: "CYw3kZ02Hs0563khs1Fj",
+    category: "business",
+    popularity: 94,
+    complexity: 7,
+    characteristics: ["Business themes", "Confident delivery", "Luxury references", "Smooth flow"],
+    matchingVoices: ["Bill", "Charlie", "George"]
   }
-}
+];
 
-export default function PersonaSelector({ selectedPersona, onSelectPersona }: PersonaSelectorProps) {
-  const personas = getPersonas();
-  
-  // Function to render the appropriate icon based on persona.icon
-  const renderIcon = (iconName: string) => {
-    switch (iconName) {
-      case "crown":
-        return <Crown className="text-secondary" />;
-      case "brain":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04Z"/></svg>;
-      case "zap":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>;
-      case "target":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>;
-      case "music":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>;
-      case "headphones":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>;
-      case "disc":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>;
-      case "cloud":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>;
-      case "mic":
-        return <Mic className="text-secondary" />;
-      case "heart":
-        return <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-secondary"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
-      default:
-        return <Mic className="text-secondary" />;
-    }
-  };
+const CATEGORIES = [
+  { id: "all", name: "All Personas", color: "bg-gray-500" },
+  { id: "aggressive", name: "Aggressive", color: "bg-red-500" },
+  { id: "conscious", name: "Conscious", color: "bg-green-500" },
+  { id: "melodic", name: "Melodic", color: "bg-blue-500" },
+  { id: "atmospheric", name: "Atmospheric", color: "bg-purple-500" },
+  { id: "punchline", name: "Punchline", color: "bg-yellow-500" },
+  { id: "lyrical", name: "Lyrical", color: "bg-indigo-500" },
+  { id: "business", name: "Business", color: "bg-orange-500" }
+];
 
-  // Group personas by category
-  const hiphopPersonas = personas.filter(p => ["outkast", "goodiemob", "liljon", "ti"].includes(p.id));
-  const rockPersonas = personas.filter(p => ["rock-ballad", "alt-indie"].includes(p.id));
-  const electronicPersonas = personas.filter(p => ["edm", "ambient"].includes(p.id));
-  const popRnbPersonas = personas.filter(p => ["pop-vocals", "rnb-smooth"].includes(p.id));
+export default function PersonaSelector({ 
+  selectedPersona, 
+  onPersonaSelect, 
+  suggestedPersonas = [],
+  userLyrics = "" 
+}: PersonaSelectorProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState<"popularity" | "complexity" | "name">("popularity");
+
+  const filteredPersonas = PERSONAS
+    .filter(persona => 
+      selectedCategory === "all" || persona.category === selectedCategory
+    )
+    .filter(persona => 
+      persona.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      persona.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      persona.characteristics.some(char => 
+        char.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    )
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "popularity":
+          return b.popularity - a.popularity;
+        case "complexity":
+          return b.complexity - a.complexity;
+        case "name":
+          return a.name.localeCompare(b.name);
+        default:
+          return 0;
+      }
+    });
+
+  const selectedPersonaData = PERSONAS.find(p => p.id === selectedPersona);
 
   return (
-    <div className="bg-card rounded-xl shadow-lg p-5 border border-muted">
-      <h2 className="font-semibold text-xl mb-4 flex items-center">
-        <Theater className="text-secondary mr-2" size={20} />
-        Music Persona
-      </h2>
-      <p className="text-muted-foreground text-sm mb-4">
-        Choose a music persona to define genre, tempo, sound vibe, vocals and overall style
-      </p>
+    <div className="space-y-4">
       
-      <Tabs defaultValue="hiphop" className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="hiphop">Hip-Hop</TabsTrigger>
-          <TabsTrigger value="rock">Rock</TabsTrigger>
-          <TabsTrigger value="electronic">Electronic</TabsTrigger>
-          <TabsTrigger value="pop">Pop/R&B</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="hiphop">
-          <div className="grid grid-cols-2 gap-3">
-            {hiphopPersonas.map((persona) => (
-              <div className="relative" key={persona.id}>
-                <input 
-                  type="radio" 
-                  id={`persona-${persona.id}`}
-                  name="persona" 
-                  value={persona.id}
-                  className="peer sr-only" 
-                  checked={selectedPersona.id === persona.id}
-                  onChange={() => onSelectPersona(persona)}
-                />
-                <label 
-                  htmlFor={`persona-${persona.id}`} 
-                  className="flex flex-col items-center p-3 border-2 border-muted rounded-lg cursor-pointer hover:bg-muted transition-colors peer-checked:border-secondary peer-checked:bg-muted"
-                >
-                  <div className="text-2xl mb-1">
-                    {renderIcon(persona.icon)}
+      {/* AI Suggestions */}
+      {suggestedPersonas.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Brain className="h-4 w-4 text-purple-400" />
+              AI Recommendations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {suggestedPersonas.map((suggestion) => (
+              <div 
+                key={suggestion.id}
+                className={`p-3 rounded-lg transition-all cursor-pointer border-2 ${
+                  selectedPersona === suggestion.id 
+                    ? 'bg-purple-900/30 border-purple-500' 
+                    : 'bg-gray-800 border-transparent hover:bg-gray-700'
+                }`}
+                onClick={() => onPersonaSelect(suggestion.id)}
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-medium text-sm">{suggestion.name}</span>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs bg-purple-600">
+                      {Math.round(suggestion.matchScore)}% match
+                    </Badge>
+                    <Star className="h-3 w-3 text-yellow-500" />
                   </div>
-                  <span className="font-medium text-lg">{persona.name}</span>
-                  <span className="text-sm text-muted-foreground mt-1">{persona.description}</span>
-                </label>
-                <div className="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-secondary">
-                  <CheckCircle size={16} />
                 </div>
+                <p className="text-xs text-gray-400">{suggestion.description}</p>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Search and Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4" />
+            Browse Personas ({filteredPersonas.length})
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search personas, styles, characteristics..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </TabsContent>
-        
-        <TabsContent value="rock">
-          <div className="grid grid-cols-2 gap-3">
-            {rockPersonas.map((persona) => (
-              <div className="relative" key={persona.id}>
-                <input 
-                  type="radio" 
-                  id={`persona-${persona.id}`}
-                  name="persona" 
-                  value={persona.id}
-                  className="peer sr-only" 
-                  checked={selectedPersona.id === persona.id}
-                  onChange={() => onSelectPersona(persona)}
-                />
-                <label 
-                  htmlFor={`persona-${persona.id}`} 
-                  className="flex flex-col items-center p-3 border-2 border-muted rounded-lg cursor-pointer hover:bg-muted transition-colors peer-checked:border-secondary peer-checked:bg-muted"
-                >
-                  <div className="text-2xl mb-1">
-                    {renderIcon(persona.icon)}
-                  </div>
-                  <span className="font-medium text-lg">{persona.name}</span>
-                  <span className="text-sm text-muted-foreground mt-1">{persona.description}</span>
-                </label>
-                <div className="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-secondary">
-                  <CheckCircle size={16} />
-                </div>
-              </div>
+
+          {/* Category Filter */}
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((category) => (
+              <Button
+                key={category.id}
+                variant={selectedCategory === category.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category.id)}
+                className="flex items-center gap-1 text-xs"
+              >
+                <div className={`w-2 h-2 rounded-full ${category.color}`}></div>
+                {category.name}
+              </Button>
             ))}
           </div>
-        </TabsContent>
-        
-        <TabsContent value="electronic">
-          <div className="grid grid-cols-2 gap-3">
-            {electronicPersonas.map((persona) => (
-              <div className="relative" key={persona.id}>
-                <input 
-                  type="radio" 
-                  id={`persona-${persona.id}`}
-                  name="persona" 
-                  value={persona.id}
-                  className="peer sr-only" 
-                  checked={selectedPersona.id === persona.id}
-                  onChange={() => onSelectPersona(persona)}
-                />
-                <label 
-                  htmlFor={`persona-${persona.id}`} 
-                  className="flex flex-col items-center p-3 border-2 border-muted rounded-lg cursor-pointer hover:bg-muted transition-colors peer-checked:border-secondary peer-checked:bg-muted"
-                >
-                  <div className="text-2xl mb-1">
-                    {renderIcon(persona.icon)}
-                  </div>
-                  <span className="font-medium text-lg">{persona.name}</span>
-                  <span className="text-sm text-muted-foreground mt-1">{persona.description}</span>
-                </label>
-                <div className="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-secondary">
-                  <CheckCircle size={16} />
-                </div>
-              </div>
-            ))}
+
+          {/* Sort Options */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-400">Sort by:</span>
+            <Button
+              variant={sortBy === "popularity" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setSortBy("popularity")}
+              className="flex items-center gap-1"
+            >
+              <TrendingUp className="h-3 w-3" />
+              Popular
+            </Button>
+            <Button
+              variant={sortBy === "complexity" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setSortBy("complexity")}
+              className="flex items-center gap-1"
+            >
+              <Zap className="h-3 w-3" />
+              Complex
+            </Button>
+            <Button
+              variant={sortBy === "name" ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setSortBy("name")}
+              className="flex items-center gap-1"
+            >
+              <User className="h-3 w-3" />
+              A-Z
+            </Button>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="pop">
-          <div className="grid grid-cols-2 gap-3">
-            {popRnbPersonas.map((persona) => (
-              <div className="relative" key={persona.id}>
-                <input 
-                  type="radio" 
-                  id={`persona-${persona.id}`}
-                  name="persona" 
-                  value={persona.id}
-                  className="peer sr-only" 
-                  checked={selectedPersona.id === persona.id}
-                  onChange={() => onSelectPersona(persona)}
-                />
-                <label 
-                  htmlFor={`persona-${persona.id}`} 
-                  className="flex flex-col items-center p-3 border-2 border-muted rounded-lg cursor-pointer hover:bg-muted transition-colors peer-checked:border-secondary peer-checked:bg-muted"
-                >
-                  <div className="text-2xl mb-1">
-                    {renderIcon(persona.icon)}
+        </CardContent>
+      </Card>
+
+      {/* Persona Grid */}
+      <ScrollArea className="h-[400px]">
+        <div className="grid grid-cols-1 gap-3">
+          {filteredPersonas.map((persona) => (
+            <Card 
+              key={persona.id}
+              className={`cursor-pointer transition-all hover:shadow-lg border-2 ${
+                selectedPersona === persona.id 
+                  ? 'bg-blue-900/30 border-blue-500 shadow-blue-500/20' 
+                  : 'border-gray-700 hover:border-gray-500'
+              }`}
+              onClick={() => onPersonaSelect(persona.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold text-base">{persona.name}</h3>
+                    <p className="text-xs text-gray-400 mb-2">{persona.description}</p>
                   </div>
-                  <span className="font-medium text-lg">{persona.name}</span>
-                  <span className="text-sm text-muted-foreground mt-1">{persona.description}</span>
-                </label>
-                <div className="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 text-secondary">
-                  <CheckCircle size={16} />
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-xs ${CATEGORIES.find(c => c.id === persona.category)?.color.replace('bg-', 'bg-opacity-20 border-')}`}
+                    >
+                      {CATEGORIES.find(c => c.id === persona.category)?.name}
+                    </Badge>
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="h-3 w-3 text-green-500" />
+                      <span className="text-xs text-gray-400">{persona.popularity}%</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
-      
-      {/* Voice Preview Section */}
-      <div className="mt-4 pt-4 border-t border-muted">
-        <h3 className="text-sm font-medium mb-2 flex items-center">
-          <Volume2 className="text-secondary mr-2" size={16} />
-          Voice Preview
-        </h3>
-        <p className="text-xs text-muted-foreground mb-2">
-          Hear how your lyrics might sound with this persona's voice
-        </p>
-        
-        <div className="bg-muted p-3 rounded-md">
-          <VoicePreview 
-            persona={selectedPersona} 
-            sampleText={getSampleTextForPersona(selectedPersona.id)}
-          />
-          <p className="text-xs text-muted-foreground mt-2 italic">
-            Using Microsoft David - English (United States)
-          </p>
+
+                {/* Characteristics */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {persona.characteristics.slice(0, 3).map((char) => (
+                    <Badge key={char} variant="outline" className="text-xs">
+                      {char}
+                    </Badge>
+                  ))}
+                  {persona.characteristics.length > 3 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{persona.characteristics.length - 3} more
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center justify-between text-xs text-gray-400">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <Zap className="h-3 w-3" />
+                      <span>Complexity {persona.complexity}/10</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Volume2 className="h-3 w-3" />
+                      <span>{persona.matchingVoices.length} voices</span>
+                    </div>
+                  </div>
+                  {selectedPersona === persona.id && (
+                    <Badge variant="default" className="text-xs">
+                      Selected
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </div>
+      </ScrollArea>
+
+      {/* Selected Persona Details */}
+      {selectedPersonaData && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Star className="h-4 w-4 text-yellow-500" />
+              Selected: {selectedPersonaData.name}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-gray-300">{selectedPersonaData.description}</p>
+            
+            <Separator />
+            
+            <div>
+              <p className="text-xs text-gray-400 mb-2">Key Characteristics:</p>
+              <div className="flex flex-wrap gap-1">
+                {selectedPersonaData.characteristics.map((char) => (
+                  <Badge key={char} variant="secondary" className="text-xs">
+                    {char}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <p className="text-xs text-gray-400 mb-2">Matching Voice Options:</p>
+              <div className="flex flex-wrap gap-1">
+                {selectedPersonaData.matchingVoices.map((voice) => (
+                  <Badge key={voice} variant="outline" className="text-xs flex items-center gap-1">
+                    <Volume2 className="h-2 w-2" />
+                    {voice}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div className="text-center">
+                <p className="text-lg font-bold text-green-500">{selectedPersonaData.popularity}%</p>
+                <p className="text-xs text-gray-400">Popularity</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-blue-500">{selectedPersonaData.complexity}/10</p>
+                <p className="text-xs text-gray-400">Complexity</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
