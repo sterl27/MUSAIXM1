@@ -32,63 +32,34 @@ export default function Home() {
       <UnifiedHeader />
       
       {/* Main Content */}
-      <div className="flex flex-col lg:flex-row min-h-screen">
-        {/* Left Side - Branding and Auth */}
-        <div className="lg:w-1/3 flex flex-col justify-center items-center p-6 lg:p-8 bg-gradient-to-br from-black via-gray-900 to-black">
-          <div className="text-center space-y-6 lg:space-y-8">
-            {/* Logo */}
-            <div className="space-y-3 lg:space-y-4">
-              <div className="w-24 h-24 lg:w-32 lg:h-32 mx-auto rounded-2xl lg:rounded-3xl bg-gradient-to-br from-[#FF4081] to-[#AB47BC] flex items-center justify-center shadow-2xl musaix-glow">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                  <Music className="h-8 w-8 lg:h-10 lg:w-10 text-[#FF4081]" />
-                </div>
-              </div>
-              <h1 className="text-3xl lg:text-5xl font-bold">
-                <span className="musaix-gradient-text">MUSAIX</span>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+        {/* Tools Grid */}
+        <div className="p-6 lg:p-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-8 lg:mb-12">
+              <h1 className="text-4xl lg:text-6xl font-bold mb-4">
+                <span className="musaix-gradient-text">Creative Tools</span>
               </h1>
-              <p className="text-gray-400 text-sm lg:text-base">AI-Powered Music Creation Platform</p>
+              <p className="text-gray-400 text-lg lg:text-xl">Professional AI-powered music production suite</p>
             </div>
-
-            {/* Auth Buttons */}
-            <div className="space-y-3 lg:space-y-4 w-full max-w-xs">
-              <Button 
-                size="lg" 
-                className="w-full bg-gradient-to-r from-[#FF4081] to-[#AB47BC] hover:from-[#FF4081]/90 hover:to-[#AB47BC]/90 text-white font-semibold py-3 px-6 rounded-xl shadow-lg musaix-glow" 
-                asChild
-              >
-                <Link href="/register">Get Started</Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="w-full border-2 border-[#FF4081]/50 text-[#FF4081] hover:bg-[#FF4081]/10 font-semibold py-3 px-6 rounded-xl" 
-                asChild
-              >
-                <Link href="/login">Sign In</Link>
-              </Button>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
+              {tools.map((tool, index) => (
+                <Link key={index} href={tool.href}>
+                  <Card className="h-32 md:h-40 lg:h-48 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-2xl lg:rounded-3xl">
+                    <CardContent className="p-4 lg:p-6 h-full flex flex-col justify-between items-center text-center">
+                      <div className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gradient-to-r ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
+                        <tool.icon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-white font-bold text-xs md:text-sm lg:text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
+                          {tool.title}
+                        </h3>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
             </div>
-          </div>
-        </div>
-
-        {/* Right Side - Tools Grid */}
-        <div className="flex-1 p-4 lg:p-8 bg-gradient-to-br from-gray-900 to-black">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 h-full">
-            {tools.map((tool, index) => (
-              <Link key={index} href={tool.href}>
-                <Card className="h-32 md:h-40 lg:h-48 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-2xl lg:rounded-3xl">
-                  <CardContent className="p-4 lg:p-6 h-full flex flex-col justify-between items-center text-center">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gradient-to-r ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                      <tool.icon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-bold text-xs md:text-sm lg:text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
-                        {tool.title}
-                      </h3>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
           </div>
         </div>
       </div>
