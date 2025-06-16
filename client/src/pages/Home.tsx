@@ -6,16 +6,24 @@ import AnimatedSoundWaveBackground from "@/components/AnimatedSoundWaveBackgroun
 import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User, Grid3X3, Palette, FileText, Target, Volume2, Wand2, TrendingUp, Brain, Sparkles, BarChart3 } from "lucide-react";
 
 export default function Home() {
-  const mainPages = [
-    { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "from-[#FF4081] to-[#AB47BC]", description: "Complete songwriting workspace" },
-    { title: "Analysis Studio", href: "/analysis-studio", icon: BarChart3, color: "from-[#AB47BC] to-[#3F51B5]", description: "Advanced lyric analysis tools" },
-    { title: "Music Player", href: "/music-player", icon: Volume2, color: "from-[#FFC107] to-[#FF4081]", description: "SoundCloud streaming" },
-    { title: "Beat Studio", href: "/beat-studio", icon: Music, color: "from-[#FF4081] to-[#AB47BC]", description: "Professional beat creation" },
-    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#AB47BC] to-[#3F51B5]", description: "AI genre recommendations" },
-    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FFC107] to-[#FF4081]", description: "Write and save lyrics" },
-    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#FF4081] to-[#AB47BC]", description: "Audio production tools" },
-    { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#AB47BC] to-[#3F51B5]", description: "Industry insights" },
-    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FFC107] to-[#FF4081]", description: "Manage your identity" },
+  const drumPads = [
+    // Top Row - Core Studios
+    { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "#FF4081", description: "Complete songwriting workspace", position: "A1" },
+    { title: "Analysis Studio", href: "/analysis-studio", icon: BarChart3, color: "#AB47BC", description: "Advanced lyric analysis tools", position: "A2" },
+    { title: "Music Player", href: "/music-player", icon: Volume2, color: "#FFC107", description: "SoundCloud streaming", position: "A3" },
+    { title: "Beat Studio", href: "/beat-studio", icon: Music, color: "#3F51B5", description: "Professional beat creation", position: "A4" },
+    
+    // Middle Row - Creative Tools
+    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "#FF6B35", description: "AI-powered lyric generation", position: "B1" },
+    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "#8E24AA", description: "Write and save lyrics", position: "B2" },
+    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "#00ACC1", description: "Audio production tools", position: "B3" },
+    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "#FB8C00", description: "AI genre recommendations", position: "B4" },
+    
+    // Bottom Row - Analysis & Tools
+    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "#E53935", description: "Visualize creative intensity", position: "C1" },
+    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "#5E35B1", description: "Analyze flow and cadence", position: "C2" },
+    { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "#00897B", description: "AI complexity analysis", position: "C3" },
+    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "#F4511E", description: "Manage your identity", position: "C4" },
   ];
 
   return (
@@ -46,25 +54,55 @@ export default function Home() {
               </p>
             </div>
             
-            {/* 3x3 Grid */}
-            <div className="grid grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-              {mainPages.map((page, index) => (
-                <Link key={index} href={page.href}>
-                  <Card className="aspect-square bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-xl md:rounded-2xl">
-                    <CardContent className="p-3 md:p-4 lg:p-6 h-full flex flex-col justify-between items-center text-center">
-                      <div className={`w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-lg md:rounded-xl bg-gradient-to-r ${page.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                        <page.icon className="h-4 w-4 md:h-6 md:w-6 lg:h-8 lg:w-8 text-white" />
-                      </div>
-                      <div className="space-y-1 md:space-y-2">
-                        <h3 className="text-white font-bold text-xs md:text-sm lg:text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
-                          {page.title}
+            {/* MIDI Drum Pad Grid - 4x3 Layout */}
+            <div className="grid grid-cols-4 gap-4 md:gap-6 max-w-5xl mx-auto">
+              {drumPads.map((pad, index) => (
+                <Link key={index} href={pad.href}>
+                  <div className="relative group">
+                    {/* MIDI Pad */}
+                    <div 
+                      className="aspect-square bg-gray-900 border-2 border-gray-700 rounded-lg relative overflow-hidden cursor-pointer transition-all duration-200 hover:border-gray-500 active:scale-95 shadow-lg"
+                      style={{
+                        background: `linear-gradient(145deg, #2a2a2a, #1a1a1a)`,
+                        boxShadow: `inset 0 2px 4px rgba(0,0,0,0.3), inset 0 -2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.4)`
+                      }}
+                    >
+                      {/* LED Indicator */}
+                      <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 opacity-30 group-hover:opacity-100 transition-opacity duration-200"></div>
+                      
+                      {/* Pad Number */}
+                      <div className="absolute top-2 left-2 text-xs text-gray-500 font-mono">{pad.position}</div>
+                      
+                      {/* Center Content */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-3">
+                        <div 
+                          className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-200 group-hover:scale-110"
+                          style={{ backgroundColor: pad.color, boxShadow: `0 0 10px ${pad.color}40` }}
+                        >
+                          <pad.icon className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                        </div>
+                        <h3 className="text-white font-bold text-xs md:text-sm text-center leading-tight group-hover:text-gray-300 transition-colors duration-200">
+                          {pad.title}
                         </h3>
-                        <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
-                          {page.description}
-                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
+                      
+                      {/* Bottom Label */}
+                      <div className="absolute bottom-1 left-1 right-1 text-center">
+                        <div className="text-xs text-gray-600 font-mono truncate">{pad.description.split(' ').slice(0, 2).join(' ')}</div>
+                      </div>
+                      
+                      {/* Hover Glow Effect */}
+                      <div 
+                        className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-20 transition-opacity duration-200"
+                        style={{ backgroundColor: pad.color }}
+                      ></div>
+                    </div>
+                    
+                    {/* Tooltip on hover */}
+                    <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-black/90 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                      {pad.description}
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
