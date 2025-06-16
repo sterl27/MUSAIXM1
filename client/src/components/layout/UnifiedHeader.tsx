@@ -49,16 +49,19 @@ export default function UnifiedHeader() {
     { href: "/songwriter", icon: <PenTool size={16} />, label: "Song Writer", description: "Generate complete songs with AI" },
     { href: "/notebook", icon: <BookOpen size={16} />, label: "Song Notebook", description: "Write and save lyrics with AI assistance" },
     { href: "/beat-generator", icon: <Music size={16} />, label: "Beat Generator", description: "Create cinematic beat prompts for production" },
-    { href: "/beat-analyzer", icon: <BarChart3 size={16} />, label: "Beat Analyzer", description: "AI-powered beat analysis and production insights" },
     { href: "/beat-studio", icon: <Settings size={16} />, label: "Beat Studio", description: "Professional beat creation and production workspace" },
-    { href: "/trends-dashboard", icon: <TrendingUp size={16} />, label: "Trends Dashboard", description: "Real-time music industry trends and insights" },
-    { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
-    { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
-    { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
-    { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
     { href: "/sounddesign", icon: <SlidersHorizontal size={16} />, label: "Sound Design", description: "Audio production suggestions" },
     { href: "/style-transformer", icon: <Wand2 size={16} />, label: "Style Transformer", description: "Transform lyrics between styles" },
     { href: "/genre-recommendation", icon: <Target size={16} />, label: "Genre Engine", description: "AI-powered music genre recommendations" },
+    { href: "/structure-formatter", icon: <FileText size={16} />, label: "Structure Formatter", description: "Format your song structure" },
+  ];
+
+  const analysisTools = [
+    { href: "/energy-meter", icon: <Activity size={16} />, label: "Energy Meter", description: "Visualize creative intensity of lyrics" },
+    { href: "/flow-analyzer", icon: <Activity size={16} />, label: "Flow Analyzer", description: "Analyze your flow and cadence" },
+    { href: "/complexity-scoring", icon: <Bot size={16} />, label: "Complexity Scoring", description: "AI-powered lyric complexity analysis" },
+    { href: "/beat-analyzer", icon: <BarChart3 size={16} />, label: "Beat Analyzer", description: "AI-powered beat analysis and production insights" },
+    { href: "/trends-dashboard", icon: <TrendingUp size={16} />, label: "Trends Dashboard", description: "Real-time music industry trends and insights" },
   ];
 
   const explorePages = [
@@ -125,6 +128,37 @@ export default function UnifiedHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-64 bg-black border-gray-700">
                 {creativeTools.map((tool) => (
+                  <DropdownMenuItem key={tool.href} asChild>
+                    <Link href={tool.href}>
+                      <div className="flex items-start gap-3 p-2 w-full cursor-pointer hover:bg-gray-800 rounded-md">
+                        <div className="mt-1 text-[#FF4081]">{tool.icon}</div>
+                        <div className="flex-1">
+                          <div className="font-medium text-white">{tool.label}</div>
+                          <div className="text-xs text-gray-400 mt-1">{tool.description}</div>
+                        </div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Analysis Tools Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className={`text-white hover:text-[#FF4081] hover:bg-white/5 transition-colors ${
+                    analysisTools.some(tool => isActive(tool.href)) ? 'text-[#FF4081] bg-white/5' : ''
+                  }`}
+                >
+                  <BarChart3 size={16} className="mr-2" />
+                  Analysis
+                  <ChevronDown size={16} className="ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-64 bg-black border-gray-700">
+                {analysisTools.map((tool) => (
                   <DropdownMenuItem key={tool.href} asChild>
                     <Link href={tool.href}>
                       <div className="flex items-start gap-3 p-2 w-full cursor-pointer hover:bg-gray-800 rounded-md">
@@ -269,7 +303,7 @@ export default function UnifiedHeader() {
                         Creative Tools
                       </h3>
                       <div className="space-y-0.5">
-                        {creativeTools.slice(0, 8).map((tool) => (
+                        {creativeTools.map((tool) => (
                           <MobileNavItem 
                             key={tool.href}
                             href={tool.href} 
@@ -281,13 +315,13 @@ export default function UnifiedHeader() {
                       </div>
                     </div>
 
-                    {/* More Tools Section */}
+                    {/* Analysis Tools Section */}
                     <div>
                       <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-2">
-                        Advanced Tools
+                        Analysis Tools
                       </h3>
                       <div className="space-y-0.5">
-                        {creativeTools.slice(8).map((tool) => (
+                        {analysisTools.map((tool) => (
                           <MobileNavItem 
                             key={tool.href}
                             href={tool.href} 
