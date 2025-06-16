@@ -28,6 +28,7 @@ import {
   Gauge
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import AnimatedSoundWaveBackground from "@/components/AnimatedSoundWaveBackground";
 
 interface AnalysisResults {
   complexity: {
@@ -212,8 +213,17 @@ export default function AnalysisPage() {
     <div className="min-h-screen bg-black">
       <UnifiedHeader />
       
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="mb-6">
+      <div className="container mx-auto p-6 max-w-7xl relative">
+        {/* Animated Sound Wave Background */}
+        <AnimatedSoundWaveBackground
+          isPlaying={false}
+          tempo={130}
+          intensity={0.6}
+          audioElement={null}
+          className="opacity-25"
+        />
+        
+        <div className="mb-6 relative z-10">
           <h1 className="text-3xl font-bold text-white mb-2">Lyric Analysis Studio</h1>
           <p className="text-gray-400">Comprehensive analysis of complexity, flow, beat matching, and sound signature</p>
         </div>

@@ -99,35 +99,34 @@ export default function AnimatedSoundWaveBackground({
     }
   }, [audioElement]);
 
-  // Detect tempo from audio data
+  // Advanced tempo detection with multiple frequency bands
   const detectTempo = useCallback(() => {
-    if (!analyserRef.current || !timeDataRef.current) return;
+    if (!analyserRef.current || !frequencyDataRef.current) return;
 
-    analyserRef.current.getByteTimeDomainData(timeDataRef.current);
+    analyserRef.current.getByteFrequencyData(frequencyDataRef.current);
     
-    // Simple beat detection based on amplitude peaks
     const currentTime = Date.now();
-    const dataArray = timeDataRef.current;
-    const threshold = 128 + (audioIntensity * 50);
+    const dataArray = frequencyDataRef.current;
     
-    let peakCount = 0;
-    for (let i = 1; i < dataArray.length - 1; i++) {
-      if (dataArray[i] > threshold && 
-          dataArray[i] > dataArray[i - 1] && 
-          dataArray[i] > dataArray[i + 1]) {
-        peakCount++;
-      }
+    // Analyze bass frequencies (20-200 Hz) for beat detection
+    const bassRange = Math.floor(dataArray.length * 0.1); // Roughly 20-200 Hz
+    let bassEnergy = 0;
+    for (let i = 0; i < bassRange; i++) {
+      bassEnergy += dataArray[i];
     }
+    bassEnergy /= bassRange;
     
-    // Update tempo based on peak detection
-    if (currentTime - lastBeatTime.current > 500) { // Minimum 500ms between tempo updates
+    // Detect peaks in bass energy
+    const threshold = 100 + (audioIntensity * 80);
+    const beatDetected = bassEnergy > threshold;
+    
+    if (beatDetected && currentTime - lastBeatTime.current > 300) { // Minimum 300ms between beats
       const timeDiff = currentTime - lastBeatTime.current;
-      if (peakCount > 0) {
-        const detectedBPM = (peakCount * 60000) / timeDiff;
-        if (detectedBPM > 60 && detectedBPM < 200) { // Reasonable BPM range
-          setActualTempo(prev => prev * 0.9 + detectedBPM * 0.1); // Smooth transition
-          beatIntervalRef.current = 60000 / detectedBPM;
-        }
+      const detectedBPM = 60000 / timeDiff;
+      
+      if (detectedBPM > 60 && detectedBPM < 200) {
+        setActualTempo(prev => prev * 0.85 + detectedBPM * 0.15); // Smooth transition
+        beatIntervalRef.current = 60000 / detectedBPM;
       }
       lastBeatTime.current = currentTime;
     }
@@ -161,25 +160,31 @@ export default function AnimatedSoundWaveBackground({
     const tempoMultiplier = actualTempo / 120; // Normalize to 120 BPM
     const beatPhase = (time % beatIntervalRef.current) / beatIntervalRef.current;
     
-    // Beat pulse effect
-    const beatPulse = Math.sin(beatPhase * Math.PI * 2) * 0.3 + 0.7;
+    // Beat pulse effect with enhanced tempo responsiveness
+    const beatPulse = Math.sin(beatPhase * Math.PI * 2) * 0.4 + 0.6;
+    const tempoIntensity = Math.min(tempoMultiplier * 1.5, 2.0);
     
     waveConfigs.forEach((config, index) => {
       ctx.beginPath();
       ctx.strokeStyle = config.color;
       ctx.globalAlpha = config.opacity * (isPlaying ? 1 : 0.3) * beatPulse;
-      ctx.lineWidth = 2 + (currentIntensity * 3);
+      ctx.lineWidth = 2 + (currentIntensity * 4) + (tempoIntensity * 1.5);
       
-      // Calculate wave parameters
-      const amplitude = config.amplitude * (1 + currentIntensity * 2) * beatPulse;
-      const frequency = config.frequency * tempoMultiplier;
-      const phase = config.phase + (time * config.speed * tempoMultiplier);
+      // Enhanced wave parameters with tempo responsiveness
+      const amplitude = config.amplitude * (1 + currentIntensity * 2.5) * beatPulse * tempoIntensity;
+      const frequency = config.frequency * tempoMultiplier * (1 + currentIntensity * 0.5);
+      const phase = config.phase + (time * config.speed * tempoMultiplier * 0.001);
       
-      // Draw wave
-      for (let x = 0; x <= width; x += 2) {
-        const y1 = height / 2 + Math.sin(x * frequency + phase) * amplitude;
-        const y2 = height / 2 + Math.cos(x * frequency * 1.5 + phase + Math.PI / 4) * amplitude * 0.5;
-        const y = (y1 + y2) / 2;
+      // Create more complex wave patterns based on tempo
+      const tempoOffset = (actualTempo - 120) / 120; // Normalized tempo offset
+      
+      // Draw primary wave
+      for (let x = 0; x <= width; x += 1) {
+        const baseWave = Math.sin(x * frequency + phase) * amplitude;
+        const tempoWave = Math.cos(x * frequency * 0.7 + phase + tempoOffset) * amplitude * 0.3;
+        const intensityWave = Math.sin(x * frequency * 2 + phase * 1.5) * amplitude * currentIntensity * 0.2;
+        
+        const y = height / 2 + baseWave + tempoWave + intensityWave;
         
         if (x === 0) {
           ctx.moveTo(x, y);

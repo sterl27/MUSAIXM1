@@ -23,7 +23,16 @@ export default function Home() {
       <UnifiedHeader />
       
       {/* Main Content */}
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black relative">
+        {/* Animated Sound Wave Background */}
+        <AnimatedSoundWaveBackground
+          isPlaying={false}
+          tempo={100}
+          intensity={0.4}
+          audioElement={null}
+          className="opacity-20"
+        />
+        
         {/* Main Pages Grid */}
         <div className="p-6 lg:p-12">
           <div className="max-w-6xl mx-auto">
