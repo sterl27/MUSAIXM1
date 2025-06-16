@@ -5,26 +5,16 @@ import UnifiedHeader from "@/components/layout/UnifiedHeader";
 import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User, Grid3X3, Palette, FileText, Target, Volume2, Wand2, TrendingUp, Brain, Sparkles, BarChart3 } from "lucide-react";
 
 export default function Home() {
-  const tools = [
-    { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Analysis Studio", href: "/analysis-studio", icon: Activity, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Lyric Studio", href: "/lyric-studio", icon: Sparkles, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "SoundCloud Player", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
-    
-    { title: "Beat Generator", href: "/beat-generator", icon: Music, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Beat Studio", href: "/beat-studio", icon: Palette, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#AB47BC] to-[#3F51B5]" },
-    
-    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "from-[#FFC107] to-[#FF4081]" },
-    
-    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Style Transformer", href: "/style-transformer", icon: Wand2, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FF4081] to-[#AB47BC]" },
+  const mainPages = [
+    { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "from-[#FF4081] to-[#AB47BC]", description: "Complete songwriting workspace" },
+    { title: "Analysis Studio", href: "/analysis-studio", icon: BarChart3, color: "from-[#AB47BC] to-[#3F51B5]", description: "Advanced lyric analysis tools" },
+    { title: "Music Player", href: "/music-player", icon: Volume2, color: "from-[#FFC107] to-[#FF4081]", description: "SoundCloud streaming" },
+    { title: "Beat Studio", href: "/beat-studio", icon: Music, color: "from-[#FF4081] to-[#AB47BC]", description: "Professional beat creation" },
+    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#AB47BC] to-[#3F51B5]", description: "AI genre recommendations" },
+    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FFC107] to-[#FF4081]", description: "Write and save lyrics" },
+    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#FF4081] to-[#AB47BC]", description: "Audio production tools" },
+    { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#AB47BC] to-[#3F51B5]", description: "Industry insights" },
+    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FFC107] to-[#FF4081]", description: "Manage your identity" },
   ];
 
   return (
@@ -33,21 +23,35 @@ export default function Home() {
       
       {/* Main Content */}
       <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
-        {/* Tools Grid */}
+        {/* Main Pages Grid */}
         <div className="p-6 lg:p-12">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {tools.map((tool, index) => (
-                <Link key={index} href={tool.href}>
-                  <Card className="h-32 md:h-40 lg:h-48 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-2xl lg:rounded-3xl">
-                    <CardContent className="p-4 lg:p-6 h-full flex flex-col justify-between items-center text-center">
-                      <div className={`w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl lg:rounded-2xl bg-gradient-to-r ${tool.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                        <tool.icon className="h-5 w-5 md:h-6 md:w-6 lg:h-7 lg:w-7 text-white" />
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-12">
+              <h1 className="text-4xl lg:text-5xl font-bold musaix-gradient-text mb-4">
+                Musaix Pro Studio
+              </h1>
+              <p className="text-gray-400 text-lg lg:text-xl max-w-2xl mx-auto">
+                AI-powered music production platform with professional creative tools
+              </p>
+            </div>
+            
+            {/* 3x3 Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {mainPages.map((page, index) => (
+                <Link key={index} href={page.href}>
+                  <Card className="h-48 lg:h-56 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-2xl lg:rounded-3xl">
+                    <CardContent className="p-6 lg:p-8 h-full flex flex-col justify-between items-center text-center">
+                      <div className={`w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-gradient-to-r ${page.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
+                        <page.icon className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
                       </div>
-                      <div>
-                        <h3 className="text-white font-bold text-xs md:text-sm lg:text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
-                          {tool.title}
+                      <div className="space-y-2">
+                        <h3 className="text-white font-bold text-lg lg:text-xl group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
+                          {page.title}
                         </h3>
+                        <p className="text-gray-400 text-sm lg:text-base leading-relaxed">
+                          {page.description}
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
