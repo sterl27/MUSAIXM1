@@ -37,19 +37,19 @@ export default function Home() {
             </div>
             
             {/* 3x3 Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            <div className="grid grid-cols-3 gap-4 md:gap-6 lg:gap-8">
               {mainPages.map((page, index) => (
                 <Link key={index} href={page.href}>
-                  <Card className="h-48 lg:h-56 bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-2xl lg:rounded-3xl">
-                    <CardContent className="p-6 lg:p-8 h-full flex flex-col justify-between items-center text-center">
-                      <div className={`w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-gradient-to-r ${page.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
-                        <page.icon className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
+                  <Card className="aspect-square bg-gray-800/60 hover:bg-gray-700/60 border-2 border-gray-600 hover:border-gray-400 transition-all duration-300 cursor-pointer group hover:scale-105 hover:shadow-2xl musaix-card-border hover:musaix-glow rounded-xl md:rounded-2xl">
+                    <CardContent className="p-3 md:p-4 lg:p-6 h-full flex flex-col justify-between items-center text-center">
+                      <div className={`w-8 h-8 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-lg md:rounded-xl bg-gradient-to-r ${page.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-xl`}>
+                        <page.icon className="h-4 w-4 md:h-6 md:w-6 lg:h-8 lg:w-8 text-white" />
                       </div>
-                      <div className="space-y-2">
-                        <h3 className="text-white font-bold text-lg lg:text-xl group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
+                      <div className="space-y-1 md:space-y-2">
+                        <h3 className="text-white font-bold text-xs md:text-sm lg:text-base group-hover:text-[#FF4081] transition-colors duration-300 leading-tight">
                           {page.title}
                         </h3>
-                        <p className="text-gray-400 text-sm lg:text-base leading-relaxed">
+                        <p className="text-gray-400 text-xs md:text-sm leading-relaxed">
                           {page.description}
                         </p>
                       </div>
