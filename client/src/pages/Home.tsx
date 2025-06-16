@@ -9,17 +9,20 @@ import {
 
 export default function Home() {
   const drumPads = [
+    // Top Row - Core Studios
     { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "#FF4081", description: "Complete songwriting workspace", position: "A1" },
     { title: "Analysis Studio", href: "/analysis-studio", icon: BarChart3, color: "#AB47BC", description: "Advanced lyric analysis tools", position: "A2" },
     { title: "Beat Studio", href: "/beat-studio", icon: Music, color: "#3F51B5", description: "Professional beat creation", position: "A3" },
-    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "#FF6B35", description: "AI-powered lyric generation", position: "A4" },
-    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "#8E24AA", description: "Write and save lyrics", position: "B1" },
-    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "#00ACC1", description: "Audio production tools", position: "B2" },
-    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "#FB8C00", description: "AI genre recommendations", position: "B3" },
-    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "#E53935", description: "Visualize creative intensity", position: "B4" },
-    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "#5E35B1", description: "Analyze flow and cadence", position: "C1" },
-    { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "#00897B", description: "AI complexity analysis", position: "C2" },
-    { title: "Artist Profile", href: "/artist-profile", icon: User, color: "#F4511E", description: "Manage your identity", position: "C3" },
+    
+    // Middle Row - Creative Tools
+    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "#FF6B35", description: "AI-powered lyric generation", position: "B1" },
+    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "#8E24AA", description: "Write and save lyrics", position: "B2" },
+    { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "#00ACC1", description: "Audio production tools", position: "B3" },
+    
+    // Bottom Row - Analysis Tools
+    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "#E53935", description: "Visualize creative intensity", position: "C1" },
+    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "#5E35B1", description: "Analyze flow and cadence", position: "C2" },
+    { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "#00897B", description: "AI complexity analysis", position: "C3" },
   ];
 
   return (
@@ -45,7 +48,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-3 gap-4 md:gap-6 max-w-2xl mx-auto">
             {drumPads.map((pad, index) => (
               <Link key={index} href={pad.href}>
                 <div
