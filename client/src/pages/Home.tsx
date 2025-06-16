@@ -2,28 +2,28 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import UnifiedHeader from "@/components/layout/UnifiedHeader";
-import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User, Grid3X3, Palette, FileText, Target, Volume2, Wand2, TrendingUp, Brain, Sparkles } from "lucide-react";
+import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User, Grid3X3, Palette, FileText, Target, Volume2, Wand2, TrendingUp, Brain, Sparkles, BarChart3 } from "lucide-react";
 
 export default function Home() {
   const tools = [
-    { title: "Lyric Studio", href: "/lyric-studio", icon: Sparkles, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "SoundCloud Player", href: "/music-player", icon: Grid3X3, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Beat Generator", href: "/beat-generator", icon: Music, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Songwriter Studio", href: "/songwriter-studio", icon: PenTool, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Analysis Studio", href: "/analysis-studio", icon: Activity, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Lyric Studio", href: "/lyric-studio", icon: Sparkles, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "SoundCloud Player", href: "/music-player", icon: Grid3X3, color: "from-[#FF4081] to-[#AB47BC]" },
+    
+    { title: "Beat Generator", href: "/beat-generator", icon: Music, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Beat Studio", href: "/beat-studio", icon: Palette, color: "from-[#FFC107] to-[#FF4081]" },
     { title: "Trends Dashboard", href: "/trends-dashboard", icon: TrendingUp, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#AB47BC] to-[#3F51B5]" },
     
-    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Beat Studio", href: "/beat-studio", icon: Palette, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Song Writer", href: "/songwriter", icon: PenTool, color: "from-[#FFC107] to-[#FF4081]" },
+    { title: "Song Notebook", href: "/notebook", icon: BookOpen, color: "from-[#FF4081] to-[#AB47BC]" },
     { title: "Complexity Scoring", href: "/complexity-scoring", icon: Bot, color: "from-[#AB47BC] to-[#3F51B5]" },
+    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "from-[#FFC107] to-[#FF4081]" },
     
-    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "from-[#FFC107] to-[#FF4081]" },
-    { title: "Flow Analyzer", href: "/flow-analyzer", icon: Brain, color: "from-[#FF4081] to-[#AB47BC]" },
+    { title: "Energy Meter", href: "/energy-meter", icon: Activity, color: "from-[#FF4081] to-[#AB47BC]" },
     { title: "Sound Design", href: "/sounddesign", icon: SlidersHorizontal, color: "from-[#AB47BC] to-[#3F51B5]" },
     { title: "Style Transformer", href: "/style-transformer", icon: Wand2, color: "from-[#FFC107] to-[#FF4081]" },
-    
-    { title: "Genre Engine", href: "/genre-recommendation", icon: Target, color: "from-[#FF4081] to-[#AB47BC]" },
-    { title: "Beat Analyzer", href: "/beat-analyzer", icon: TrendingUp, color: "from-[#AB47BC] to-[#3F51B5]" },
-    { title: "Sound Signature", href: "/sound-signature", icon: Volume2, color: "from-[#FFC107] to-[#FF4081]" },
     { title: "Artist Profile", href: "/artist-profile", icon: User, color: "from-[#FF4081] to-[#AB47BC]" },
   ];
 
