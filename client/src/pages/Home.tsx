@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import UnifiedHeader from "@/components/layout/UnifiedHeader";
+import AnimatedSoundWaveBackground from "@/components/AnimatedSoundWaveBackground";
 import { Music, Bot, PenTool, BookOpen, Activity, Video, SlidersHorizontal, User, Grid3X3, Palette, FileText, Target, Volume2, Wand2, TrendingUp, Brain, Sparkles, BarChart3 } from "lucide-react";
 
 export default function Home() {

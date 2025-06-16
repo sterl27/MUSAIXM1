@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import SoundWaveVisualizer from '@/components/SoundWaveVisualizer';
+import AnimatedSoundWaveBackground from '@/components/AnimatedSoundWaveBackground';
 
 declare global {
   interface Window {
@@ -183,7 +184,16 @@ export default function MusicPlayerPage() {
       title="Music Player" 
       description="Stream curated playlists and discover new music"
     >
-      <div className="space-y-6">
+      <div className="space-y-6 relative">
+        {/* Animated Sound Wave Background */}
+        <AnimatedSoundWaveBackground
+          isPlaying={isPlaying}
+          tempo={120}
+          intensity={0.7}
+          audioElement={null}
+          className="opacity-30"
+        />
+        
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
