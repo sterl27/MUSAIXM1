@@ -26,6 +26,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import SoundWaveVisualizer from '@/components/SoundWaveVisualizer';
 
 declare global {
   interface Window {
@@ -487,6 +488,13 @@ export default function MusicPlayerPage() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Sound Wave Visualizer */}
+        <SoundWaveVisualizer 
+          isPlaying={isPlaying}
+          audioElement={null}
+          className="mb-6"
+        />
 
         {/* Quick Actions */}
         <Card className="musaix-card-border bg-black/50">
