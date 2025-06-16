@@ -36,12 +36,6 @@ export default function Home() {
         {/* Tools Grid */}
         <div className="p-6 lg:p-12">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-8 lg:mb-12">
-              <h1 className="text-4xl lg:text-6xl font-bold mb-4">
-                <span className="musaix-gradient-text">Creative Tools</span>
-              </h1>
-              <p className="text-gray-400 text-lg lg:text-xl">Professional AI-powered music production suite</p>
-            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {tools.map((tool, index) => (
                 <Link key={index} href={tool.href}>
