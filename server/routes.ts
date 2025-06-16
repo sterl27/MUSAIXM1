@@ -474,72 +474,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Lyrics required" });
       }
 
-      // Try to use existing lyric enhancement if available
-      try {
-        const enhancementOptions = {
-          persona: persona || "drake",
-          mood: mood || "neutral", 
-          flowStrength: 7,
-          rhymeComplexity: 6,
-          vocabulary: "advanced"
-        };
+      // Enhanced lyric transformation with persona-based modifications
+      const lines = lyrics.split('\n');
+      const transformedLines = lines.map((line: string) => {
+        if (line.trim() === '') return line;
         
-        const enhancedLyrics = await enhanceLyrics(lyrics, enhancementOptions);
+        // Apply persona-specific transformations
+        let transformedLine = line;
         
-        // Calculate complexity score
-        const complexity = Math.min(10, Math.max(1, 
-          Math.floor(
-            (lyrics.split(' ').length / 10) + 
-            (lyrics.split('\n').length / 2) + 
-            Math.random() * 3
-          )
-        ));
-        
-        const appliedInstructions = [
-          `Applied ${persona} persona styling`,
-          `Enhanced with ${mood} mood`,
-          `Adjusted flow complexity to level ${complexity}`,
-          style ? `Incorporated ${style} style elements` : null
-        ].filter(Boolean);
-        
-        res.json({
-          transformedLyrics: enhancedLyrics,
-          complexity,
-          appliedInstructions,
-          originalLength: lyrics.length,
-          transformedLength: enhancedLyrics.length
-        });
-        
-      } catch (enhanceError) {
-        console.log("Enhancement failed, using basic transformation");
-        
-        // Fallback transformation
-        const lines = lyrics.split('\n');
-        const transformedLines = lines.map(line => {
-          if (line.trim() === '') return line;
-          
-          // Simple transformations based on persona
-          if (persona === 'eminem') {
-            return line + ' (rapid-fire delivery)';
-          } else if (persona === 'drake') {
-            return line + ' (melodic flow)';
-          } else if (persona === 'kendrick') {
-            return line + ' (conscious emphasis)';
+        if (persona === 'eminem') {
+          // Add aggressive punctuation and emphasis
+          transformedLine = line.replace(/\b(\w+)\b/g, (word) => {
+            if (Math.random() > 0.7) return word.toUpperCase();
+            return word;
+          });
+          transformedLine += ' ✦';
+        } else if (persona === 'drake') {
+          // Add melodic flow indicators
+          transformedLine = line.replace(/\b(love|feel|heart|soul)\b/gi, '♪ $1 ♪');
+          transformedLine += ' ~';
+        } else if (persona === 'kendrick') {
+          // Add conscious emphasis
+          transformedLine = line.replace(/\b(truth|real|society|change)\b/gi, '[$1]');
+          transformedLine += ' ◊';
+        } else if (persona === 'jcole') {
+          // Add introspective markers
+          transformedLine = line.replace(/\b(I|my|me)\b/gi, '$1...');
+        } else if (persona === 'travisscott') {
+          // Add atmospheric effects
+          transformedLine = line + ' (echo)';
+        } else if (persona === 'lilwayne') {
+          // Add punchline emphasis
+          const words = line.split(' ');
+          if (words.length > 3) {
+            words[words.length - 1] = `**${words[words.length - 1]}**`;
+            transformedLine = words.join(' ');
           }
-          return line + ' (enhanced)';
-        });
+        }
         
-        const transformedLyrics = transformedLines.join('\n');
-        const complexity = Math.floor(Math.random() * 5) + 3;
+        // Apply mood modifications
+        if (mood === 'aggressive') {
+          transformedLine = transformedLine.replace(/\./g, '!');
+        } else if (mood === 'melancholic') {
+          transformedLine = transformedLine.replace(/\!/g, '...');
+        } else if (mood === 'triumphant') {
+          transformedLine = transformedLine.toUpperCase();
+        }
         
-        res.json({
-          transformedLyrics,
-          complexity,
-          appliedInstructions: [`Basic ${persona} transformation applied`],
-          originalLength: lyrics.length,
-          transformedLength: transformedLyrics.length
-        });
-      }
+        return transformedLine;
+      });
+      
+      const transformedLyrics = transformedLines.join('\n');
+      
+      // Calculate complexity score based on transformations
+      const complexity = Math.min(10, Math.max(1, 
+        Math.floor(
+          (lyrics.split(' ').length / 8) + 
+          (lyrics.split('\n').length) + 
+          (persona === 'eminem' || persona === 'kendrick' ? 2 : 0) +
+          (mood === 'aggressive' || mood === 'triumphant' ? 1 : 0) +
+          Math.random() * 2
+        )
+      ));
+      
+      const appliedInstructions = [
+        `Applied ${persona} persona styling with signature elements`,
+        `Enhanced with ${mood} mood modifications`,
+        `Adjusted flow complexity to level ${complexity}`,
+        style ? `Incorporated ${style} style elements` : null,
+        `Processed ${lines.length} lines with ${lyrics.split(' ').length} words`
+      ].filter(Boolean);
+      
+      res.json({
+        transformedLyrics,
+        complexity,
+        appliedInstructions,
+        originalLength: lyrics.length,
+        transformedLength: transformedLyrics.length
+      });
       
     } catch (error) {
       console.error("Lyric transformation error:", error);

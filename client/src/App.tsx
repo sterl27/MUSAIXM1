@@ -25,6 +25,7 @@ import BeatAnalyzer from "@/pages/BeatAnalyzer";
 import BeatStudio from "@/pages/BeatStudio";
 import TrendsDashboard from "@/pages/TrendsDashboard";
 import GenreRecommendation from "@/pages/GenreRecommendation";
+import UnifiedDashboard from "@/pages/UnifiedDashboard";
 
 function Router() {
   return (
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/beat-studio" component={BeatStudio} />
       <Route path="/trends-dashboard" component={TrendsDashboard} />
       <Route path="/genre-recommendation" component={GenreRecommendation} />
+      <Route path="/lyric-studio" component={UnifiedDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
